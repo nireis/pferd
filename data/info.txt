@@ -1,0 +1,53 @@
+Info
+
+
+Format Information:
+
+Data Types:
+<INT>
+<INT>
+<INT> <DOUBLE> <DOUBLE> <INT>
+...
+...
+<INT> <INT> <INT> <INT>
+...
+...
+
+Data Information:
+<#Nodes>
+<#Edges>
+<NodeID> <Lat> <Lon> <Elevation> * <#Nodes>
+<NodeID> <NodeID> <Distance> <Street Type> * <#Edges>
+
+
+15000K.txt
+
+Nodes: 15172432
+Edges: 31047230
+Size of biggest strong connected component: 15015864
+
+
+
+1500K: 
+
+Area: lat > 47.5, lat < 49.5, lon > 8.4, lon < 9.835;
+
+Nodes: 1500351
+Edges: 3071416
+Size of biggest strong connected component: 1474588
+
+150K: 
+
+Area: lat > 48.55, lat < 49, lon > 8.508, lon < 9;
+
+Nodes: 149910
+Edges: 309641
+Size of biggest strong connected component: 147388
+
+15K: 
+
+Area: lat > 48.315, lat < 48.5, lon > 9.032, lon < 9.2;
+
+Nodes: 15046
+Edges: 31261
+Size of biggest strong connected component: 14511
