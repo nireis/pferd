@@ -8,7 +8,7 @@ class Graph {
 	public:
 
 		struct Simple_Edge {
-			unsigned int distance; // negative distanz sinnvoll?
+			unsigned int distance; // negative distanz nicht sinnvoll!
 			unsigned int source;
 			unsigned int target;
 		};
