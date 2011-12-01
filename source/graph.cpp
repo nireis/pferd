@@ -35,3 +35,33 @@ Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, // Graph klein initialis
 	nodes = n;
 	edges = e;
 }
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::initOffsets(){
+}
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::initShortcutOffsets(){
+}
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::clearShortcuts(){
+}
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::addShortcut(S& sc){
+}
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::getEdges(unsigned int node_id, E** aedges, int& count){
+}
+
+template <typename E, typename N, typename S>
+void Graph<E, N, S>::sortEdgesBy(bool sortby){
+}
+
+/* methoden implementieren, um:
+  * graph zu initialisieren -> offsets setzen
+  * shortuts zu verwalten
+  * gewichte/auslastung der kanten zu verwalten
+  */

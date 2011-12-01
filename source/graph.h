@@ -47,10 +47,6 @@ class Graph {
 				// Uebergeben werden: anzahl der Edges/Nodes; 
 				// Pointer auf Array mit Instanzen der Edges/Nodes
 
-				// E** ie, E** oe, // die offsets kann die klasse selber machen.
-				// sinnvoller? trennt parsen des graphen vom aufbau.
-				// S** is, S** os); // die shortcuts kommen viel spaeter hinzu.
-
 		void initOffsets();
 
 		void initShortcutOffsets();
