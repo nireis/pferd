@@ -86,8 +86,14 @@ class Graph {
 				Simple_Edge** ie, Simple_Edge** oe,
 				Shortcut** is, Shortcut** os);
 
+		Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
+				Simple_Node* sn, Simple_Edge* se);
+				// Simple_Edge** ie, Simple_Edge** oe, // die offsets kann die klasse selber machen.
+				// sinnvoller? trennt parsen des graphen vom aufbau.
+				// Shortcut** is, Shortcut** os); // die shortcuts kommen viel spaeter hinzu.
+
 		/* methoden implementieren, um:
-		  * graph zu initialisieren
+		  * graph zu initialisieren -> offsets setzen
 		  * shortuts zu verwalten
 		  * gewichte/auslastung der kanten zu verwalten
 		  */

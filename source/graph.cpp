@@ -24,3 +24,11 @@ Graph::Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
 	in_shortcuts = is;
 	out_shortcuts = os;
 }
+
+Graph::Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
+		Simple_Node* sn, Simple_Edge* se){
+	node_count = nc;
+	edge_count = ec;
+	nodes = sn;
+	edges = se;
+}
