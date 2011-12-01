@@ -1,6 +1,7 @@
 #include "graph.h"
 
-Graph::Graph(){
+template <typename E, typename N, typename S>
+Graph<E, N, S>::Graph(){
 	node_count = 0;
 	edge_count = 0;
 	nodes = 0;
@@ -11,24 +12,26 @@ Graph::Graph(){
 	out_shortcuts = 0;
 }
 
-Graph::Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
-		Simple_Node* sn, Simple_Edge* se,
-		Simple_Edge** ie, Simple_Edge** oe,
-		Shortcut** is, Shortcut** os){
+template <typename E, typename N, typename S>
+Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
+		N* n, E* e,
+		E** ie, E** oe,
+		S** is, S** os){
 	node_count = nc;
 	edge_count = ec;
-	nodes = sn;
-	edges = se;
+	nodes = n;
+	edges = e;
 	in_edges = ie;
 	out_edges = oe;
 	in_shortcuts = is;
 	out_shortcuts = os;
 }
 
-Graph::Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
-		Simple_Node* sn, Simple_Edge* se){
+template <typename E, typename N, typename S>
+Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
+		N* n, E* e){
 	node_count = nc;
 	edge_count = ec;
-	nodes = sn;
-	edges = se;
+	nodes = n;
+	edges = e;
 }

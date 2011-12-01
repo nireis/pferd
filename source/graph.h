@@ -2,60 +2,16 @@
 #define graph_h
 
 #include <list>
+#include "structs.h"
 
+// welche kanten/knoten der graph nutzt soll variabel sein
+// wir wollen ein wenig rumexperimentieren, wie die datenstrukturen
+// sich im platzverbrauch verhalten, ob uns also auch ne groessere 
+// struktur wehtun wuerde
+// E ~ Edges , N  ~ Nodes , S ~ Shortcuts
+template <typename E, typename N, typename S> 
 class Graph {
-
-	public:
-
-		struct Simple_Edge {
-			unsigned int distance; // negative distanz sinnvoll?
-			unsigned int source;
-			unsigned int target;
-		};
 	
-		struct Edge : public Simple_Edge {
-			unsigned char type;
-			unsigned int id; // damit man kanten im kantenarray finden kann
-			// alternativ, statt ID, die differenz des zeigers auf Kante und
-			// des zeigers auf anfang des arrays benutzen...
-		};
-
-		struct Shortcut : public Simple_Edge {
-			Edge* from;
-			bool from_is_sc; // damit wir wissen, ob dies ein shortcut ist,
-			Edge* to;			// der weiter aufgemacht gehoert
-			bool to_is_sc;
-		};
-
-//		class ShortcutList { //shortcuts wollen wir oft erstellen
-//			private:				// und spaeter durch neue ersetzen, daher listen
-//				std::list<Shortcut> liste;
-//			public: // das ganze pipen
-//		};
-//
-//		class EdgeList {
-//			private:
-//				std::list<unsigned int> liste; // wir nutzen die IDs der kanten
-//				// diese spaeter einfach durchlaufen und auslastung aktualisieren
-//			public: // das ganze pipen
-//		};
-
-		struct Simple_Node {
-			//int id; // durch arrayindex gegeben
-			unsigned int in_edge_offset; // offset fuer array der eingehenden kanten
-			unsigned int out_edge_offset;
-
-		//	std::list<Shortcut>* in_shortcuts; //listen einkommender/ausgehender shortcuts
-		//	std::list<Shortcut>* out_shortcuts;
-		};
-		
-		struct Node : public Simple_Node {
-			float lat;
-			float lon;
-			int elevation;
-		};
-	
-
 	private:
 
 		unsigned int node_count;
@@ -64,33 +20,48 @@ class Graph {
 		//voererst alles simpel halten
 		// statischer teil des graphen
 		//
-		Simple_Node* nodes; // arrays aller kanten und knoten
-		Simple_Edge* edges;
+		N* nodes; // arrays aller kanten und knoten
+		E* edges;
 	
-		Simple_Edge** in_edges; // arrays von pointern auf kanten
-		Simple_Edge** out_edges; // hierrin suchen wir mit den offsets nach kanten
+		E** in_edges; // arrays von pointern auf kanten
+		E** out_edges; // hierrin suchen wir mit den offsets nach kanten
 		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
 
-		// dynamischer teil des graphen, Shortcuts
+		// dynamischer teil des graphen, Ss
 
-		std::list<Shortcut> shortcuts; //alle shortscuts
+		std::list<S> shortcuts; //alle shortscuts
 
-		Shortcut** in_shortcuts; // array mit pointern
-		Shortcut** out_shortcuts;// auf shortcuts
+		S** in_shortcuts; // array mit pointern
+		S** out_shortcuts;// auf shortcuts
 		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
 	public:
 
 		Graph();
 		Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
-				Simple_Node* sn, Simple_Edge* se,
-				Simple_Edge** ie, Simple_Edge** oe,
-				Shortcut** is, Shortcut** os);
+				N* n, E* e,
+				E** ie, E** oe,
+				S** is, S** os);
 
 		Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
-				Simple_Node* sn, Simple_Edge* se);
-				// Simple_Edge** ie, Simple_Edge** oe, // die offsets kann die klasse selber machen.
+				N* n, E* e);
+				// Uebergeben werden: anzahl der Edges/Nodes; 
+				// Pointer auf Array mit Instanzen der Edges/Nodes
+
+				// E** ie, E** oe, // die offsets kann die klasse selber machen.
 				// sinnvoller? trennt parsen des graphen vom aufbau.
-				// Shortcut** is, Shortcut** os); // die shortcuts kommen viel spaeter hinzu.
+				// S** is, S** os); // die shortcuts kommen viel spaeter hinzu.
+
+		void initOffsets();
+
+		void initShortcutOffsets();
+
+		void clearShortcuts();
+
+		void addShortcut(S& sc);
+		
+		void getEdges(unsigned int node_id, E** aedges, int& count);
+
+		void sortEdgesBy(bool sortby);
 
 		/* methoden implementieren, um:
 		  * graph zu initialisieren -> offsets setzen
