@@ -17,15 +17,19 @@ class Graph {
 		unsigned int node_count;
 		unsigned int edge_count;
 	
-		//voererst alles simpel halten
 		// statischer teil des graphen
-		//
-		N* nodes; // arrays aller kanten und knoten
+		
+		// arrays aller kanten und knoten
+		N* nodes; 
+		// nodes muss groesse node_count+1 haben! 
+		// der letzte ist ein dummy, damit das mit den offsets klappt
 		E* edges;
-	
+		
 		E** in_edges; // arrays von pointern auf kanten
-		E** out_edges; // hierrin suchen wir mit den offsets nach kanten
+		// hierrin suchen wir mit den offsets nach kanten
 		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
+		// E** out_edges; - ist redundant, siehe implementierung in der .cpp
+		// anhand der offsets kann man direkt in E* edges die ausgehenden kanten finden
 
 		// dynamischer teil des graphen, Ss
 
@@ -46,8 +50,12 @@ class Graph {
 				N* n, E* e);
 				// Uebergeben werden: anzahl der Edges/Nodes; 
 				// Pointer auf Array mit Instanzen der Edges/Nodes
+				//  WICHTIG: N* n - die nodes sind genau _nc+1_ nodes,
+				//  der letzte ein dummy mit offsets=0
+		
+		~Graph();
 
-		void initOffsets();
+		void initOffsets(); // done
 
 		void initShortcutOffsets();
 
@@ -56,8 +64,6 @@ class Graph {
 		void addShortcut(S& sc);
 		
 		void getEdges(unsigned int node_id, E** aedges, int& count);
-
-		void sortEdgesBy(bool sortby);
 
 		/* methoden implementieren, um:
 		  * graph zu initialisieren -> offsets setzen
