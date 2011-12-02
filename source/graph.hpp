@@ -1,4 +1,11 @@
-#include "graph.h"
+/*
+ * Diese Datei gibt es nur, 
+ * damit die graph.h nicht aufgebläht wird.
+ * ja nicht irgendwo includieren ausser in die graph.h
+ */
+
+#ifndef graph_hpp
+#define graph_hpp
 
 template <typename E, typename N, typename S>
 Graph<E, N, S>::Graph(){
@@ -72,7 +79,7 @@ void Graph<E, N, S>::initOffsets(){
 	// wenn wir uns die incoming-edges fuer jeden knoten merken,
 	// brauchen wir das spaeter nur in die offsets reinzusetzen. 
 
-	for(int i = 0; i < node_count; i++){ // durchlaufe alle nodes
+	for(unsigned int i = 0; i < node_count; i++){ // durchlaufe alle nodes
 		
 		number_of_edges = 0;
 		while(edges[j].source == i){ // zu jedem node zaehle ausgehende kanten
@@ -90,7 +97,7 @@ void Graph<E, N, S>::initOffsets(){
 
 	j = 0;
 	// nun die incoming edges verteilen
-	for(int i = 0; i < node_count; i++){
+	for(unsigned int i = 0; i < node_count; i++){
 		// summiere offsets von vorne, damit die differenzen spaeter stimmen
 		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
 		while( !edge_pointers_of_incomming_edges_for_nodes[i].empty() ){
@@ -118,11 +125,25 @@ void Graph<E, N, S>::addShortcut(S& sc){
 }
 
 template <typename E, typename N, typename S>
-void Graph<E, N, S>::getEdges(unsigned int node_id, E** aedges, int& count){
+std::list<E*> Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
+	std::list<E*> l;
+	return l;
 }
 
-/* methoden implementieren, um:
-  * graph zu initialisieren -> offsets setzen
-  * shortuts zu jerwalten
-  * gewichte/auslastung der kanten zu jerwalten
-  */
+template <typename E, typename N, typename S>
+std::list<E*> Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
+	std::list<E*> l;
+	return l;
+}
+
+// template <typename E, typename N, typename S>
+// void Graph<E, N, S>::getAdjOutEdges(unsigned int node_id, 
+// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
+// }
+// 
+// template <typename E, typename N, typename S>
+// void Graph<E, N, S>::getAdjInEdges(unsigned int node_id, 
+// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
+// }
+
+#endif
