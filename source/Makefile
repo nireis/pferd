@@ -1,4 +1,3 @@
-
 all: pferd
 
 pferd: pferd.o graph.o

@@ -59,7 +59,7 @@ class Graph {
 
 		void initShortcutOffsets();
 
-		void clearShortcuts();
+		void clearShortcuts(); // done
 
 		void addShortcut(S& sc);
 		

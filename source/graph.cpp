@@ -44,6 +44,7 @@ Graph<E, N, S>::~Graph(){
 	delete[] in_edges; in_edges = 0;
 	delete[] in_shortcuts; in_shortcuts = 0;
 	delete[] out_shortcuts; out_shortcuts = 0;
+	shortcuts.clear();
 }
 
 template <typename E, typename N, typename S>
@@ -56,7 +57,10 @@ template <typename E, typename N, typename S>
  *  über die in_offsets in den nodes
  */
 void Graph<E, N, S>::initOffsets(){
-	in_edges = new N*[edge_count];
+	if (!edges || !nodes || !node_count || !edge_count)
+		return;
+
+	in_edges = new E*[edge_count];
 
 	// voraussetzung, damit das alles funktioniert, ist,
 	// dass die kanten den sources nach aufsteigend sortiert sind,
@@ -80,7 +84,8 @@ void Graph<E, N, S>::initOffsets(){
 			number_of_edges++;
 			j++;
 		}
-		nodes[i+1] = nodes[i] + number_of_edges; //setze offset
+		nodes[i+1].out_edge_offset = nodes[i].out_edge_offset 
+			+ number_of_edges; //setze offset
 	}
 
 	j = 0;
@@ -90,7 +95,8 @@ void Graph<E, N, S>::initOffsets(){
 		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
 		while( !edge_pointers_of_incomming_edges_for_nodes[i].empty() ){
 			// gib die pointer auf die zugehörigen edges in das array
-			in_edges[j] = & edge_pointers_of_incomming_edges_for_nodes[i].pop_front();
+			in_edges[j] = edge_pointers_of_incomming_edges_for_nodes[i].front();
+			edge_pointers_of_incomming_edges_for_nodes[i].pop_front();
 			j++;
 		}
 	}
