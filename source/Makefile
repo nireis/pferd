@@ -1,11 +1,32 @@
+CC = g++
+CFLAGS = -Wall -g
+LDFLAGS = 
+BIN =pferd
 
-all: pferd
+# zu jeder X.cpp datei, die kompiliert wird, hier in
+# OBJ eine entsprechende X.o file anlegen lassen
+CPP =pferd.cpp graphalgs.cpp
+OBJ =pferd.o graphalgs.o
 
-pferd: pferd.o graph.o
-	$(CC) -o $@ $^
+all: $(OBJ)
+	$(CC) $(CFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
+
+# es werden all .cpp dateien kompiliert
+$(OBJ):
+	$(CC) $(CFLAGS) -c $(CPP)
 
 clean:
-	rm -f pferd *.o
+	rm -f $(BIN) $(OBJ)
 
 .PHONY: all clean
 
+#all: pferd
+#
+#pferd: pferd.o
+#	$(CC) -o $@ $^
+#
+#clean:
+#	rm -f pferd *.o
+#
+#.PHONY: all clean
+#
