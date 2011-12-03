@@ -6,6 +6,7 @@
 #define parser_h
 
 #include "structs.h"
+#include <cstdlib>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -20,12 +21,20 @@ private:
 
 	/*
 	 * createNode - erstellt einen neuen Knoten
+	 * @variables
+	 * string - aus datei eingelesene Zeile
+	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	Node* createNode(string);
+	void createNode(string, Node*);
+
 	/*
 	 * createEdge - erstellt eine neue Kante
+	 * @variables
+	 * string - aus datei eingelesene Zeile
+	 * unsinged int - Indexstelle des Arrays, KantenID
+	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	Edge* createEdge(string,int);
+	void createEdge(string,unsigned int, Edge*);
 public:
 	/*
 	 *default constructer

@@ -16,10 +16,8 @@ parser::~parser(void)
 {
 }
 
-Node* parser::createNode(string inputString)
+void parser::createNode(string inputString, Node* rNode)
 {
-	//Rückgabewert
-	Node* rNode;
 	rNode->in_edge_offset = 0;
 	rNode->out_edge_offset = 0;
 
@@ -27,7 +25,7 @@ Node* parser::createNode(string inputString)
 	string::iterator itr1;
 	string::iterator itr2 = inputString.begin();
 	//Zahlvaribale für die Zuweisung der einzelnen Node-Variablen
-	int currentComponent = 1;
+	unsigned int currentComponent = 1;
 	//Temporäre Variable vom Typ String, weil ich gerade zu blöd bin es ohne zu machen
 	string tempStr;
 
@@ -43,42 +41,38 @@ Node* parser::createNode(string inputString)
 			}
 			else if(currentComponent == 2)
 			{
-				tempStr.append(itr2, itr1);
+				tempStr.assign(itr2, itr1);
 				rNode->lat = atof(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 3)
 			{
-				tempStr.append(itr2, itr1);
+				tempStr.assign(itr2, itr1);
 				rNode->lon = atof(tempStr.c_str());
-				currentComponent++;
-				itr2 = (itr1 + 1);
-			}
-			else if(currentComponent == 4)
-			{
-				tempStr.append(itr2, itr1);
-				rNode->elevation = atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 		}
 	}
 
-	return rNode;
+	/*
+	 * Die Schleife wird verlassen sobald itr1 das ende der Zeile erreicht hat,
+	 * und somit kann das letzte Element der Zeile nicht innerhalb der Schleife eingelesen werde
+	 */
+	tempStr.assign(itr2, itr1);
+	rNode->elevation = atoi(tempStr.c_str());
 }
 
-Edge* parser::createEdge(string inputString, int nodeID)
+void parser::createEdge(string inputString, unsigned int nodeID, Edge* rEdge)
 {
-	//Rückgabewert
-	Edge* rEdge;
 	rEdge->id = nodeID;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
 	string::iterator itr2 = inputString.begin();
 	//Zahlvaribale für die Zuweisung der einzelnen Node-Variablen
-	int currentComponent = 1;
+	unsigned int currentComponent = 1;
 	//Temporäre Variable vom Typ String, weil ich gerade zu blöd bin es ohne zu machen
 	string tempStr;
 
@@ -88,36 +82,34 @@ Edge* parser::createEdge(string inputString, int nodeID)
 	    {
 			if(currentComponent == 1)
 			{
-				tempStr.append(itr2, itr1);
+				tempStr.assign(itr2, itr1);
 				rEdge->source = atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 2)
 			{
-				tempStr.append(itr2, itr1);
+				tempStr.assign(itr2, itr1);
 				rEdge->target = atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 3)
 			{
-				tempStr.append(itr2, itr1);
+				tempStr.assign(itr2, itr1);
 				rEdge->distance = atoi(tempStr.c_str());
-				currentComponent++;
-				itr2 = (itr1 + 1);
-			}
-			else if(currentComponent == 4)
-			{
-				tempStr.append(itr2, itr1);
-				rEdge->type = atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 		}
 	}
-
-	return rEdge;
+	/*
+	 * Die Schleife wird verlassen sobald itr1 das ende der Zeile erreicht hat,
+	 * und somit kann das letzte Element der Zeile nicht innerhalb der Schleife eingelesen werde
+	 */
+	tempStr.assign(itr2, itr1);
+	// Vorsicht! Die Doku der Quelldatei spricht hier zwar von integer, aber nirei hielt char* für eine gute Idee
+	rEdge->type = *(tempStr.c_str());
 }
 
 bool parser::readFile(string filename)
@@ -126,7 +118,7 @@ bool parser::readFile(string filename)
 	int currentline = 1;
 
 	ifstream file;
-	file.open(filename, ios::in);
+	file.open(filename.c_str(), ios::in);
 
 	if( file.is_open())
 	{
@@ -145,13 +137,13 @@ bool parser::readFile(string filename)
 				EdgeCount = atoi(buffer.c_str());
 				graphEdges = new Edge[EdgeCount];
 			}
-			else if(2 < currentline < (NodeCount+3) && buffer.size() > 1)
+			else if(2 < currentline && currentline < (NodeCount+3) && buffer.size() > 1)
 			{
-				graphNodes[currentline -3] = *(createNode(buffer));
+				createNode(buffer, &graphNodes[currentline -3]);
 			}
-			else if((NodeCount+2) < currentline < (NodeCount+EdgeCount+3) && buffer.size() > 1)
+			else if((NodeCount+2) < currentline && currentline < (NodeCount+EdgeCount+3) && buffer.size() > 1)
 			{
-				graphEdges[currentline -NodeCount -3] = *(createEdge(buffer,(currentline -NodeCount -3)));
+				createEdge(buffer, (currentline -NodeCount -3), &graphEdges[currentline -NodeCount -3]);
 			}
 			else
 			{
@@ -172,8 +164,6 @@ bool parser::readFile(string filename)
 	{
 		return false;
 	}
-
-	file.close();
 }
 
 int parser::getNodeCount()
