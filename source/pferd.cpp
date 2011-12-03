@@ -12,16 +12,16 @@ int main(){
 	g.initShortcutOffsets();
 	Shortcut s;
 	g.addShortcut(s);
-	g.getAdjOutEdges(0);
-	g.getAdjInEdges(0);
+	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
+	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
 	 ///*
-	unsigned int a = 1;
-	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = Graph<Edge, Node, Shortcut>::OutEdgesOfNode(a, &g);
-	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = Graph<Edge, Node, Shortcut>::InEdgesOfNode(a, &g);
-	Edge e;
-	oe.getEdge(a-1, e);
-	oe.getEdge(a, e);
-	 //*/
+// 	unsigned int a = 1;
+// 	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = Graph<Edge, Node, Shortcut>::OutEdgesOfNode(a, &g);
+// 	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = Graph<Edge, Node, Shortcut>::InEdgesOfNode(a, &g);
+// 	Edge e;
+// 	oe.getEdge(a-1, e);
+// 	oe.getEdge(a, e);
+// 	 //*/
 	
 	/*
 	 * Test der Graphalgs Klasse!

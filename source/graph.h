@@ -104,9 +104,20 @@ class Graph {
 
 		void addShortcut(S& sc);
 
-		OutEdgesOfNode getAdjOutEdges(unsigned int node_id);
+		/*
+		 * Die Implementierung dieser beiden Methoden im Header
+		 * spart Stress in der graph.cpp, 
+		 * der aufgrund der templates aufkommt
+		 */
+		OutEdgesOfNode getAdjOutEdges(unsigned int node_id){
+			// OutEdgesOfNode oe =& OutEdgesOfNode(node_id, this);
+			return OutEdgesOfNode(node_id, this);
+		}
 
-		InEdgesOfNode getAdjInEdges(unsigned int node_id);
+		InEdgesOfNode getAdjInEdges(unsigned int node_id){
+			// InEdgesOfNode ie = InEdgesOfNode(node_id, this);
+			return InEdgesOfNode(node_id, this);
+		}
 
 		/* methoden implementieren, um:
 		  * graph zu initialisieren -> offsets setzen

@@ -126,7 +126,7 @@ bool parser::readFile(string filename)
 	int currentline = 1;
 
 	ifstream file;
-	file.open(filename, std::ios_base::in);
+	file.open(filename.c_str(), std::ifstream::in);
 
 	if( file.is_open())
 	{
@@ -173,8 +173,6 @@ bool parser::readFile(string filename)
 	{
 		return false;
 	}
-
-	file.close();
 }
 
 int parser::getNodeCount()

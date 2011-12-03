@@ -124,17 +124,17 @@ template <typename E, typename N, typename S>
 void Graph<E, N, S>::addShortcut(S& sc){
 }
 
-template <typename E, typename N, typename S>
-Graph::OutEdgesOfNode Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
-	Graph<E, N, S>::OutEdgesOfNode oe = OutEdgesOfNode(node_id, this);
-	return oe;
-}
-
-template <typename E, typename N, typename S>
-Graph::InEdgesOfNode Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
-	Graph<E, N, S>::InEdgesOfNode ie = InEdgesOfNode(node_id, this);
-	return ie;
-}
+// template <typename E, typename N, typename S>
+// Graph::OutEdgesOfNode Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
+// 	Graph<E, N, S>::OutEdgesOfNode oe = OutEdgesOfNode(node_id, this);
+// 	return oe;
+// }
+// 
+// template <typename E, typename N, typename S>
+// Graph::InEdgesOfNode Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
+// 	Graph<E, N, S>::InEdgesOfNode ie = InEdgesOfNode(node_id, this);
+// 	return ie;
+// }
 
 template <typename E, typename N, typename S>
 Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
@@ -158,8 +158,7 @@ Graph<E, N, S>::OutEdgesOfNode::~OutEdgesOfNode(){
 template <typename E, typename N, typename S>
 Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
 	this->node_id = node_id;
-	this->edge_count = g->nodes[this->node_id+1].out_edge_offset 
-		- g->nodes[this->node_id].out_edge_offset;
+	this->edge_count = g->nodes[this->node_id+1].out_edge_offset - g->nodes[this->node_id].out_edge_offset;
 	this->nodes_array_base = 0;
 	if(this->node_id < g->node_count)
 		this->nodes_array_base = & g->edges[g->nodes[this->node_id].out_edge_offset];
