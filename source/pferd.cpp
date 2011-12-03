@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "graphalgs.cpp"
 
 int main(){
 	
@@ -13,6 +14,12 @@ int main(){
 	g.getAdjOutEdges(0);
 	g.getAdjInEdges(0);
 	// */
+	
+	/*
+	 * Test der Graphalgs Klasse!
+	 */
+	Graphalgs ga = Graphalgs(&g);
+	ga.Dijkstra(0);
 
 	return 0;
 }

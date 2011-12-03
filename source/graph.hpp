@@ -19,7 +19,7 @@ Graph<E, N, S>::Graph(){
 }
 
 template <typename E, typename N, typename S>
-Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, // Graph jon aussen setzen
+Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
 		N* n, E* e,
 		E** ie, E** oe,
 		S** is, S** os){
