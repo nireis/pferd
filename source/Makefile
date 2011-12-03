@@ -5,8 +5,8 @@ BIN =pferd
 
 # zu jeder X.cpp datei, die kompiliert wird, hier in
 # OBJ eine entsprechende X.o file anlegen lassen
-CPP =pferd.cpp graphalgs.cpp
-OBJ =pferd.o graphalgs.o
+CPP =pferd.cpp graphalgs.cpp parser.cpp
+OBJ =pferd.o graphalgs.o parser.o
 
 all: $(OBJ)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)

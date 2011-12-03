@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "graphalgs.h"
+#include "parser.h"
 
 int main(){
 	
@@ -27,6 +28,9 @@ int main(){
 	 */
 	Graphalgs ga = Graphalgs(&g);
 	ga.Dijkstra(0);
+
+	parser p = parser();
+	p.readFile("../data/15K.txt");
 
 	return 0;
 }

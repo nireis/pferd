@@ -16,10 +16,10 @@ parser::~parser(void)
 {
 }
 
-Node* parser::createNode(string inputString)
+Node* parser::createNode(string inputString, Node* rNode)
 {
 	//Rückgabewert
-	Node* rNode;
+	// Node* rNode;
 	rNode->in_edge_offset = 0;
 	rNode->out_edge_offset = 0;
 
@@ -58,7 +58,7 @@ Node* parser::createNode(string inputString)
 			else if(currentComponent == 4)
 			{
 				tempStr.append(itr2, itr1);
-				rNode->elevation = atoi(tempStr.c_str());
+				rNode->elevation = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
@@ -68,11 +68,11 @@ Node* parser::createNode(string inputString)
 	return rNode;
 }
 
-Edge* parser::createEdge(string inputString, int nodeID)
+Edge* parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 {
 	//Rückgabewert
-	Edge* rEdge;
-	rEdge->id = nodeID;
+	// Edge* rEdge;
+	rEdge->id = edgeID;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
@@ -89,28 +89,28 @@ Edge* parser::createEdge(string inputString, int nodeID)
 			if(currentComponent == 1)
 			{
 				tempStr.append(itr2, itr1);
-				rEdge->source = atoi(tempStr.c_str());
+				rEdge->source = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 2)
 			{
 				tempStr.append(itr2, itr1);
-				rEdge->target = atoi(tempStr.c_str());
+				rEdge->target = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 3)
 			{
 				tempStr.append(itr2, itr1);
-				rEdge->distance = atoi(tempStr.c_str());
+				rEdge->distance = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 4)
 			{
 				tempStr.append(itr2, itr1);
-				rEdge->type = atoi(tempStr.c_str());
+				rEdge->type = (unsigned char)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
@@ -126,7 +126,7 @@ bool parser::readFile(string filename)
 	int currentline = 1;
 
 	ifstream file;
-	file.open(filename, ios::in);
+	file.open(filename, std::ios_base::in);
 
 	if( file.is_open())
 	{
@@ -137,21 +137,22 @@ bool parser::readFile(string filename)
 
 			if(currentline == 1 && buffer.size() > 1)
 			{
-				NodeCount = atoi(buffer.c_str());
+				NodeCount = (unsigned int)atoi(buffer.c_str());
 				graphNodes = new Node[NodeCount+1];
 			}
 			else if(currentline == 2 && buffer.size() > 1)
 			{
-				EdgeCount = atoi(buffer.c_str());
+				EdgeCount = (unsigned int)atoi(buffer.c_str());
 				graphEdges = new Edge[EdgeCount];
 			}
-			else if(2 < currentline < (NodeCount+3) && buffer.size() > 1)
+			else if(2 < currentline &&  currentline < (NodeCount+3) && buffer.size() > 1)
 			{
-				graphNodes[currentline -3] = *(createNode(buffer));
+				graphNodes[currentline -3] = *(createNode(buffer, &graphNodes[currentline -3]));
 			}
-			else if((NodeCount+2) < currentline < (NodeCount+EdgeCount+3) && buffer.size() > 1)
+			else if((NodeCount+2) < currentline && currentline < (NodeCount+EdgeCount+3) && buffer.size() > 1)
 			{
-				graphEdges[currentline -NodeCount -3] = *(createEdge(buffer,(currentline -NodeCount -3)));
+				graphEdges[currentline -NodeCount -3] = 
+					*(createEdge(buffer,(currentline -NodeCount -3), &graphEdges[currentline -NodeCount -3]));
 			}
 			else
 			{

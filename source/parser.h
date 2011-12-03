@@ -6,6 +6,7 @@
 #define parser_h
 
 #include "structs.h"
+#include <cstdlib>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -14,18 +15,18 @@ using namespace std;
 class parser
 {
 private:
-	int NodeCount, EdgeCount;
+	unsigned int NodeCount, EdgeCount;
 	Node* graphNodes;
 	Edge* graphEdges;
 
 	/*
 	 * createNode - erstellt einen neuen Knoten
 	 */
-	Node* createNode(string);
+	Node* createNode(string, Node*);
 	/*
 	 * createEdge - erstellt eine neue Kante
 	 */
-	Edge* createEdge(string,int);
+	Edge* createEdge(string,unsigned int, Edge*);
 public:
 	/*
 	 *default constructer

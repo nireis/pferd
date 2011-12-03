@@ -104,15 +104,9 @@ class Graph {
 
 		void addShortcut(S& sc);
 
-//		std::list<E*> getAdjOutEdges(unsigned int node_id);
-//
-//		std::list<E*> getAdjInEdges(unsigned int node_id);
-//
-//		void getAdjOutEdges(unsigned int node_id, 
-//					E** array_of_edge_pointers, unsigned int &adj_edge_count);
-//
-//		void getAdjOutEdges(unsigned int node_id, 
-//					E** array_of_edge_pointers, unsigned int &adj_edge_count);
+		OutEdgesOfNode getAdjOutEdges(unsigned int node_id);
+
+		InEdgesOfNode getAdjInEdges(unsigned int node_id);
 
 		/* methoden implementieren, um:
 		  * graph zu initialisieren -> offsets setzen

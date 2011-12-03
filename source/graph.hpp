@@ -125,26 +125,16 @@ void Graph<E, N, S>::addShortcut(S& sc){
 }
 
 template <typename E, typename N, typename S>
-std::list<E*> Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
-	std::list<E*> l;
-	return l;
+Graph::OutEdgesOfNode Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
+	Graph<E, N, S>::OutEdgesOfNode oe = OutEdgesOfNode(node_id, this);
+	return oe;
 }
 
 template <typename E, typename N, typename S>
-std::list<E*> Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
-	std::list<E*> l;
-	return l;
+Graph::InEdgesOfNode Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
+	Graph<E, N, S>::InEdgesOfNode ie = InEdgesOfNode(node_id, this);
+	return ie;
 }
-
-// template <typename E, typename N, typename S>
-// void Graph<E, N, S>::getAdjOutEdges(unsigned int node_id, 
-// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
-// }
-// 
-// template <typename E, typename N, typename S>
-// void Graph<E, N, S>::getAdjInEdges(unsigned int node_id, 
-// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
-// }
 
 template <typename E, typename N, typename S>
 Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
@@ -177,8 +167,9 @@ Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id, Graph<E, N,
 
 template <typename E, typename N, typename S>
 bool Graph<E, N, S>::OutEdgesOfNode::getEdge(unsigned int edge_id, E& e){
-	if(0 < edge_id && edge_id <= this->edge_count){
-		e = nodes_array_base[edge_id - 1];
+	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
+		e = nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
+		// macht uns das viel langsamer?
 		return true;
 	} else { // entweder keine edges oder id falsch
 		return false;
@@ -212,8 +203,8 @@ Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(unsigned int node_id, Graph<E, N, S
 
 template <typename E, typename N, typename S>
 bool Graph<E, N, S>::InEdgesOfNode::getEdge(unsigned int edge_id, E& e){
-	if(0 < edge_id && edge_id <= this->edge_count){
-		e = * nodes_array_base[edge_id - 1];
+	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
+		e = * nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
 		return true;
 	} else { // entweder keine edges oder id falsch
 		return false;
