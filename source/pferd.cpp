@@ -13,10 +13,14 @@ int main(){
 	g.addShortcut(s);
 	g.getAdjOutEdges(0);
 	g.getAdjInEdges(0);
-	 /*
-	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = Graph<Edge, Node, Shortcut>::OutEdgesOfNode();
-	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = Graph<Edge, Node, Shortcut>::InEdgesOfNode();
-	 */
+	 ///*
+	unsigned int a = 1;
+	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = Graph<Edge, Node, Shortcut>::OutEdgesOfNode(a, &g);
+	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = Graph<Edge, Node, Shortcut>::InEdgesOfNode(a, &g);
+	Edge e;
+	oe.getEdge(a-1, e);
+	oe.getEdge(a, e);
+	 //*/
 	
 	/*
 	 * Test der Graphalgs Klasse!

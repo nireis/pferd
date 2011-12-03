@@ -147,6 +147,13 @@ std::list<E*> Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
 // }
 
 template <typename E, typename N, typename S>
+Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
+	//nix zu tun ?
+}
+
+
+
+template <typename E, typename N, typename S>
 Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(){
 	this->node_id = 0;
 	this->edge_count = 0;
@@ -159,21 +166,19 @@ Graph<E, N, S>::OutEdgesOfNode::~OutEdgesOfNode(){
 }
 
 template <typename E, typename N, typename S>
-Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id){
+Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
 	this->node_id = node_id;
-	this->edge_count = nodes[node_id+1].out_edge_offset 
-		- nodes[node_id].out_edge_offset;
-	if(edge_count > 0){
-		this->nodes_array_base = nodes[node_id].out_edge_offset -1;
-	} else {
-		this->nodes_array_base = 0; // keine edges -> kein offset
-	}
+	this->edge_count = g->nodes[this->node_id+1].out_edge_offset 
+		- g->nodes[this->node_id].out_edge_offset;
+	this->nodes_array_base = 0;
+	if(this->node_id < g->node_count)
+		this->nodes_array_base = & g->edges[g->nodes[this->node_id].out_edge_offset];
 }
 
 template <typename E, typename N, typename S>
 bool Graph<E, N, S>::OutEdgesOfNode::getEdge(unsigned int edge_id, E& e){
 	if(0 < edge_id && edge_id <= this->edge_count){
-		e = edges[nodes_array_base + edge_id]; // den offset rechnen muss man immer
+		e = nodes_array_base[edge_id - 1];
 		return true;
 	} else { // entweder keine edges oder id falsch
 		return false;
@@ -196,21 +201,19 @@ Graph<E, N, S>::InEdgesOfNode::~InEdgesOfNode(){
 }
 
 template <typename E, typename N, typename S>
-Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(unsigned int node_id){
+Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
 	this->node_id = node_id;
-	this->edge_count = nodes[node_id+1].in_edge_offset 
-		- nodes[node_id].in_edge_offset;
-	if(edge_count > 0){
-		this->nodes_array_base = nodes[node_id].in_edge_offset -1;
-	} else {
-		this->nodes_array_base = 0; // keine edges -> kein offset
-	}
+	this->edge_count = g->nodes[node_id+1].in_edge_offset 
+		- g->nodes[this->node_id].in_edge_offset;
+	this->nodes_array_base = 0;
+	if(this->node_id < g->node_count)
+		this->nodes_array_base = & g->in_edges[g->nodes[this->node_id].in_edge_offset];
 }
 
 template <typename E, typename N, typename S>
 bool Graph<E, N, S>::InEdgesOfNode::getEdge(unsigned int edge_id, E& e){
 	if(0 < edge_id && edge_id <= this->edge_count){
-		e = * in_edges[nodes_array_base + edge_id]; // den offset rechnen muss man immer
+		e = * nodes_array_base[edge_id - 1];
 		return true;
 	} else { // entweder keine edges oder id falsch
 		return false;

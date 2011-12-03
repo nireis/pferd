@@ -35,22 +35,22 @@ class Graph {
 			public:
 				OutEdgesOfNode();
 				~OutEdgesOfNode();
-				OutEdgesOfNode(unsigned int node_id);
+				OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
 				bool getEdge(unsigned int edge_id, E& e);
 
 			private:
-				unsigned int nodes_array_base;
+				E* nodes_array_base;
 		};
 
 		class InEdgesOfNode : public AbstractEdgesOfNode{
 			public:
 				InEdgesOfNode();
 				~InEdgesOfNode();
-				InEdgesOfNode(unsigned int node_id);
+				InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
 				bool getEdge(unsigned int edge_id, E& e);
 
 			private:
-				unsigned int nodes_array_base;
+				E** nodes_array_base;
 		};
 
 	private:
@@ -104,10 +104,10 @@ class Graph {
 
 		void addShortcut(S& sc);
 
-		std::list<E*> getAdjOutEdges(unsigned int node_id);
-
-		std::list<E*> getAdjInEdges(unsigned int node_id);
-
+//		std::list<E*> getAdjOutEdges(unsigned int node_id);
+//
+//		std::list<E*> getAdjInEdges(unsigned int node_id);
+//
 //		void getAdjOutEdges(unsigned int node_id, 
 //					E** array_of_edge_pointers, unsigned int &adj_edge_count);
 //
