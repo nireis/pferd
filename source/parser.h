@@ -21,12 +21,20 @@ private:
 
 	/*
 	 * createNode - erstellt einen neuen Knoten
+	 * @variables
+	 * string - aus datei eingelesene Zeile
+	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	Node* createNode(string, Node*);
+	void createNode(string, Node*);
+
 	/*
 	 * createEdge - erstellt eine neue Kante
+	 * @variables
+	 * string - aus datei eingelesene Zeile
+	 * unsinged int - Indexstelle des Arrays, KantenID
+	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	Edge* createEdge(string,unsigned int, Edge*);
+	void createEdge(string,unsigned int, Edge*);
 public:
 	/*
 	 *default constructer
