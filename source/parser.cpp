@@ -64,9 +64,9 @@ void parser::createNode(string inputString, Node* rNode)
 	rNode->elevation = atoi(tempStr.c_str());
 }
 
-void parser::createEdge(string inputString, unsigned int nodeID, Edge* rEdge)
+void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 {
-	rEdge->id = nodeID;
+	rEdge->id = edgeID;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
@@ -83,21 +83,21 @@ void parser::createEdge(string inputString, unsigned int nodeID, Edge* rEdge)
 			if(currentComponent == 1)
 			{
 				tempStr.assign(itr2, itr1);
-				rEdge->source = atoi(tempStr.c_str());
+				rEdge->source = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 2)
 			{
 				tempStr.assign(itr2, itr1);
-				rEdge->target = atoi(tempStr.c_str());
+				rEdge->target = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 3)
 			{
 				tempStr.assign(itr2, itr1);
-				rEdge->distance = atoi(tempStr.c_str());
+				rEdge->distance = (unsigned int)atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
@@ -109,13 +109,13 @@ void parser::createEdge(string inputString, unsigned int nodeID, Edge* rEdge)
 	 */
 	tempStr.assign(itr2, itr1);
 	// Vorsicht! Die Doku der Quelldatei spricht hier zwar von integer, aber nirei hielt char* für eine gute Idee
-	rEdge->type = *(tempStr.c_str());
+	rEdge->type = (unsigned char) *(tempStr.c_str());
 }
 
 bool parser::readFile(string filename)
 {
 	string buffer;
-	int currentline = 1;
+	unsigned int currentline = 1;
 
 	ifstream file;
 	file.open(filename.c_str(), ios::in);
@@ -166,12 +166,12 @@ bool parser::readFile(string filename)
 	}
 }
 
-int parser::getNodeCount()
+unsigned int parser::getNodeCount()
 {
 	return NodeCount;
 }
 
-int parser::getEdgeCount()
+unsigned int parser::getEdgeCount()
 {
 	return EdgeCount;
 }

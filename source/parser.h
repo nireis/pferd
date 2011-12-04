@@ -52,11 +52,11 @@ public:
 	/*
 	 * getNodeCount - Gibt Knotenanzahl zurück
 	 */
-	int getNodeCount();
+	unsigned int getNodeCount();
 	/*
 	 * getEdgeCount - Gibt Kantenanzahl zurück
 	 */
-	int getEdgeCount();
+	unsigned int getEdgeCount();
 	/*
 	 * getNodes - Gibt Knotenarray zurück
 	 */
