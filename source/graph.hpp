@@ -79,7 +79,11 @@ void Graph<E, N, S>::initOffsets(){
 	
 	//TODO eigene Liste implementieren, das hier scheint sich mit dem
 	//TODO speicher nicht zu vertragn für große graphdateien
-	std::list<E*> edge_pointers_of_incomming_edges_for_nodes[node_count]; 
+	std::list<E*>* edge_pointers_of_incomming_edges_for_nodes[node_count]; 
+	
+	for(unsigned int i = 0; i < node_count; i++)
+		edge_pointers_of_incomming_edges_for_nodes[i] = new std::list<E*>();
+
 	std::cout << "3" << std::endl;
 	// wenn wir uns die incoming-edges fuer jeden knoten merken,
 	// brauchen wir das spaeter nur in die offsets reinzusetzen. 
@@ -91,7 +95,7 @@ void Graph<E, N, S>::initOffsets(){
 		//TODO 
 		while(edges[j].source == i){ // zu jedem node zaehle ausgehende kanten
 			//merke fuer target node, wer darauf zeigt
-			edge_pointers_of_incomming_edges_for_nodes[edges[j].target]
+			(*edge_pointers_of_incomming_edges_for_nodes[edges[j].target])
 				.push_front( &edges[j] ); 
 			// bereite in targets offsets vor
 			nodes[ edges[j].target +1 ].in_edge_offset ++; 
@@ -108,16 +112,18 @@ void Graph<E, N, S>::initOffsets(){
 	for(unsigned int i = 0; i < node_count; i++){
 		// summiere offsets von vorne, damit die differenzen spaeter stimmen
 		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
-		while( !edge_pointers_of_incomming_edges_for_nodes[i].empty() ){
+		while( !(*edge_pointers_of_incomming_edges_for_nodes[i]).empty() ){
 			// gib die pointer auf die zugehörigen edges in das array
-			in_edges[j] = edge_pointers_of_incomming_edges_for_nodes[i].front();
-			edge_pointers_of_incomming_edges_for_nodes[i].pop_front();
+			in_edges[j] = (*edge_pointers_of_incomming_edges_for_nodes[i]).front();
+			(*edge_pointers_of_incomming_edges_for_nodes[i]).pop_front();
 			j++;
 		}
 	}
 	std::cout << "5" << std::endl;
-	for(unsigned int it=0; it < node_count; it++)
-	edge_pointers_of_incomming_edges_for_nodes[it].clear();
+	for(unsigned int it=0; it < node_count; it++){
+		(*edge_pointers_of_incomming_edges_for_nodes[it]).clear();
+		delete edge_pointers_of_incomming_edges_for_nodes[it];
+	}
 	std::cout << "6" << std::endl;
 }
 
