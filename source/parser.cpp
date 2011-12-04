@@ -156,7 +156,13 @@ bool parser::readFile(string filename)
 
 		file.close();
 		//Dummy Node als letzten Eintrag im Knotenarray
-		graphNodes[NodeCount] = Node();
+		Node DummyNode;
+		DummyNode.lat=0;
+		DummyNode.lon=0;
+		DummyNode.elevation=0;
+		DummyNode.in_edge_offset=0;
+		DummyNode.out_edge_offset=0;
+		graphNodes[NodeCount] = DummyNode;
 		
 		return true;
 	}
