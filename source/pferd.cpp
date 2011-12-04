@@ -57,6 +57,7 @@ if(i == 1){
 		cout << "Parsen fertig. Gebrauchte Sekunden: "<< time << endl 
 			<< "Erstelle und initialisiere Graph." << endl;
 	start = clock();
+		cout <<"Graph(NodeCount, EdgeCount, Nodes, Edges)" << p.getNodeCount() <<" " << p.getEdgeCount() <<" " << p.getNodes() <<" " << p.getEdges() << endl;
 		Graph<Simple_Edge, Simple_Node, Shortcut> g = 
 			Graph<Simple_Edge, Simple_Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 					p.getNodes(), p.getEdges());
