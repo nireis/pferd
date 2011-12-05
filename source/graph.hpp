@@ -55,6 +55,11 @@ Graph<E, N, S>::~Graph(){
 }
 
 template <typename E, typename N, typename S>
+int Graph<E, N, S>::getNodeCount(){
+	return node_count;
+}
+
+template <typename E, typename N, typename S>
 /*  initOffsets()
  *
  *  richtet die offsets der nodes ein so,
