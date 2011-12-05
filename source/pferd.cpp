@@ -101,8 +101,24 @@ if(i == 1){
 		cout <<"            target: " << e.target<< endl;
 		cout <<"             distance: " << e.distance << endl;
 	
-		p.~simple_parser();
-		g.~Graph<Simple_Edge, Simple_Node, Shortcut>();
+	cout << "Nun mit einem OutEdgesIterator "<< endl 
+		<< "   die ausgehenden Kanten von Node 0:" << endl;
+	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+	while(it.hasNext()){
+		Simple_Edge &e(it.getNext());
+		cout <<" -- next edge --" << endl;
+		cout <<" source: " << e.source << endl;
+		cout <<" target: " << e.target<< endl;
+		cout <<" distance: " << e.distance << endl;
+		
+	}
+
+		
+	p.~simple_parser();
+	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
+	cin.get(); 
+		
+	g.~Graph<Simple_Edge, Simple_Node, Shortcut>();
 	
 } else {
 
@@ -144,6 +160,26 @@ finish = clock();
 	cout <<"             distance: " << e.distance << endl;
 	cout <<"                     type: " << e.type << endl;
 	
+	cout << "Nun mit einem OutEdgesIterator "<< endl 
+		<< "   die ausgehenden Kanten von Node 0:" << endl;
+	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+	while(it.hasNext()){
+		Edge &e(it.getNext());
+		cout <<" -- next edge --" << endl;
+		cout <<" source: " << e.source << endl;
+		cout <<" target: " << e.target<< endl;
+		cout <<" distance: " << e.distance << endl;
+		cout <<" type: " << e.type << endl;
+		cout <<" edge-id : " << e.id << endl;
+		
+	}
+	
+	
+	p.~parser();
+	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
+	cin.get(); 
+		
+	g.~Graph<Edge, Node, Shortcut>();
 }
 	
 //	parser testParser;
