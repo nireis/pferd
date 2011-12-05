@@ -4,6 +4,8 @@
  * ja nicht irgendwo includieren ausser in die graph.h
  */
 
+#include <iostream>
+
 #ifndef graph_hpp
 #define graph_hpp
 
@@ -55,7 +57,7 @@ Graph<E, N, S>::~Graph(){
 }
 
 template <typename E, typename N, typename S>
-int Graph<E, N, S>::getNodeCount(){
+unsigned int Graph<E, N, S>::getNodeCount(){
 	return node_count;
 }
 
@@ -71,47 +73,49 @@ template <typename E, typename N, typename S>
 void Graph<E, N, S>::initOffsets(){
 	if (!edges || !nodes || !node_count || !edge_count)
 		return;
-
 	in_edges = new E*[edge_count];
-
 	// voraussetzung, damit das alles funktioniert, ist,
 	// dass die kanten den sources nach aufsteigend sortiert sind,
 	// so, wie die nodes den IDs nach selbst aufsteigend sortiert sind
-	unsigned int number_of_edges;
-	unsigned int j = 0;
 	
-	std::list<E*> edge_pointers_of_incomming_edges_for_nodes[node_count];
+	std::list<E*>** edge_pointers_of_incomming_edges_for_nodes;
+	edge_pointers_of_incomming_edges_for_nodes = new std::list<E*>*[node_count];
+
+	for(unsigned int i = 0; i < node_count; i++)
+		edge_pointers_of_incomming_edges_for_nodes[i] = new std::list<E*>();
+
 	// wenn wir uns die incoming-edges fuer jeden knoten merken,
 	// brauchen wir das spaeter nur in die offsets reinzusetzen. 
 
-	for(unsigned int i = 0; i < node_count; i++){ // durchlaufe alle nodes
-		
-		number_of_edges = 0;
-		while(edges[j].source == i){ // zu jedem node zaehle ausgehende kanten
-			//merke fuer target node, wer darauf zeigt
-			edge_pointers_of_incomming_edges_for_nodes[edges[j].target]
-				.push_front( &edges[j] ); 
-			// bereite in targets offsets vor
-			nodes[ edges[j].target +1 ].in_edge_offset ++; 
-			number_of_edges++;
-			j++;
-		}
-		nodes[i+1].out_edge_offset = nodes[i].out_edge_offset 
-			+ number_of_edges; //setze offset
+	for(unsigned int j = 0; j < edge_count; j++){
+		//merke fuer target node, wer darauf zeigt
+		(*edge_pointers_of_incomming_edges_for_nodes[edges[j].target])
+			.push_front( &edges[j] ); 
+		// bereite in targets offsets vor
+		nodes[ edges[j].target +1 ].in_edge_offset ++; 
+		// bereite in sources offsets vor
+		nodes[ edges[j].source +1 ].out_edge_offset ++; 
 	}
 
-	j = 0;
+	unsigned int j = 0;
 	// nun die incoming edges verteilen
 	for(unsigned int i = 0; i < node_count; i++){
 		// summiere offsets von vorne, damit die differenzen spaeter stimmen
 		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
-		while( !edge_pointers_of_incomming_edges_for_nodes[i].empty() ){
+		nodes[i+1].out_edge_offset = nodes[i+1].out_edge_offset + nodes[i].out_edge_offset;
+		
+		while( !(*edge_pointers_of_incomming_edges_for_nodes[i]).empty() ){
 			// gib die pointer auf die zugehörigen edges in das array
-			in_edges[j] = edge_pointers_of_incomming_edges_for_nodes[i].front();
-			edge_pointers_of_incomming_edges_for_nodes[i].pop_front();
+			in_edges[j] = (*edge_pointers_of_incomming_edges_for_nodes[i]).front();
+			(*edge_pointers_of_incomming_edges_for_nodes[i]).pop_front();
 			j++;
 		}
 	}
+	for(unsigned int it=0; it < node_count; it++){
+		(*edge_pointers_of_incomming_edges_for_nodes[it]).clear();
+		delete edge_pointers_of_incomming_edges_for_nodes[it];
+	}
+	delete[] edge_pointers_of_incomming_edges_for_nodes;
 }
 
 template <typename E, typename N, typename S>
@@ -130,25 +134,77 @@ void Graph<E, N, S>::addShortcut(S& sc){
 }
 
 template <typename E, typename N, typename S>
-std::list<E*> Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
-	std::list<E*> l;
-	return l;
+Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
+	//nix zu tun ?
+}
+
+
+template <typename E, typename N, typename S>
+Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(){
+	this->node_id = 0;
+	this->edge_count = 0;
+	this->nodes_array_base = 0;
 }
 
 template <typename E, typename N, typename S>
-std::list<E*> Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
-	std::list<E*> l;
-	return l;
+Graph<E, N, S>::OutEdgesOfNode::~OutEdgesOfNode(){
+	//nix zu tun ?
 }
 
-// template <typename E, typename N, typename S>
-// void Graph<E, N, S>::getAdjOutEdges(unsigned int node_id, 
-// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
-// }
-// 
-// template <typename E, typename N, typename S>
-// void Graph<E, N, S>::getAdjInEdges(unsigned int node_id, 
-// 		E** array_of_edge_pointers, unsigned int &adj_edge_count){
-// }
+template <typename E, typename N, typename S>
+Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
+	this->node_id = node_id;
+	this->edge_count = g->nodes[this->node_id+1].out_edge_offset - g->nodes[this->node_id].out_edge_offset;
+	this->nodes_array_base = 0;
+	if(this->node_id < g->node_count)
+		this->nodes_array_base = & g->edges[g->nodes[this->node_id].out_edge_offset];
+}
+
+template <typename E, typename N, typename S>
+bool Graph<E, N, S>::OutEdgesOfNode::getEdge(unsigned int edge_id, E& e){
+	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
+		e = nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
+		// macht uns das viel langsamer?
+		return true;
+	} else { // entweder keine edges oder id falsch
+		return false;
+	}
+}
+
+
+template <typename E, typename N, typename S>
+Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(){
+	this->node_id = 0;
+	this->edge_count = 0;
+	this->nodes_array_base = 0;
+}
+
+template <typename E, typename N, typename S>
+Graph<E, N, S>::InEdgesOfNode::~InEdgesOfNode(){
+	//nix zu tun ?
+}
+
+template <typename E, typename N, typename S>
+Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
+	this->node_id = node_id;
+	this->edge_count = g->nodes[node_id+1].in_edge_offset 
+		- g->nodes[this->node_id].in_edge_offset;
+	this->nodes_array_base = 0;
+	if(this->node_id < g->node_count)
+		this->nodes_array_base = & g->in_edges[g->nodes[this->node_id].in_edge_offset];
+}
+
+template <typename E, typename N, typename S>
+bool Graph<E, N, S>::InEdgesOfNode::getEdge(unsigned int edge_id, E& e){
+	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
+		e = * nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
+		return true;
+	} else { // entweder keine edges oder id falsch
+		return false;
+	}
+}
+
+
+
 
 #endif

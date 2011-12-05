@@ -1,6 +1,8 @@
 #ifndef graphalgs_h
 #define graphalgs_h
 
+#include "graph.h"
+
 class Graphalgs{
 	private:
 		Graph<Edge, Node, Shortcut>* g;

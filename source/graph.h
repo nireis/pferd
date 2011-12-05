@@ -23,6 +23,51 @@ class Graph {
 		 * (lokale variablen, etc) , aber diese würde man sich sehr wahrscheinlich
 		 * sowieso irgendwo merken müssen oder stets neu rechnen
 		 */
+
+		class OE_Andrenator {
+			public:
+				OE_Andrenator(){
+				}
+
+				OE_Andrenator(unsigned int node, Graph<E, N, S> *g){
+					start = &(g->edges[node]);
+					// position = g->edges[node].out_edge_offset;
+					position = g->nodes[node+1].out_edge_offset 
+						- g->nodes[node].out_edge_offset;
+				}
+
+				~OE_Andrenator(){
+					start = 0;
+				}
+				
+				bool hasNext() const{
+					return (position > 0);
+				}
+
+				// Verwendung: E &e(it.getNext());
+				E& getNext(){
+					if(position > 0)
+						return start[--position];
+
+					// wer auf das hasNext() nicht hört, 
+					// ist selber schuld
+					return * start;
+				}
+
+			private:
+				unsigned int position;
+				E* start;
+		};
+
+		class IE_Andrenator {
+
+		};
+
+
+		/* ======================
+		 * === ÜBERFLÜSSIG ======
+		 * ======================
+		 */
 		class AbstractEdgesOfNode{
 			public:
 				unsigned int node_id;
@@ -35,23 +80,27 @@ class Graph {
 			public:
 				OutEdgesOfNode();
 				~OutEdgesOfNode();
-				OutEdgesOfNode(unsigned int node_id);
+				OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
 				bool getEdge(unsigned int edge_id, E& e);
 
 			private:
-				unsigned int nodes_array_base;
+				E* nodes_array_base;
 		};
 
 		class InEdgesOfNode : public AbstractEdgesOfNode{
 			public:
 				InEdgesOfNode();
 				~InEdgesOfNode();
-				InEdgesOfNode(unsigned int node_id);
+				InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
 				bool getEdge(unsigned int edge_id, E& e);
 
 			private:
-				unsigned int nodes_array_base;
+				E** nodes_array_base;
 		};
+		/* ======================
+		 * === ÜBERFLÜSSIG ENDE =
+		 * ======================
+		 */
 
 	private:
 
@@ -81,6 +130,8 @@ class Graph {
 		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
 	public:
 
+		typedef OE_Andrenator OutEdgesIterator;
+
 		Graph();
 		Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
 				N* n, E* e,
@@ -94,7 +145,7 @@ class Graph {
 				//  WICHTIG: N* n - die nodes sind genau _nc+1_ nodes,
 				//  der letzte ein dummy mit offsets=0
 		
-		~Graph();
+		virtual ~Graph();
 
 		void initOffsets(); // done
 
@@ -104,17 +155,34 @@ class Graph {
 
 		void addShortcut(S& sc);
 
-		std::list<E*> getAdjOutEdges(unsigned int node_id);
+		unsigned int getNodeCount();
+		
+		OutEdgesIterator getOutEdges(unsigned int node){
+			return OutEdgesIterator(node, this);
+		}
 
-		std::list<E*> getAdjInEdges(unsigned int node_id);
+		/*
+		 * Die Implementierung dieser beiden Methoden im Header
+		 * spart Stress in der graph.cpp, 
+		 * der aufgrund der templates aufkommt
+		 */
+		/* ======================
+		 * === ÜBERFLÜSSIG ======
+		 * ======================
+		 */
+		OutEdgesOfNode getAdjOutEdges(unsigned int node_id){
+			// OutEdgesOfNode oe =& OutEdgesOfNode(node_id, this);
+			return OutEdgesOfNode(node_id, this);
+		}
 
-		int getNodeCount();
-
-//		void getAdjOutEdges(unsigned int node_id, 
-//					E** array_of_edge_pointers, unsigned int &adj_edge_count);
-//
-//		void getAdjOutEdges(unsigned int node_id, 
-//					E** array_of_edge_pointers, unsigned int &adj_edge_count);
+		InEdgesOfNode getAdjInEdges(unsigned int node_id){
+			// InEdgesOfNode ie = InEdgesOfNode(node_id, this);
+			return InEdgesOfNode(node_id, this);
+		}
+		/* ======================
+		 * === ÜBERFLÜSSIG ENDE =
+		 * ======================
+		 */
 
 		/* methoden implementieren, um:
 		  * graph zu initialisieren -> offsets setzen
