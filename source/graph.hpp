@@ -68,66 +68,37 @@ template <typename E, typename N, typename S>
 void Graph<E, N, S>::initOffsets(){
 	if (!edges || !nodes || !node_count || !edge_count)
 		return;
-	std::cout << "1" << std::endl;
 	in_edges = new E*[edge_count];
-	std::cout << "2" << std::endl;
 	// voraussetzung, damit das alles funktioniert, ist,
 	// dass die kanten den sources nach aufsteigend sortiert sind,
 	// so, wie die nodes den IDs nach selbst aufsteigend sortiert sind
 	
-	//TODO eigene Liste implementieren, das hier scheint sich mit dem
-	//TODO speicher nicht zu vertragn für große graphdateien
-	
-	std::cout << "node_count before: "<< node_count <<std:: endl;
-	
 	std::list<E*>** edge_pointers_of_incomming_edges_for_nodes;
 	edge_pointers_of_incomming_edges_for_nodes = new std::list<E*>*[node_count];
-
-	std::cout << "node_count after: "<< node_count << std::endl;
 
 	for(unsigned int i = 0; i < node_count; i++)
 		edge_pointers_of_incomming_edges_for_nodes[i] = new std::list<E*>();
 
-	std::cout << "3" << std::endl;
 	// wenn wir uns die incoming-edges fuer jeden knoten merken,
 	// brauchen wir das spaeter nur in die offsets reinzusetzen. 
 
-	unsigned int number_of_edges;
-	unsigned int j = 0;
-	for(unsigned int i = 0; i < node_count; i++){ // durchlaufe alle nodes
-		
-		number_of_edges = 0;
-		//TODO INVALID RAD OF SIZE 4
-		//TODO
-		//TODO ausgabe in valgrind legt nahe: 
-		//TODO	manche kanten sind nicht gescheit initialisiert oder so
-		//TODO	zumindest stimme irgendwo was mit dem speicher nicht
-			std::cout<< "edges[j].target = " ;
-			std::cout<< edges[j].target ;
-			std::cout<< ", edges[j].source = " ;
-			std::cout<< edges[j].source ;
-			std::cout<< ", i = " ;
-			std::cout<< i ;
-			std::cout << std::endl;
-		while(edges[j].source == i){ // zu jedem node zaehle ausgehende kanten
-			//merke fuer target node, wer darauf zeigt
-			(*edge_pointers_of_incomming_edges_for_nodes[edges[j].target])
-				.push_front( &edges[j] ); 
-			// bereite in targets offsets vor
-			nodes[ edges[j].target +1 ].in_edge_offset ++; 
-			number_of_edges++;
-			j++;
-		}
-		nodes[i+1].out_edge_offset = nodes[i].out_edge_offset 
-			+ number_of_edges; //setze offset
+	for(unsigned int j = 0; j < edge_count; j++){
+		//merke fuer target node, wer darauf zeigt
+		(*edge_pointers_of_incomming_edges_for_nodes[edges[j].target])
+			.push_front( &edges[j] ); 
+		// bereite in targets offsets vor
+		nodes[ edges[j].target +1 ].in_edge_offset ++; 
+		// bereite in sources offsets vor
+		nodes[ edges[j].source +1 ].out_edge_offset ++; 
 	}
-	std::cout << "4" << std::endl;
 
-	j = 0;
+	unsigned int j = 0;
 	// nun die incoming edges verteilen
 	for(unsigned int i = 0; i < node_count; i++){
 		// summiere offsets von vorne, damit die differenzen spaeter stimmen
 		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
+		nodes[i+1].out_edge_offset = nodes[i+1].out_edge_offset + nodes[i].out_edge_offset;
+		
 		while( !(*edge_pointers_of_incomming_edges_for_nodes[i]).empty() ){
 			// gib die pointer auf die zugehörigen edges in das array
 			in_edges[j] = (*edge_pointers_of_incomming_edges_for_nodes[i]).front();
@@ -135,13 +106,11 @@ void Graph<E, N, S>::initOffsets(){
 			j++;
 		}
 	}
-	std::cout << "5" << std::endl;
 	for(unsigned int it=0; it < node_count; it++){
 		(*edge_pointers_of_incomming_edges_for_nodes[it]).clear();
 		delete edge_pointers_of_incomming_edges_for_nodes[it];
 	}
 	delete[] edge_pointers_of_incomming_edges_for_nodes;
-	std::cout << "6" << std::endl;
 }
 
 template <typename E, typename N, typename S>
@@ -159,23 +128,10 @@ template <typename E, typename N, typename S>
 void Graph<E, N, S>::addShortcut(S& sc){
 }
 
-// template <typename E, typename N, typename S>
-// Graph::OutEdgesOfNode Graph<E, N, S>::getAdjOutEdges(unsigned int node_id){
-// 	Graph<E, N, S>::OutEdgesOfNode oe = OutEdgesOfNode(node_id, this);
-// 	return oe;
-// }
-// 
-// template <typename E, typename N, typename S>
-// Graph::InEdgesOfNode Graph<E, N, S>::getAdjInEdges(unsigned int node_id){
-// 	Graph<E, N, S>::InEdgesOfNode ie = InEdgesOfNode(node_id, this);
-// 	return ie;
-// }
-
 template <typename E, typename N, typename S>
 Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
 	//nix zu tun ?
 }
-
 
 
 template <typename E, typename N, typename S>
@@ -209,8 +165,6 @@ bool Graph<E, N, S>::OutEdgesOfNode::getEdge(unsigned int edge_id, E& e){
 		return false;
 	}
 }
-
-
 
 
 template <typename E, typename N, typename S>

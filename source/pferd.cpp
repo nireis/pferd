@@ -25,9 +25,24 @@ int main(int argc, char *argv[]){
 // 	oe.getEdge(a, e);
 // 	 //*/
 
-	if(argc == 1 || argc > 3){
-		cout << "---" << endl << "-- Verwendung: " << argv[0] << " Modus"<< " Graphendatei " << endl
-			<< "-- Modus: 1==Simple_Structs ; sonst==Structs" << endl << "---" << endl;
+cout << "            _|\\__/|, " << endl;
+cout << "          ,((\\````\\\\_" << endl;
+cout << "        ,(())     `))\\ "<< endl;
+cout << "      ,(()))       ,_ \\ "<< endl;
+cout << "     ((())'   |        \\ "<< endl;
+cout << "     )))))     >.__     \\ "<< endl;
+cout << "     ((('     /    `-. .c|" << endl;
+cout << "hjw          /        `-`'" << endl;
+cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
+cout << " " << endl;
+cout << " " << endl;
+
+	if(argc == 1 || argc == 2 || argc > 3){
+		cout << "---" << endl 
+				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Modus"<< " Graphendatei " << endl
+				<< "-- Modus: 1==Simple_Structs ; sonstige Zahl==Structs" << endl 
+				<< "-- Graphdatei: Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
+				<< "---" << endl;
 		return 0;
 	} 
 
@@ -54,7 +69,7 @@ if(i == 1){
 		p.readFile(file);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Parsen fertig. Gebrauchte Sekunden: "<< time << endl 
+		cout << "Parsen fertig. Benötigte Sekunden: "<< time << endl 
 			<< "Erstelle und initialisiere Graph." << endl;
 	start = clock();
 		cout <<"Graph(NodeCount, EdgeCount, Nodes, Edges)" << p.getNodeCount() <<" " << p.getEdgeCount() <<" " << p.getNodes() <<" " << p.getEdges() << endl;
@@ -65,26 +80,26 @@ if(i == 1){
 		g.initOffsets();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Graph initialisiert! Gebrauchte Sekunden: "<<time << endl
+		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
 			<< "Hier die Informationen zur ersten Kante des Knotens 0:" << endl;
 	start = clock();
 	 	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
 	 	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
 	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Sekunden, um ausgehende und eingehende Kanten "<< endl 
-			<<"eines Knotens zu bestimmen (nicht viele Kanten): " << time << endl;
+		cout << "-CPU-Clocks, um ausgehende und eingehende Kanten "<< endl 
+			<<"   eines Knotens zu bestimmen: " << (finish-start) << endl;
 		Edge e;
 	start = clock();
 		oe.getEdge(1, e);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Sekunden, eine Kante zu bekommen: " << time << endl;
-		cout <<"oe: Node ID (0) : " << oe.node_id << endl;
-		cout <<"oe: EdgeCount (3 ausgehende) : " << oe.edge_count << endl;
-		cout <<"        source: " << e.source << endl;
-		cout <<"           target: " << e.target<< endl;
-		cout <<"            distance: " << e.distance << endl;
+		cout << "-CPU-Clocks, eine Kante zu bekommen: " << finish-start<< endl;
+		cout <<"-oe: Node ID (0) : " << oe.node_id << endl;
+		cout <<"-oe: EdgeCount : " << oe.edge_count << endl;
+		cout <<"-oe: getEdge(1) (S, T, DI) : " << endl;
+		cout <<"         source: " << e.source << endl;
+		cout <<"            target: " << e.target<< endl;
+		cout <<"             distance: " << e.distance << endl;
 	
 		p.~simple_parser();
 		g.~Graph<Simple_Edge, Simple_Node, Shortcut>();
@@ -114,23 +129,20 @@ start = clock();
  	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
  	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
 finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Sekunden, um ausgehende und eingehende Kanten "<< endl 
-		<<"eines Knotens zu bestimmen (nicht viele Kanten): " << time << endl;
+		cout << "-CPU-Clocks, um ausgehende und eingehende Kanten "<< endl 
+			<<"   eines Knotens zu bestimmen: " << (finish-start) << endl;
 	Edge e;
 start = clock();
 	oe.getEdge(1, e);
 finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Sekunden, eine Kante zu bekommen: " << time << endl;
-	cout <<"oe: Node ID (0) : " << oe.node_id << endl;
-	cout <<"oe: EdgeCount (3 ausgehende) : " << oe.edge_count << endl;
-	cout <<"oe: getEdge(1) (0, 1, 22, 9), ID : " << e.id << endl;
-	cout <<"        source: " << e.source << endl;
-	cout <<"           target: " << e.target<< endl;
-	cout <<"            distance: " << e.distance << endl;
-	cout <<"                    type: " << e.type << endl;
-
+	cout << "-CPU-Clocks, eine Kante zu bekommen: " << finish-start<< endl;
+	cout <<"-oe: Node ID (0) : " << oe.node_id << endl;
+	cout <<"-oe: EdgeCount : " << oe.edge_count << endl;
+	cout <<"-oe: getEdge(1) (S, T, DI, TY), ID : " << e.id << endl;
+	cout <<"         source: " << e.source << endl;
+	cout <<"            target: " << e.target<< endl;
+	cout <<"             distance: " << e.distance << endl;
+	cout <<"                     type: " << e.type << endl;
 	
 }
 	
@@ -164,6 +176,8 @@ time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 //	Graphalgs ga = Graphalgs(&g);
 //	ga.Dijkstra(0);
 
+	cout << "Taste drücken zum beenden ... "; 
+	cin.get(); 
 
 	return 0;
 }
