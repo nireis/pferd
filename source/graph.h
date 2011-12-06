@@ -18,18 +18,20 @@ class Graph {
 	public:
 		class OE_Andrenator {
 			private:
-				unsigned int position;
-				unsigned int begin;
+				unsigned int max;
+				unsigned int pos;
 				E* start;
 			public:
 				OE_Andrenator(){
-					position = 0;
+					pos = 0;
+					max = 0;
+					start = 0;
 				}
 
 				OE_Andrenator(unsigned int node, Graph<E, N, S> *g){
 					start = &(g->edges[g->nodes[node].out_edge_offset]);
-					begin = 0;
-					position = g->nodes[node+1].out_edge_offset 
+					pos = 0;
+					max = g->nodes[node+1].out_edge_offset 
 						- g->nodes[node].out_edge_offset;
 				}
 
@@ -38,35 +40,33 @@ class Graph {
 				}
 				
 				bool hasNext(){
-					return (position > 0);
+					return (pos < max);
 				}
 
-				
-				// Verwendung, falls E& zurückgegeben wird: 
-				//    E &e(it.getNext());
-				// aber E* zurückgeben ist sinnvoller, wegen return 0;
 				E* getNext(){
-					if(position > 0){
-						position = position - 1;
-						begin = begin + 1;
-					return &start[begin-1];
-				}
-
-					// wer auf das hasNext() nicht hört, 
-					// ist selber schuld
+					if(pos < max){
+						pos = pos + 1;
+					return &start[pos-1];
+					}
 					return 0;
 				}
-
 		};
-
 		class IE_Andrenator {
+			private:
+				unsigned int max;
+				unsigned int pos;
+				E** start;
 			public:
 				IE_Andrenator(){
+					pos = 0;
+					max = 0;
+					start = 0;
 				}
 
 				IE_Andrenator(unsigned int node, Graph<E, N, S> *g){
-					start = &(g->in_edges[node]);
-					position = g->nodes[node+1].in_edge_offset 
+					start = &(g->in_edges[g->nodes[node].in_edge_offset]);
+					pos = 0;
+					max = g->nodes[node+1].in_edge_offset 
 						- g->nodes[node].in_edge_offset;
 				}
 
@@ -74,27 +74,19 @@ class Graph {
 					start = 0;
 				}
 				
-				bool hasNext() const{
-					return (position > 0);
+				bool hasNext(){
+					return (pos < max);
 				}
 
-				
-				// Verwendung, falls E& zurückgegeben wird: 
-				//    E &e(it.getNext());
-				// aber E* zurückgeben ist sinnvoller, wegen return 0;
 				E* getNext(){
-					if(position > 0)
-						return start[--position];
-
-					// wer auf das hasNext() nicht hört, 
-					// ist selber schuld
+					if(pos < max){
+						pos = pos + 1;
+					return start[pos-1];
+					}
 					return 0;
 				}
-
-			private:
-				unsigned int position;
-				E** start;
 		};
+
 
 	/*
 	 * Eigentliche interne Daten des Graphen

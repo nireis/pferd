@@ -61,6 +61,9 @@ if(i == 1){
 			Graph<Simple_Edge, Simple_Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 					p.getNodes(), p.getEdges());
 	
+	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
+	cin.get(); 
+
 		g.initOffsets();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -126,6 +129,9 @@ start = clock();
 		Graph<Edge, Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 				p.getNodes(), p.getEdges());
 
+	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
+	cin.get(); 
+
 		g.initOffsets();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -172,6 +178,9 @@ start = clock();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
+
+	cout << "Taste drücken, damit   DIJKSTRA   beginnt. "; 
+	cin.get(); 
 
 	/*
 	 * Test der Graphalgs Klasse!

@@ -13,7 +13,7 @@ struct Simple_Edge {
 };
 
 struct Edge : public Simple_Edge {
-	unsigned char type;
+	unsigned int type; //stellt sich raus, char bringt uns nix
 	unsigned int id; // damit man kanten im kantenarray finden kann
 	// alternativ, statt ID, die differenz des zeigers auf Kante und
 	// des zeigers auf anfang des arrays benutzen...
@@ -36,6 +36,57 @@ struct Node : public Simple_Node {
 	float lat;
 	float lon;
 	int elevation;
+};
+
+template <typename T>
+class SList {
+	private:
+		struct SListData;
+		SListData* root;
+		
+		struct SListData{
+			T data;
+			SListData* next;
+		};
+	public:
+		
+		bool empty(){
+			if(root == 0)
+				return true;
+
+			return false;
+		}
+		void push(T d){
+			if(root == 0){
+				root = new SListData;
+				root->next = 0;
+				root->data = d;
+			} else {
+				SListData* t = new SListData;
+				t->next = root->next;
+				t->data = d;
+				root = t;
+			}
+		}
+		T pop(){
+			T d;
+			if(root != 0){
+				SListData* t = root->next;
+				d = root->data;
+				delete root;
+				root = t;
+			} // wenn Liste leer,
+			// gibt es für T hoffentlich
+			// sinnvole default belegungen
+			return d;
+		}
+		void clear(){
+			while(root != 0){
+				SListData* t = root->next;
+				delete root;
+				root = t;
+			}
+		}
 };
 
 #endif

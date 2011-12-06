@@ -76,7 +76,8 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 	//Temporaere Variable vom Typ String, weil ich gerade zu blöd bin es ohne zu machen
 	string tempStr;
 	//Temporaere Varibale vom Typ char* für die sehr ekelhaft, aber hoffentlich platzsparende type Zuweisung der Kanten
-	unsigned char* tempChar = new unsigned char[2];
+	// TODO
+//	unsigned char tempChar = new unsigned char[2];
 
 	for (itr1=inputString.begin(); itr1 != inputString.end(); itr1++)
     {
@@ -111,8 +112,11 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 	 */
 	tempStr.assign(itr2, itr1);
 	// Vorsicht! Die Doku der Quelldatei spricht hier zwar von integer, aber nirei hielt char* für eine gute Idee
-	strcpy((char*)tempChar, tempStr.c_str());
-	rEdge->type = *tempChar;
+	
+	rEdge->type =(unsigned int) atoi(tempStr.c_str());
+//	strcpy(tempChar, tempStr.c_str());
+//	
+//	rEdge->type = tempChar;
 }
 
 bool parser::readFile(string filename)
