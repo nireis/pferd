@@ -75,5 +75,4 @@ void Graphalgs::Dijkstra(int node_id){
 	delete[] dist;
 	delete[] found;
 	// delete[] in_edge_nr;
-	delete nextEdge;
 }
