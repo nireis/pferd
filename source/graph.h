@@ -153,11 +153,11 @@ class Graph {
 
 		unsigned int getNodeCount();
 		
-		OutEdgesIterator getOutEdges(unsigned int node){
+		OutEdgesIterator getOutEdgesIt(unsigned int node){
 			return OutEdgesIterator(node, this);
 		}
 
-		InEdgesIterator getInEdges(unsigned int node){
+		InEdgesIterator getInEdgesIt(unsigned int node){
 			return InEdgesIterator(node, this);
 		}
 

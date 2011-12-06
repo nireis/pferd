@@ -1,44 +1,70 @@
 #include "graphalgs.h"
+#include <queue>
+using namespace std;
 
 Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
 	this->g = g;
 }
 
 void Graphalgs::Dijkstra(int node_id){
-// Hier liegen am Ende die kürzesten Distanzen
+	// Hier liegen am Ende die kürzesten Distanzen
+	unsigned int dist[g->getNodeCount()];
+	// Hier sehen wir ob ein Knoten schon seinen kürzesten Pfad gefunden hat
+	bool found[g->getNodeCount()];
+	// Hier können wir den Pfad zu den Knoten rekonstruieren
+	// unsigned int in_edge_nr[g->getNodeCount()];
+	// Iterator um die ausgehenden Kanten durchzugehen (erster Wert node_id)
+	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g->getOutEdgesIt(node_id);
+	// Pointer um die akutelle Kante zu behandeln
+	Edge* nextEdge;
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
-/* gibt fehler */ //unsigned int dist[getNodeCount()];
+	// Init, damit alles passt (Vorsichtsmaßnahme)
+	for (unsigned int i = 0; i < g->getNodeCount(); i++){
+		found[i] = false;
+	}
 
-// Hier sehen wir ob ein Knoten schon seinen kürzesten Pfad gefunden hat
+	// Den ersten Knoten abarbeiten
+	dist[node_id] = 0;
+	found[node_id] = true;
+	while(it.hasNext()){
+		nextEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(nextEdge->distance,nextEdge->target,node_id)); //...
+	}
 
-/* gibt fehler */ //bool found[getNodeCount()];
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	while(!U.empty()){
+		tmpid = U.top().id;
+		// TEST
+		cout << "Knoten wird jetzt bearbeitet: " << tmpid << endl;
+		cout << "Die Kante kam von: " << U.top().sid << endl; //...
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		if(!found[tmpid]){
+			// TEST
+			cout << tmpid << ": " << U.top().distance << endl;
+			dist[tmpid] = U.top().distance;
+			found[tmpid] = true;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				nextEdge = it.getNext();
+				cout << "Die Kante führt zu: " << nextEdge->target << endl; // ...
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[nextEdge->id]){
+					// ...tu sie in U
+					U.push(U_element(
+								nextEdge->distance+dist[tmpid],nextEdge->target,tmpid)); //...
+				}
+			}
+		}
+		U.pop();
+	}
 
-// Hier können wir den Pfad zu den Knoten rekonstruieren
-
-/* gibt fehler */ //unsigned int in_edge_nr[getNodeCount()];
-
-// == das hier wird hoffentlich nicht mehr gebraucht
-// == statt dessen 
-// == Graph<Edge, Node, Shortcut>::OutEdgesIterator benutzen, siehe main
-// 
-// Tmp für die ausgehenden Kanten (schonmal auf den Startknoten gesetzt)
-//OutEdgesOfNode<Edge, Node, Shortcut> tmpOutEdges = OutEdgesOfNode<Edge, Node, Shortcut>(node_id);
-
-/* gibt warnung */ //Edge* tmpEdge;
-
-// Init, damit alles passt (Vorsichtsmaßnahme)
-
-/* gibt fehler */ //for (int i=0; i<getNodeCound(); i++){
-/* gibt fehler */ //	found[i] = false;
-/* gibt fehler */ //}
-
-// Den ersten Knoten abarbeiten
-
-/* gibt fehler */ //dist[node_id] = 0;
-/* gibt fehler */ //found[node_id] = true;
-/* gibt fehler */ //for(int i=0; i<tmpOutEdges.edge_count; i++){
-/* gibt fehler */ //	tmpOutEdges(i,tmpEdge);
-/* gibt fehler */ //	dist[tmpEdge->target] = tmpEdge->distance;
-/* gibt fehler */ //	found[tmpEdge->target] = true;
-/* gibt fehler */ //}
+	// TEST: Ergebnisse ausgeben
+	for(unsigned int i=0; i < g->getNodeCount(); i++){
+		cout << dist[i] << endl;
+	}
 }

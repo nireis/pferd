@@ -8,12 +8,14 @@ BIN =pferd
 CPP =pferd.cpp graphalgs.cpp parser.cpp simple_parser.cpp
 OBJ =pferd.o graphalgs.o parser.o simple_parser.o
 
-all: $(OBJ)
+all: $(BIN)
+
+$(BIN): $(OBJ)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 # es werden all .cpp dateien kompiliert
-$(OBJ):
-	$(CC) $(CFLAGS) -c $(CPP)
+$(OBJ): $(wildcard *.h) $(wildcard *.hpp)
+
 
 clean:
 	rm -f $(BIN) $(OBJ)

@@ -6,6 +6,31 @@
 class Graphalgs{
 	private:
 		Graph<Edge, Node, Shortcut>* g;
+		
+		// struct für die Elemente aus U incl. Vergleich
+		struct U_element{
+			unsigned int distance;
+			unsigned int id;
+			unsigned int sid; //...
+
+			U_element(unsigned int d, unsigned int i, unsigned int si){ //...
+				distance = d;
+				id = i;
+				sid = si; //...
+			}
+		};
+
+		// Vergleich für structs um der kleinsten Distanz die höchste Priorität zu geben.
+		class Compare_U_element{
+			public:
+				bool operator()(U_element& u1, U_element& u2){
+					if(u1.distance > u2.distance){
+						return true;
+					}
+					return false;
+				}
+		};
+
 	public:
 		/*
 		 * Konstruktor!
