@@ -8,22 +8,6 @@ int main(int argc, char *argv[]){
 	
 	
 	// Test des Graphen: instanziieren und alles mal ausprobieren 
-// 	Graph<Edge, Node, Shortcut> g = Graph<Edge, Node, Shortcut>();
-// 	g.initOffsets();
-// 	g.clearShortcuts();
-// 	g.initShortcutOffsets();
-// 	Shortcut s;
-// 	g.addShortcut(s);
-// 	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
-// 	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
-	 ///*
-// 	unsigned int a = 1;
-// 	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = Graph<Edge, Node, Shortcut>::OutEdgesOfNode(a, &g);
-// 	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = Graph<Edge, Node, Shortcut>::InEdgesOfNode(a, &g);
-// 	Edge e;
-// 	oe.getEdge(a-1, e);
-// 	oe.getEdge(a, e);
-// 	 //*/
 
 cout << "            _|\\__/|, " << endl;
 cout << "          ,((\\````\\\\_" << endl;
@@ -81,39 +65,45 @@ if(i == 1){
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
-			<< "Hier die Informationen zur ersten Kante des Knotens 0:" << endl;
+			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
 	start = clock();
-	 	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
-	 	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
+	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesIterator iit = g.getInEdges(0);
 	finish = clock();
-		cout << "-CPU-Clocks, um ausgehende und eingehende Kanten "<< endl 
-			<<"   eines Knotens zu bestimmen: " << (finish-start) << endl;
-		Edge e;
-	start = clock();
-		oe.getEdge(1, e);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "-CPU-Clocks, eine Kante zu bekommen: " << finish-start<< endl;
-		cout <<"-oe: Node ID (0) : " << oe.node_id << endl;
-		cout <<"-oe: EdgeCount : " << oe.edge_count << endl;
-		cout <<"-oe: getEdge(1) (S, T, DI) : " << endl;
-		cout <<"         source: " << e.source << endl;
-		cout <<"            target: " << e.target<< endl;
-		cout <<"             distance: " << e.distance << endl;
+		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
 	
 	cout << "Nun mit einem OutEdgesIterator "<< endl 
-		<< "   die ausgehenden Kanten von Node 0:" << endl;
-	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+		<< "   die AUSgehenden Kanten von Node 0:" << endl;
+	start = clock();
 	while(it.hasNext()){
-		Simple_Edge &e(it.getNext());
+		//Simple_Edge &e(it.getNext());
+		Simple_Edge *e = it.getNext();
 		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e.source << endl;
-		cout <<" target: " << e.target<< endl;
-		cout <<" distance: " << e.distance << endl;
+		cout <<" source: " << e->source << endl;
+		cout <<" target: " << e->target<< endl;
+		cout <<" distance: " << e->distance << endl;
 		
 	}
-
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
 		
+	cout << "Nun mit einem OutEdgesIterator "<< endl 
+		<< "   die EINgehenden Kanten von Node 0:" << endl;
+	start = clock();
+	while(iit.hasNext()){
+		//Simple_Edge &e(it.getNext());
+		Simple_Edge *e = iit.getNext();
+		cout <<" -- next edge --" << endl;
+		cout <<" source: " << e->source << endl;
+		cout <<" target: " << e->target<< endl;
+		cout <<" distance: " << e->distance << endl;
+		
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
+	
 	p.~simple_parser();
 	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
 	cin.get(); 
@@ -136,75 +126,58 @@ start = clock();
 		Graph<Edge, Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 				p.getNodes(), p.getEdges());
 
-	g.initOffsets();
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Graph initialisiert! Gebrauchte Sekunden: "<<time << endl
-		<< "Hier die Informationen zur ersten Kante des Knotens 0:" << endl;
-start = clock();
- 	Graph<Edge, Node, Shortcut>::OutEdgesOfNode oe = g.getAdjOutEdges(0);
- 	Graph<Edge, Node, Shortcut>::InEdgesOfNode ie = g.getAdjInEdges(0);
-finish = clock();
-		cout << "-CPU-Clocks, um ausgehende und eingehende Kanten "<< endl 
-			<<"   eines Knotens zu bestimmen: " << (finish-start) << endl;
-	Edge e;
-start = clock();
-	oe.getEdge(1, e);
-finish = clock();
-	cout << "-CPU-Clocks, eine Kante zu bekommen: " << finish-start<< endl;
-	cout <<"-oe: Node ID (0) : " << oe.node_id << endl;
-	cout <<"-oe: EdgeCount : " << oe.edge_count << endl;
-	cout <<"-oe: getEdge(1) (S, T, DI, TY), ID : " << e.id << endl;
-	cout <<"         source: " << e.source << endl;
-	cout <<"            target: " << e.target<< endl;
-	cout <<"             distance: " << e.distance << endl;
-	cout <<"                     type: " << e.type << endl;
+		g.initOffsets();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
+			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
+	start = clock();
+	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+	Graph<Edge, Node, Shortcut>::InEdgesIterator iit = g.getInEdges(0);
+	finish = clock();
+		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
 	
 	cout << "Nun mit einem OutEdgesIterator "<< endl 
-		<< "   die ausgehenden Kanten von Node 0:" << endl;
-	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
+		<< "   die AUSgehenden Kanten von Node 0:" << endl;
+	start = clock();
 	while(it.hasNext()){
-		Edge &e(it.getNext());
+		//Simple_Edge &e(it.getNext());
+		Edge *e = it.getNext();
 		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e.source << endl;
-		cout <<" target: " << e.target<< endl;
-		cout <<" distance: " << e.distance << endl;
-		cout <<" type: " << e.type << endl;
-		cout <<" edge-id : " << e.id << endl;
+		cout <<" source: " << e->source << endl;
+		cout <<" target: " << e->target<< endl;
+		cout <<" distance: " << e->distance << endl;
+		cout << " type : " << e->type << endl;
+		cout << " id : "<< e->id << endl;
 		
 	}
-	
-	
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
+		
+	cout << "Nun mit einem OutEdgesIterator "<< endl 
+		<< "   die EINgehenden Kanten von Node 0:" << endl;
+	start = clock();
+	while(iit.hasNext()){
+		//Simple_Edge &e(it.getNext());
+		Edge *e = iit.getNext();
+		cout <<" -- next edge --" << endl;
+		cout <<" source: " << e->source << endl;
+		cout <<" target: " << e->target<< endl;
+		cout <<" distance: " << e->distance << endl;
+		cout << " type : " << e->type << endl;
+		cout << " id : "<< e->id << endl;
+		
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
 	p.~parser();
 	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
 	cin.get(); 
 		
 	g.~Graph<Edge, Node, Shortcut>();
 }
-	
-//	parser testParser;
-//	Node* testArray1;
-//	Edge* testArray2;
-//	
-//	testParser.readFile("../data/15K.txt");
-//	cout << testParser.getNodeCount() << endl;
-//	cout << testParser.getEdgeCount() << endl;
-//	
-//	testArray1 = testParser.getNodes();
-//	cout << testArray1[1].lat << endl;
-//	cout << testArray1[1].lon << endl;
-//	cout << testArray1[1].elevation << endl;
-//	
-//	testArray2 = testParser.getEdges();
-//	cout << testArray2[0].source << endl;
-//	cout << testArray2[0].target << endl;
-//	cout << testArray2[0].id << endl;
-//	cout << testArray2[0].distance << endl;
-//	cout << testArray2[0].type << endl;
-//	
-//	delete[] testArray1;
-//	delete[] testArray2;
-
 
 	/*
 	 * Test der Graphalgs Klasse!

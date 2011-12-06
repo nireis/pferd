@@ -12,18 +12,10 @@
 template <typename E, typename N, typename S> 
 class Graph {
 
+	/* 
+	 * Iteratoren für Kanten von Nodes
+	 */
 	public:
-		/* anscheinend brauchen wir, wenn der dijkstra nicht zu spezialisiert
-		 * sein soll auf den offset array, klassen, die den zugriff auf 
-		 * kanten von knoten kapseln. das soll hier passieren.
-		 * die arbeit, die man im dijkstra sowieso machen muessten, 
-		 * wird also in getEdge(i) ausgelagert.
-		 * hinzu kommt dann der umstand, dass dsa ganze in klassen 
-		 * und funktionen gepackt ist, die selber erstmal speicher brauchen
-		 * (lokale variablen, etc) , aber diese würde man sich sehr wahrscheinlich
-		 * sowieso irgendwo merken müssen oder stets neu rechnen
-		 */
-
 		class OE_Andrenator {
 			public:
 				OE_Andrenator(){
@@ -31,7 +23,6 @@ class Graph {
 
 				OE_Andrenator(unsigned int node, Graph<E, N, S> *g){
 					start = &(g->edges[node]);
-					// position = g->edges[node].out_edge_offset;
 					position = g->nodes[node+1].out_edge_offset 
 						- g->nodes[node].out_edge_offset;
 				}
@@ -44,14 +35,17 @@ class Graph {
 					return (position > 0);
 				}
 
-				// Verwendung: E &e(it.getNext());
-				E& getNext(){
+				
+				// Verwendung, falls E& zurückgegeben wird: 
+				//    E &e(it.getNext());
+				// aber E* zurückgeben ist sinnvoller, wegen return 0;
+				E* getNext(){
 					if(position > 0)
-						return start[--position];
+						return &start[--position];
 
 					// wer auf das hasNext() nicht hört, 
 					// ist selber schuld
-					return * start;
+					return 0;
 				}
 
 			private:
@@ -60,48 +54,45 @@ class Graph {
 		};
 
 		class IE_Andrenator {
-
-		};
-
-
-		/* ======================
-		 * === ÜBERFLÜSSIG ======
-		 * ======================
-		 */
-		class AbstractEdgesOfNode{
 			public:
-				unsigned int node_id;
-				unsigned int edge_count;
-				virtual bool getEdge(unsigned int edge_id, E& e)=0;
-				virtual ~AbstractEdgesOfNode();
-		};
+				IE_Andrenator(){
+				}
 
-		class OutEdgesOfNode : public AbstractEdgesOfNode{
-			public:
-				OutEdgesOfNode();
-				~OutEdgesOfNode();
-				OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
-				bool getEdge(unsigned int edge_id, E& e);
+				IE_Andrenator(unsigned int node, Graph<E, N, S> *g){
+					start = &(g->in_edges[node]);
+					position = g->nodes[node+1].in_edge_offset 
+						- g->nodes[node].in_edge_offset;
+				}
+
+				~IE_Andrenator(){
+					start = 0;
+				}
+				
+				bool hasNext() const{
+					return (position > 0);
+				}
+
+				
+				// Verwendung, falls E& zurückgegeben wird: 
+				//    E &e(it.getNext());
+				// aber E* zurückgeben ist sinnvoller, wegen return 0;
+				E* getNext(){
+					if(position > 0)
+						return start[--position];
+
+					// wer auf das hasNext() nicht hört, 
+					// ist selber schuld
+					return 0;
+				}
 
 			private:
-				E* nodes_array_base;
+				unsigned int position;
+				E** start;
 		};
 
-		class InEdgesOfNode : public AbstractEdgesOfNode{
-			public:
-				InEdgesOfNode();
-				~InEdgesOfNode();
-				InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g);
-				bool getEdge(unsigned int edge_id, E& e);
-
-			private:
-				E** nodes_array_base;
-		};
-		/* ======================
-		 * === ÜBERFLÜSSIG ENDE =
-		 * ======================
-		 */
-
+	/*
+	 * Eigentliche interne Daten des Graphen
+	 */
 	private:
 
 		unsigned int node_count;
@@ -128,9 +119,14 @@ class Graph {
 		S** in_shortcuts; // array mit pointern
 		S** out_shortcuts;// auf shortcuts
 		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
+	
+	/*
+	 * Methoden und zeugs
+	 */
 	public:
 
 		typedef OE_Andrenator OutEdgesIterator;
+		typedef IE_Andrenator InEdgesIterator;
 
 		Graph();
 		Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
@@ -159,31 +155,11 @@ class Graph {
 			return OutEdgesIterator(node, this);
 		}
 
-		/*
-		 * Die Implementierung dieser beiden Methoden im Header
-		 * spart Stress in der graph.cpp, 
-		 * der aufgrund der templates aufkommt
-		 */
-		/* ======================
-		 * === ÜBERFLÜSSIG ======
-		 * ======================
-		 */
-		OutEdgesOfNode getAdjOutEdges(unsigned int node_id){
-			// OutEdgesOfNode oe =& OutEdgesOfNode(node_id, this);
-			return OutEdgesOfNode(node_id, this);
+		InEdgesIterator getInEdges(unsigned int node){
+			return InEdgesIterator(node, this);
 		}
-
-		InEdgesOfNode getAdjInEdges(unsigned int node_id){
-			// InEdgesOfNode ie = InEdgesOfNode(node_id, this);
-			return InEdgesOfNode(node_id, this);
-		}
-		/* ======================
-		 * === ÜBERFLÜSSIG ENDE =
-		 * ======================
-		 */
 
 		/* methoden implementieren, um:
-		  * graph zu initialisieren -> offsets setzen
 		  * shortuts zu verwalten
 		  * gewichte/auslastung der kanten zu verwalten
 		  */

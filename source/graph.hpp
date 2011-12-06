@@ -72,7 +72,9 @@ void Graph<E, N, S>::initOffsets(){
 	// voraussetzung, damit das alles funktioniert, ist,
 	// dass die kanten den sources nach aufsteigend sortiert sind,
 	// so, wie die nodes den IDs nach selbst aufsteigend sortiert sind
-	
+
+	//TODO: diese Liste eventuell durch eine eigene ersetzen?
+	//könnte man bei den shortcuts eh gebrauchen
 	std::list<E*>** edge_pointers_of_incomming_edges_for_nodes;
 	edge_pointers_of_incomming_edges_for_nodes = new std::list<E*>*[node_count];
 
@@ -128,76 +130,6 @@ template <typename E, typename N, typename S>
 void Graph<E, N, S>::addShortcut(S& sc){
 }
 
-template <typename E, typename N, typename S>
-Graph<E, N, S>::AbstractEdgesOfNode::~AbstractEdgesOfNode(){
-	//nix zu tun ?
-}
-
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(){
-	this->node_id = 0;
-	this->edge_count = 0;
-	this->nodes_array_base = 0;
-}
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::OutEdgesOfNode::~OutEdgesOfNode(){
-	//nix zu tun ?
-}
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::OutEdgesOfNode::OutEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
-	this->node_id = node_id;
-	this->edge_count = g->nodes[this->node_id+1].out_edge_offset - g->nodes[this->node_id].out_edge_offset;
-	this->nodes_array_base = 0;
-	if(this->node_id < g->node_count)
-		this->nodes_array_base = & g->edges[g->nodes[this->node_id].out_edge_offset];
-}
-
-template <typename E, typename N, typename S>
-bool Graph<E, N, S>::OutEdgesOfNode::getEdge(unsigned int edge_id, E& e){
-	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
-		e = nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
-		// macht uns das viel langsamer?
-		return true;
-	} else { // entweder keine edges oder id falsch
-		return false;
-	}
-}
-
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(){
-	this->node_id = 0;
-	this->edge_count = 0;
-	this->nodes_array_base = 0;
-}
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::InEdgesOfNode::~InEdgesOfNode(){
-	//nix zu tun ?
-}
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::InEdgesOfNode::InEdgesOfNode(unsigned int node_id, Graph<E, N, S> *g){
-	this->node_id = node_id;
-	this->edge_count = g->nodes[node_id+1].in_edge_offset 
-		- g->nodes[this->node_id].in_edge_offset;
-	this->nodes_array_base = 0;
-	if(this->node_id < g->node_count)
-		this->nodes_array_base = & g->in_edges[g->nodes[this->node_id].in_edge_offset];
-}
-
-template <typename E, typename N, typename S>
-bool Graph<E, N, S>::InEdgesOfNode::getEdge(unsigned int edge_id, E& e){
-	if(0 < edge_id && edge_id <= this->edge_count){ // user soll keinen blödsinn machen
-		e = * nodes_array_base[edge_id - 1]; // hier passiert immer ein arbeit... 
-		return true;
-	} else { // entweder keine edges oder id falsch
-		return false;
-	}
-}
 
 
 
