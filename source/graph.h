@@ -151,6 +151,8 @@ class Graph {
 
 		void addShortcut(S& sc);
 
+		unsigned int getNodeCount();
+		
 		OutEdgesIterator getOutEdges(unsigned int node){
 			return OutEdgesIterator(node, this);
 		}
