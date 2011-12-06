@@ -17,12 +17,18 @@ class Graph {
 	 */
 	public:
 		class OE_Andrenator {
+			private:
+				unsigned int position;
+				unsigned int begin;
+				E* start;
 			public:
 				OE_Andrenator(){
+					position = 0;
 				}
 
 				OE_Andrenator(unsigned int node, Graph<E, N, S> *g){
-					start = &(g->edges[node]);
+					start = &(g->edges[g->nodes[node].out_edge_offset]);
+					begin = 0;
 					position = g->nodes[node+1].out_edge_offset 
 						- g->nodes[node].out_edge_offset;
 				}
@@ -31,7 +37,7 @@ class Graph {
 					start = 0;
 				}
 				
-				bool hasNext() const{
+				bool hasNext(){
 					return (position > 0);
 				}
 
@@ -40,17 +46,17 @@ class Graph {
 				//    E &e(it.getNext());
 				// aber E* zurückgeben ist sinnvoller, wegen return 0;
 				E* getNext(){
-					if(position > 0)
-						return &start[--position];
+					if(position > 0){
+						position = position - 1;
+						begin = begin + 1;
+					return &start[begin-1];
+				}
 
 					// wer auf das hasNext() nicht hört, 
 					// ist selber schuld
 					return 0;
 				}
 
-			private:
-				unsigned int position;
-				E* start;
 		};
 
 		class IE_Andrenator {
@@ -153,11 +159,13 @@ class Graph {
 
 		unsigned int getNodeCount();
 		
-		OutEdgesIterator getOutEdges(unsigned int node){
+		unsigned int getEdgeCount();
+		
+		OutEdgesIterator getOutEdgesIt(unsigned int node){
 			return OutEdgesIterator(node, this);
 		}
 
-		InEdgesIterator getInEdges(unsigned int node){
+		InEdgesIterator getInEdgesIt(unsigned int node){
 			return InEdgesIterator(node, this);
 		}
 
@@ -165,6 +173,39 @@ class Graph {
 		  * shortuts zu verwalten
 		  * gewichte/auslastung der kanten zu verwalten
 		  */
+/*
+		void printGraph(){
+
+			
+			Graph::OutEdgesIterator it = getOutEdges(0);
+
+			std::cout << node_count << std::endl;
+			std::cout << edge_count << std::endl;
+			for(unsigned int i = 0; i < node_count; i++){
+				std::cout << i<< " " << nodes[i].lat<< " "  << nodes[i].lon<< " "  << nodes[i].elevation << std::endl;
+			}
+			for(unsigned int i = 0; i < edge_count; i++){
+				std::cout << edges[i].source << " " << edges[i].target << " "  << edges[i].distance << " "  << edges[i].type << std::endl;
+			}
+		}
+		void printGraphIt(){
+
+			
+			std::cout << node_count << std::endl;
+			std::cout << edge_count << std::endl;
+			for(unsigned int i = 0; i < node_count; i++){
+				std::cout << i<< " " << nodes[i].lat<< " "  << nodes[i].lon<< " "  << nodes[i].elevation << std::endl;
+			}
+			E* e;
+			for(unsigned int i = 0; i < node_count; i++){
+				OutEdgesIterator it = getOutEdges(i);
+				while (it.hasNext()){
+					e = it.getNext();
+					std::cout << e->source << " " << e->target << " "  << e->distance << " "  << e->type << std::endl;
+				}
+			}
+		}
+*/
 };
 
 #include "graph.hpp"

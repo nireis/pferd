@@ -13,7 +13,7 @@ all: $(OBJ)
 
 # es werden all .cpp dateien kompiliert
 $(OBJ):
-	$(CC) $(CFLAGS) -c $(CPP)
+	$(CC) $(CFLAGS) -c $(CPP) $(LDFLAGS)
 
 clean:
 	rm -f $(BIN) $(OBJ)

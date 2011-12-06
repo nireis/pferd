@@ -62,6 +62,11 @@ unsigned int Graph<E, N, S>::getNodeCount(){
 }
 
 template <typename E, typename N, typename S>
+unsigned int Graph<E, N, S>::getEdgeCount(){
+	return edge_count;
+}
+
+template <typename E, typename N, typename S>
 /*  initOffsets()
  *
  *  richtet die offsets der nodes ein so,

@@ -67,8 +67,8 @@ if(i == 1){
 		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
 			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
 	start = clock();
-	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
-	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesIterator iit = g.getInEdges(0);
+	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdgesIt(0);
+	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesIterator iit = g.getInEdgesIt(0);
 	finish = clock();
 		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
 	
@@ -132,8 +132,8 @@ start = clock();
 		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
 			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
 	start = clock();
-	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdges(0);
-	Graph<Edge, Node, Shortcut>::InEdgesIterator iit = g.getInEdges(0);
+	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdgesIt(0);
+	Graph<Edge, Node, Shortcut>::InEdgesIterator iit = g.getInEdgesIt(0);
 	finish = clock();
 		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
 	
@@ -172,18 +172,22 @@ start = clock();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
+
+	/*
+	 * Test der Graphalgs Klasse!
+	 */
+	cout << "Dijkstra beginnt." << endl;
+	Graphalgs ga = Graphalgs(&g);
+	ga.Dijkstra(0);
+	cout << "Dijkstra endet." << endl;
+
 	p.~parser();
+
 	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
 	cin.get(); 
 		
 	g.~Graph<Edge, Node, Shortcut>();
 }
-
-	/*
-	 * Test der Graphalgs Klasse!
-	 */
-//	Graphalgs ga = Graphalgs(&g);
-//	ga.Dijkstra(0);
 
 	cout << "Taste drücken zum beenden ... "; 
 	cin.get(); 
