@@ -13,6 +13,15 @@ struct Simple_Edge {
 };
 
 struct Edge : public Simple_Edge {
+
+	Edge(){
+		type = 0;
+		id = 0;
+		source = 0;
+		target = 0;
+		distance = 0;
+	}
+
 	unsigned int type; //stellt sich raus, char bringt uns nix
 	unsigned int id; // damit man kanten im kantenarray finden kann
 	// alternativ, statt ID, die differenz des zeigers auf Kante und
@@ -57,19 +66,20 @@ class SList {
 			return false;
 		}
 		void push(T d){
+				SListData* t = new SListData;
 			if(root == 0){
-				root = new SListData;
+				root = t;
 				root->next = 0;
 				root->data = d;
 			} else {
-				SListData* t = new SListData;
-				t->next = root->next;
-				t->data = d;
+				t->next = root;
 				root = t;
+				root->data = d;
 			}
+			t = 0;
 		}
 		T pop(){
-			T d;
+			T d = T();
 			if(root != 0){
 				SListData* t = root->next;
 				d = root->data;

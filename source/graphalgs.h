@@ -18,6 +18,12 @@ class Graphalgs{
 				id = i;
 				eid = ei;
 			}
+
+			U_element(){
+				distance = 0;
+				id = 0;
+				eid = 0;
+			}
 		};
 
 		// Vergleich für structs um der kleinsten Distanz die höchste Priorität zu geben.
@@ -41,7 +47,7 @@ class Graphalgs{
 		 *
 		 * Macht einen "normalen" Dijkstra auf dem gegebenen Knoten.
 		 */
-		void Dijkstra(int node_id);
+		void Dijkstra(unsigned int node_id);
 };
 
 #endif

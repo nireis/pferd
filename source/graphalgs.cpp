@@ -6,7 +6,7 @@ Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
 	this->g = g;
 }
 
-void Graphalgs::Dijkstra(int node_id){
+void Graphalgs::Dijkstra(unsigned int node_id){
 	// Hier liegen am Ende die kürzesten Distanzen
 	unsigned int* dist;
 	// Hier sehen wir ob ein Knoten schon seinen kürzesten Pfad gefunden hat
