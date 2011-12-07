@@ -22,7 +22,7 @@ class Graphalgs{
 			U_element(){
 				distance = 0;
 				id = 0;
-				sid = 0;
+				eid = 0;
 			}
 		};
 
