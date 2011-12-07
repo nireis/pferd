@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -g
+CXXFLAGS = -Wall -g -O3
 LDFLAGS = 
 BIN =pferd
 
@@ -11,10 +11,11 @@ OBJ =pferd.o graphalgs.o parser.o simple_parser.o
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
+	$(CC) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 # es werden all .cpp dateien kompiliert
 $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
+
 
 
 clean:
