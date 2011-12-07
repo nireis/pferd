@@ -81,11 +81,11 @@ void Graph<E, N, S>::initOffsets(){
 	in_edges = new E*[edge_count];
 
 
-#include <iostream>
-	std::cout << "Kurz inne halten: nun sind alle Datenstrukturen" << std::endl;
-	std::cout<< "für den Graphen initialisiert und müssen nur noch befüllt werden." << std::endl; 
-	std::cout<< "Schau Dir den Speicherverbrauch an. Taste drücken zum Fortfahren." << std::endl;
-	std::cin.get();
+// #include <iostream>
+// 	std::cout << "Kurz inne halten: nun sind alle Datenstrukturen" << std::endl;
+// 	std::cout<< "für den Graphen initialisiert und müssen nur noch befüllt werden." << std::endl; 
+// 	std::cout<< "Schau Dir den Speicherverbrauch an. Taste drücken zum Fortfahren." << std::endl;
+// 	std::cin.get();
 
 
 	// voraussetzung, damit das alles funktioniert, ist,
@@ -100,13 +100,13 @@ void Graph<E, N, S>::initOffsets(){
 	if(switsch == 1){
 		SList<E*>** pointing_at_income;
 		pointing_at_income = new SList<E*>*[node_count];
-	std::cout<< "Listengröße akzeptabel? Nun initialisieren: " << std::endl;
-	std::cin.get();
+//	std::cout<< "Listengröße akzeptabel? Nun initialisieren: " << std::endl;
+//	std::cin.get();
 	
 		for(unsigned int i = 0; i < node_count; i++)
 			pointing_at_income[i] = new SList<E*>();
-	std::cout<< "Listen wurden angelegt. Nun befüllen: " << std::endl;
-	std::cin.get();
+//	std::cout<< "Listen wurden angelegt. Nun befüllen: " << std::endl;
+//	std::cin.get();
 	
 		// wenn wir uns die incoming-edges fuer jeden knoten merken,
 		// brauchen wir das spaeter nur in die offsets reinzusetzen. 
@@ -121,8 +121,8 @@ void Graph<E, N, S>::initOffsets(){
 			nodes[ edges[j].source +1 ].out_edge_offset ++; 
 		}
 	
-	std::cout<< "Listen wurden befülllt. Nun zurückschreiben:" << std::endl;
-	std::cin.get();
+//	std::cout<< "Listen wurden befülllt. Nun zurückschreiben:" << std::endl;
+//	std::cin.get();
 		unsigned int j = 0;
 		// nun die incoming edges verteilen
 		for(unsigned int i = 0; i < node_count; i++){
@@ -136,8 +136,8 @@ void Graph<E, N, S>::initOffsets(){
 				j++;
 			}
 		}
-	std::cout<< "Listen wurden gepopt. Nun löschem:" << std::endl;
-	std::cin.get();
+//	std::cout<< "Listen wurden gepopt. Nun löschem:" << std::endl;
+//	std::cin.get();
 		for(unsigned int it=0; it < node_count; it++){
 			(*pointing_at_income[it]).clear();
 			delete pointing_at_income[it];

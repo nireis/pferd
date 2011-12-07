@@ -61,8 +61,8 @@ if(i == 1){
 			Graph<Simple_Edge, Simple_Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 					p.getNodes(), p.getEdges());
 	
-	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
-	cin.get(); 
+//	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
+//	cin.get(); 
 
 		g.initOffsets();
 	finish = clock();
@@ -108,8 +108,8 @@ if(i == 1){
 	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
 	
 	p.~simple_parser();
-	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
-	cin.get(); 
+//	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
+//	cin.get(); 
 		
 	g.~Graph<Simple_Edge, Simple_Node, Shortcut>();
 	
@@ -129,8 +129,8 @@ start = clock();
 		Graph<Edge, Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
 				p.getNodes(), p.getEdges());
 
-	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
-	cin.get(); 
+//	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
+//	cin.get(); 
 
 		g.initOffsets();
 	finish = clock();
@@ -179,8 +179,8 @@ start = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
 
-	cout << "Taste drücken, damit   DIJKSTRA   beginnt. "; 
-	cin.get(); 
+//	cout << "Taste drücken, damit   DIJKSTRA   beginnt. "; 
+//	cin.get(); 
 
 	/*
 	 * Test der Graphalgs Klasse!
@@ -195,8 +195,8 @@ start = clock();
 
 	p.~parser();
 
-	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
-	cin.get(); 
+//	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
+//	cin.get(); 
 		
 	g.~Graph<Edge, Node, Shortcut>();
 }

@@ -25,9 +25,11 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	in_edge_id = new unsigned int[g->getNodeCount()];
 
 	// Init, damit alles passt (Vorsichtsmaßnahme)
-	/*for (unsigned int i = 0; i < g->getNodeCount(); i++){
+	for (unsigned int i = 0; i < g->getNodeCount(); i++){
 		found[i] = false;
-	}*/
+//		in_edge_id[i] = 0;
+//		dist[i] = 0;
+	}
 
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
@@ -52,7 +54,7 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 			while(it.hasNext()){
 				nextEdge = it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[nextEdge->id]){
+				if(!found[nextEdge->target]){
 					// ...tu sie in U
 					U.push(U_element(
 								nextEdge->distance+dist[tmpid],nextEdge->target,nextEdge->id));
