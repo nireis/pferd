@@ -61,7 +61,7 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 
 	// TEST: Ergebnisse ausgeben
-	for(unsigned int i=0; i < g->getNodeCount(); i++){
-		cout << dist[i] << endl;
-	}
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		cout << dist[i] << endl;
+//	}
 }
