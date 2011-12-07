@@ -130,7 +130,34 @@ bool parser::readFile(string filename)
 	if( file.is_open())
 	{
 		file.seekg(0, ios::beg);
-		while( !file.eof())
+		
+		getline(file,buffer,'\n');
+		NodeCount = (unsigned int)atoi(buffer.c_str());
+		graphNodes = new Node[NodeCount+1];
+
+
+		getline(file,buffer,'\n');
+		EdgeCount = (unsigned int)atoi(buffer.c_str());
+		graphEdges = new Edge[EdgeCount];
+
+		for(unsigned int i = 0; i < NodeCount; i++){
+			getline(file,buffer,'\n');
+			createNode(buffer, &graphNodes[i]);
+		}
+		unsigned int j = 0;
+		while(j < EdgeCount ){
+			getline(file,buffer,'\n');
+			createEdge(buffer, j, &graphEdges[j]);
+			j++;
+		}
+		
+		/*
+		 * Sorry Michi, 
+		 * der Parser gab teilweise nicht initialisierte
+		 * Objekte zurück :(
+		 */
+
+		/*while( !file.eof())
 		{
 			getline(file,buffer,'\n');
 
@@ -159,7 +186,7 @@ bool parser::readFile(string filename)
 
 			currentline = currentline + 1;
 
-		}
+		}*/
 
 		file.close();
 		//Dummy Node als letzten Eintrag im Knotenarray
