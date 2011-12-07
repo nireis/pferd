@@ -186,9 +186,12 @@ start = clock();
 	 * Test der Graphalgs Klasse!
 	 */
 	cout << "Dijkstra beginnt." << endl;
+	start = clock();
 	Graphalgs ga = Graphalgs(&g);
 	ga.Dijkstra(0);
-	cout << "Dijkstra endet." << endl;
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Dijkstra beendet in sek " << time << endl;
 
 	p.~parser();
 
