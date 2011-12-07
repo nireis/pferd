@@ -1,5 +1,6 @@
 #include "graphalgs.h"
 #include <queue>
+#include <ctime>
 using namespace std;
 
 Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
@@ -7,33 +8,21 @@ Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
 }
 
 void Graphalgs::Dijkstra(unsigned int node_id){
-	// Pointer Deklaration
-//	unsigned int* dist;
-//	bool* found;
-//	unsigned int* in_edge_id;
 	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g->getOutEdgesIt(node_id);
 	// Pointer um die akutelle Kante zu behandeln
 	Edge* nextEdge;
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
-	
+
 	// Die ganzen Vektoren initialisieren
 	vector<unsigned int> dist(g->getNodeCount());
 	vector<bool> found(g->getNodeCount(),false);
 	vector<unsigned int> in_edge_id(g->getNodeCount());
 
-//	// Die ganzen Arrays initialisieren
-//	dist = new unsigned int[g->getNodeCount()];
-//	found = new bool[g->getNodeCount()];
-//	in_edge_id = new unsigned int[g->getNodeCount()];
-//
-//	// Init, damit alles passt (Vorsichtsmaßnahme)
-//	for (unsigned int i = 0; i < g->getNodeCount(); i++){
-//		found[i] = false;
-//		in_edge_id[i] = 0;
-//		dist[i] = 0;
-//	}
-
+	//TEST
+	clock_t start,finish;
+	start = clock();
+	
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
 	found[node_id] = true;
@@ -67,8 +56,12 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 		U.pop();
 	}
 
+	// TEST
+	finish = clock();
+	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
 	// TEST: Ergebnisse ausgeben
-	/*for(unsigned int i=0; i < g->getNodeCount(); i++){
+	for(unsigned int i=0; i < g->getNodeCount(); i++){
 		cout << dist[i] << endl;
-	}*/
+	}
 }
