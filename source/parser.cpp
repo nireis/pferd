@@ -122,7 +122,7 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 bool parser::readFile(string filename)
 {
 	string buffer;
-	unsigned int currentline = 1;
+//	unsigned int currentline = 1;
 
 	ifstream file;
 	file.open(filename.c_str(), ios::in);

@@ -44,11 +44,11 @@ class Graph {
 				}
 
 				E* getNext(){
-					if(pos < max){
-						pos = pos + 1;
-					return &start[pos-1];
-					}
-					return 0;
+			//		if(pos < max){
+			//			pos = pos + 1;
+					return &start[pos++];
+			//		}
+			//		return 0;
 				}
 		};
 		class IE_Andrenator {
