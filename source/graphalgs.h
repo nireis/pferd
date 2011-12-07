@@ -11,12 +11,12 @@ class Graphalgs{
 		struct U_element{
 			unsigned int distance;
 			unsigned int id;
-			unsigned int sid; //...
+			unsigned int eid;
 
-			U_element(unsigned int d, unsigned int i, unsigned int si){ //...
+			U_element(unsigned int d, unsigned int i, unsigned int ei){
 				distance = d;
 				id = i;
-				sid = si; //...
+				eid = ei;
 			}
 		};
 
