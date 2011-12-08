@@ -1,6 +1,7 @@
 #include "graphalgs.h"
 #include <queue>
 #include <ctime>
+#include <iostream>
 using namespace std;
 
 Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){

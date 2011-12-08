@@ -16,26 +16,26 @@ class Graph {
 	 * Iteratoren für Kanten von Nodes
 	 */
 	public:
-		class OE_Andrenator {
+		template <typename T>
+		class Andrenator_DP {
 			private:
 				unsigned int max;
 				unsigned int pos;
-				E* start;
+				T** start;
 			public:
-				OE_Andrenator(){
+				Andrenator_DP(){
 					pos = 0;
 					max = 0;
 					start = 0;
 				}
 
-				OE_Andrenator(unsigned int node, Graph<E, N, S> *g){
-					start = &(g->edges[g->nodes[node].out_edge_offset]);
+				Andrenator_DP(unsigned int node, T** strt, unsigned int mx){
+					start = strt;
 					pos = 0;
-					max = g->nodes[node+1].out_edge_offset 
-						- g->nodes[node].out_edge_offset;
+					max = mx;
 				}
 
-				~OE_Andrenator(){
+				~Andrenator_DP(){
 					start = 0;
 				}
 				
@@ -43,50 +43,41 @@ class Graph {
 					return (pos < max);
 				}
 
-				E* getNext(){
-			//		if(pos < max){
-			//			pos = pos + 1;
+				T* getNext(){
+					return start[pos++];
+				}
+		}; 
+		template <typename T>
+		class Andrenator_P {
+			private:
+				unsigned int max;
+				unsigned int pos;
+				T* start;
+			public:
+				Andrenator_P(){
+					pos = 0;
+					max = 0;
+					start = 0;
+				}
+
+				Andrenator_P(unsigned int node, T* strt, unsigned int mx){
+					start = strt;
+					pos = 0;
+					max = mx;
+				}
+
+				~Andrenator_P(){
+					start = 0;
+				}
+				
+				bool hasNext(){
+					return (pos < max);
+				}
+
+				T* getNext(){
 					return &start[pos++];
-			//		}
-			//		return 0;
 				}
 		};
-		class IE_Andrenator {
-			private:
-				unsigned int max;
-				unsigned int pos;
-				E** start;
-			public:
-				IE_Andrenator(){
-					pos = 0;
-					max = 0;
-					start = 0;
-				}
-
-				IE_Andrenator(unsigned int node, Graph<E, N, S> *g){
-					start = &(g->in_edges[g->nodes[node].in_edge_offset]);
-					pos = 0;
-					max = g->nodes[node+1].in_edge_offset 
-						- g->nodes[node].in_edge_offset;
-				}
-
-				~IE_Andrenator(){
-					start = 0;
-				}
-				
-				bool hasNext(){
-					return (pos < max);
-				}
-
-				E* getNext(){
-					if(pos < max){
-						pos = pos + 1;
-					return start[pos-1];
-					}
-					return 0;
-				}
-		};
-
 
 	/*
 	 * Eigentliche interne Daten des Graphen
@@ -96,75 +87,157 @@ class Graph {
 		unsigned int node_count;
 		unsigned int edge_count;
 	
-		// statischer teil des graphen
-		
-		// arrays aller kanten und knoten
+		/*
+		 * statischer teil des graphen
+		 */
+
+		/* 
+		 * arrays aller kanten und knoten 
+		 * */
+
 		N* nodes; 
-		// nodes muss groesse node_count+1 haben! 
-		// der letzte ist ein dummy, damit das mit den offsets klappt
+		/* 
+		 * nodes muss groesse node_count+1 haben! 
+		 * der letzte ist ein dummy, damit das mit den offsets klappt
+		 */
+
 		E* edges;
+		E** in_edges; 
+		/* 
+		 * arrays von pointern auf kanten
+		 * hierrin suchen wir mit den offsets nach kanten
+		 * anhand der offsets in den nodes kann man direkt 
+		 * in E* und E** die ausgehenden/eingehenden kanten finden
+		 */
+
+		/*
+		 * dynamischer teil des graphen
+		 * ( Shortcuts anders verwaltbar als in Listen? )
+		 */
 		
-		E** in_edges; // arrays von pointern auf kanten
-		// hierrin suchen wir mit den offsets nach kanten
-		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
-		// E** out_edges; - ist redundant, siehe implementierung in der .cpp
-		// anhand der offsets kann man direkt in E* edges die ausgehenden kanten finden
+		S** shortcuts;
+		/*
+		 * eine Idee wäre, die Shortcutliste
+		 * in nen Array umzusetzen, falls uns das was bringt.
+		 * mal schauen
+		 */
+		SListExt<S> shortcutlist;
+		//std::list<S> shortcuts; 
+		/*
+		 * alle shortscuts
+		 * TODO schauen, ob vector mehr platz braucht
+		 *	     oder flexibler und schneller ist
+		 *
+		 *	     alternativ eine eigene listenstruktur, 
+		 *	     welche updates aus neu zugefügten SC's 
+		 *	     zulässt?
+		 */
 
-		// dynamischer teil des graphen, Ss
+		S** in_shortcuts; 
+		S** out_shortcuts;
+		/*
+		 * arrays mit pointern auf shortcuts
+		 * die pointer verweisen auf shortcuts, welche
+		 * in der liste eingetragen sind
+		 *
+		 */
 
-		std::list<S> shortcuts; //alle shortscuts
 
-		S** in_shortcuts; // array mit pointern
-		S** out_shortcuts;// auf shortcuts
-		// (int*)[]; // eigentlich sollen das arrays mit pointern drin sein
-	
 	/*
 	 * Methoden und zeugs
 	 */
 	public:
 
-		typedef OE_Andrenator OutEdgesIterator;
-		typedef IE_Andrenator InEdgesIterator;
+		typedef Andrenator_P<E> OutEdgesIterator;
+		typedef Andrenator_DP<E> InEdgesIterator;
+		typedef Andrenator_DP<S> OutShortcutsIterator;
+		typedef Andrenator_DP<S> InShortcutsIterator;
 
 		Graph();
-		Graph(unsigned int nc, unsigned int ec, // Graph von aussen setzen
+		Graph(unsigned int nc, unsigned int ec, 
 				N* n, E* e,
 				E** ie, E** oe,
 				S** is, S** os);
-
-		Graph(unsigned int nc, unsigned int ec, // Graph klein initialisieren
+		/*
+		 * Dies ist der für uns interessante Konstruktor
+		 * Merke: es gibt NodeCount 'nc' viele Nodes, aber
+		 * das Nodearray ist n+1 lang. 
+		 * Der Dummy am Ende darf nie nach aussen gelangen.
+		 */
+		Graph(unsigned int nc, unsigned int ec, 
 				N* n, E* e);
-				// Uebergeben werden: anzahl der Edges/Nodes; 
-				// Pointer auf Array mit Instanzen der Edges/Nodes
-				//  WICHTIG: N* n - die nodes sind genau _nc+1_ nodes,
-				//  der letzte ein dummy mit offsets=0
 		
+		/*
+		 * falls jemand von uns ableitet
+		 * wer auch immer sowas wollen würde...
+		 */
 		virtual ~Graph();
+		
+		/*
+		 * initialisiert die Offsets für out/in edges der nodes
+		 * das ganze passiert in O( 2*edge_count + node_count ) Zeit
+		 * dynamischer Platzverbrauch liegt etwa in O( 4*edge_count )
+		 */
+		void initOffsets();
 
-		void initOffsets(); // done
-
+		/*
+		 * initialisiert die Offsets der Shortcuts
+		 * Zeit/Platzaufwand abhängig von größe der Shortcut Liste
+		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
+		 */
 		void initShortcutOffsets();
 
-		void clearShortcuts(); // done
+		/*
+		 * Shortcutliste komplett löschen
+		 * 
+		 * impliziert auch löschen der dazugehörigen offsets etc...
+		 */
+		void clearShortcuts();
 
-		void addShortcut(S& sc);
+		void addShortcut(S sc);
 
 		unsigned int getNodeCount();
-		
 		unsigned int getEdgeCount();
-		
+
+		/*
+		 * hier werden iteratoren über kanten nach aussen gegeben
+		 * 
+		 * ein iterator funktioniert 
+		 *		* nur ein mal, wenn man damit alle kanten anschaut
+		 *		* für nur einen knoten
+		 *		* für genau alle kanten der angeforderten richtung 
+		 */
 		OutEdgesIterator getOutEdgesIt(unsigned int node){
-			return OutEdgesIterator(node, this);
+			return OutEdgesIterator
+					(node
+					, &(edges[nodes[node].out_edge_offset])
+					,nodes[node+1].out_edge_offset-nodes[node].out_edge_offset);
 		}
 
 		InEdgesIterator getInEdgesIt(unsigned int node){
-			return InEdgesIterator(node, this);
+			return InEdgesIterator
+				(node
+				 ,&(in_edges[nodes[node].in_edge_offset]) 
+				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
+		}
+		
+		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
+			return InEdgesIterator
+				(node
+				 ,&(in_edges[nodes[node].in_edge_offset]) 
+				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
+		}
+		
+		InShortcutsIterator getInShortcutsIt(unsigned int node){
+			return InEdgesIterator
+				(node
+				 ,&(in_edges[nodes[node].in_edge_offset]) 
+				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
 		}
 
-		/* methoden implementieren, um:
-		  * shortuts zu verwalten
-		  * gewichte/auslastung der kanten zu verwalten
-		  */
+		/*
+		 *		von hier an gibt es nichts zu sehen
+		 */
 /*
 		void printGraph(){
 

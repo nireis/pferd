@@ -20,6 +20,8 @@ void parser::createNode(string inputString, Node* rNode)
 {
 	rNode->in_edge_offset = 0;
 	rNode->out_edge_offset = 0;
+	rNode->in_shortcut_offset = 0;
+	rNode->out_shortcut_offset = 0;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;

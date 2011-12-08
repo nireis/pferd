@@ -188,7 +188,10 @@ start = clock();
 	cout << "Dijkstra angefangen." << endl;
 	Graphalgs ga = Graphalgs(&g);
 	ga.Dijkstra(0);
+	g.initShortcutOffsets();
 	cout << "Dijkstra beendet." << endl;
+
+	g.initShortcutOffsets();
 
 	p.~parser();
 

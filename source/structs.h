@@ -13,7 +13,6 @@ struct Simple_Edge {
 };
 
 struct Edge : public Simple_Edge {
-
 	Edge(){
 		type = 0;
 		id = 0;
@@ -29,19 +28,21 @@ struct Edge : public Simple_Edge {
 };
 
 struct Shortcut : public Simple_Edge {
-	Simple_Edge* from;
+	Simple_Edge* srcEdg;
 	bool from_is_sc; // damit wir wissen, ob dies ein shortcut ist,
-	Simple_Edge* to; // der weiter aufgemacht gehoert
+	Simple_Edge* trgtEdg; // der weiter aufgemacht gehoert
 	bool to_is_sc;
 };
 
 struct Simple_Node {
-	//int id; // durch arrayindex gegeben
-	unsigned int in_edge_offset; // offset fuer array der eingehenden kanten
+	unsigned int in_edge_offset; 
 	unsigned int out_edge_offset;
 };
 
 struct Node : public Simple_Node {
+	unsigned int in_shortcut_offset;
+	unsigned int out_shortcut_offset;
+
 	float lat;
 	float lon;
 	int elevation;
@@ -49,7 +50,7 @@ struct Node : public Simple_Node {
 
 template <typename T>
 class SList {
-	private:
+	protected:
 		struct SListData;
 		SListData* root;
 		
@@ -58,7 +59,12 @@ class SList {
 			SListData* next;
 		};
 	public:
-		
+		SList(){
+			root = 0;
+		}
+		virtual ~SList(){
+			clear();
+		}
 		bool empty(){
 			if(root == 0)
 				return true;
@@ -96,6 +102,74 @@ class SList {
 				delete root;
 				root = t;
 			}
+		}
+};
+ 
+template <typename T>
+/*
+ * Erweiterung der push/pop Liste 
+ * um Mitzählen der Größe
+ * und peek()
+ * und einen Iterator durch die Liste
+ */
+class SListExt : public SList<T> {
+	protected:
+		unsigned int siz;
+	public:
+		SListExt(){
+			siz = 0;
+		}
+		~SListExt(){
+		}
+
+		void push(T d){
+			siz++;
+			SList<T>::push(d);
+		}
+		T pop(){
+			siz--;
+			return SList<T>::pop();
+		}
+		void clear(){
+			siz = 0;
+			SList<T>::clear();
+		}
+
+		bool peek(T* t){
+			if(siz != 0){
+				t = & SList<T>::root->data;
+				return true;
+			}
+
+			return false;
+		}
+		unsigned int size(){
+			return siz;
+		}
+		class Iterator {
+			private:
+				typename SList<T>::SListData* position;
+			public:
+				Iterator(typename SList<T>::SListData* r){
+					position = r;
+				}
+				~Iterator(){
+					position = 0;
+				}
+				bool hasNext(){
+					if(position == 0)
+						return false;
+					
+					return true;
+				}
+				void getNext(T* t){
+					t = & (position->data);
+					position = position->next;
+				}
+		};
+		Iterator getIterator(){
+			Iterator i = Iterator(this->root);
+			return i;
 		}
 };
 
