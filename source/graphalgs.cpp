@@ -1,6 +1,7 @@
 #include "graphalgs.h"
 #include <queue>
 #include <ctime>
+#include <limits>
 using namespace std;
 
 Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
@@ -16,20 +17,14 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
 	unsigned int nr_of_nodes = g->getNodeCount();
+	// Die ganzen Vektoren initialisieren
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<bool> found(nr_of_nodes,false);
+	vector<unsigned int> in_edge_id(nr_of_nodes);
 
 	//TEST
 	clock_t start,finish;
 	start = clock();
-
-	vector<unsigned int> dist(nr_of_nodes,0);
-
-	// TEST
-	finish = clock();
-	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
-
-	// Die ganzen Vektoren initialisieren
-	vector<bool> found(nr_of_nodes,false);
-	vector<unsigned int> in_edge_id(nr_of_nodes);
 
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
@@ -63,6 +58,11 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 		}
 		U.pop();
 	}
+
+	// TEST
+	finish = clock();
+	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
 	// TEST: Ergebnisse ausgeben
 	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
 	//		cout << dist[i] << endl;
@@ -74,19 +74,19 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	for(unsigned int i=0; i < g->getNodeCount(); i++){
 		iit = g->getInEdgesIt(i);
 		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
-		if(dist[i] != 0){
+		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
 			Edge* tmpedge = g->getEdge(in_edge_id[i]);
 			// Wenn die Distanz nicht stimmt...
 			if(tmpedge->distance + dist[tmpedge->source] != dist[i]){
 				// DISTANZ in Dijkstra nicht konsistent!!
-				cout << "Fuck Distanz stimmt nicht für: " << i << endl;
+				cout << "Distanz stimmt nicht für: " << i << endl;
 			}
 		}
 		while(iit.hasNext()){
 			inEdge = iit.getNext();		
-			if(dist[i] > inEdge->distance + dist[inEdge->source] && dist[inEdge->source] != 0){
+			if(dist[i] > inEdge->distance + dist[inEdge->source] && dist[inEdge->source] != numeric_limits<unsigned int>::max()){
 				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
-				cout << "Fuck minimal stimmt nicht für: ";
+				cout << "Minimal stimmt nicht für: ";
 				cout << "Edge ID: " << in_edge_id[i];
 				cout << " Source Node: " << inEdge->source;
 				cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
