@@ -57,6 +57,11 @@ Graph<E, N, S>::~Graph(){
 }
 
 template <typename E, typename N, typename S>
+Edge* Graph<E, N, S>::getEdge(unsigned int id){
+	return &edges[id];
+}
+
+template <typename E, typename N, typename S>
 unsigned int Graph<E, N, S>::getNodeCount(){
 	return node_count;
 }

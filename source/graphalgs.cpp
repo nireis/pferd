@@ -21,7 +21,7 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	clock_t start,finish;
 	start = clock();
 
-	vector<unsigned int> dist(nr_of_nodes);
+	vector<unsigned int> dist(nr_of_nodes,0);
 
 	// TEST
 	finish = clock();
@@ -67,4 +67,32 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
 	//		cout << dist[i] << endl;
 	//	}
+	// Test: Dijkstra verifizieren
+	// Schauen ob die Distanzen stimmen und auch minimal sind
+	Graph<Edge, Node, Shortcut>::InEdgesIterator iit;
+	Edge* inEdge;
+	for(unsigned int i=0; i < g->getNodeCount(); i++){
+		iit = g->getInEdgesIt(i);
+		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+		if(dist[i] != 0){
+			Edge* tmpedge = g->getEdge(in_edge_id[i]);
+			// Wenn die Distanz nicht stimmt...
+			if(tmpedge->distance + dist[tmpedge->source] != dist[i]){
+				// DISTANZ in Dijkstra nicht konsistent!!
+				cout << "Fuck Distanz stimmt nicht für: " << i << endl;
+			}
+		}
+		while(iit.hasNext()){
+			inEdge = iit.getNext();		
+			if(dist[i] > inEdge->distance + dist[inEdge->source] && dist[inEdge->source] != 0){
+				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+				cout << "Fuck minimal stimmt nicht für: ";
+				cout << "Edge ID: " << in_edge_id[i];
+				cout << " Source Node: " << inEdge->source;
+				cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+				cout << " Dijkstra Dist: " << dist[i];
+				cout << " Scheinbar min Dist: " << inEdge->distance + dist[inEdge->source] << endl;
+			}
+		}
+	}
 }

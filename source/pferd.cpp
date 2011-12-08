@@ -187,7 +187,7 @@ start = clock();
 	 */
 	cout << "Dijkstra angefangen." << endl;
 	Graphalgs ga = Graphalgs(&g);
-	ga.Dijkstra(7500000);
+	ga.Dijkstra(0);
 	cout << "Dijkstra beendet." << endl;
 
 	p.~parser();

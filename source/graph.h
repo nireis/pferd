@@ -141,6 +141,8 @@ class Graph {
 		
 		virtual ~Graph();
 
+		Edge* getEdge(unsigned int id);
+
 		void initOffsets(); // done
 
 		void initShortcutOffsets();
