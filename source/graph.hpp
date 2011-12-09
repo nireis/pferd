@@ -62,6 +62,16 @@ Edge* Graph<E, N, S>::getEdge(unsigned int id){
 }
 
 template <typename E, typename N, typename S>
+unsigned int Graph<E, N, S>::getLowerEdgeBound(unsigned int id){
+	return nodes[id].out_edge_offset;
+}
+
+template <typename E, typename N, typename S>
+unsigned int Graph<E, N, S>::getUpperEdgeBound(unsigned int id){
+	return nodes[id+1].out_edge_offset;
+}
+
+template <typename E, typename N, typename S>
 unsigned int Graph<E, N, S>::getNodeCount(){
 	return node_count;
 }

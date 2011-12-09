@@ -143,6 +143,10 @@ class Graph {
 
 		Edge* getEdge(unsigned int id);
 
+		unsigned int getLowerEdgeBound(unsigned int id);
+
+		unsigned int getUpperEdgeBound(unsigned int id);
+
 		void initOffsets(); // done
 
 		void initShortcutOffsets();
