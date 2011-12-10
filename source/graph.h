@@ -1,7 +1,6 @@
 #ifndef graph_h
 #define graph_h
 
-#include <list>
 #include "structs.h"
 
 // welche kanten/knoten der graph nutzt soll variabel sein
@@ -169,6 +168,14 @@ class Graph {
 		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
 		 */
 		void initShortcutOffsets();
+
+		/*
+		 * siehe initShortcutOffsets(),
+		 * nur wird hier ein array mit den shortcuts entgegen genommen
+		 * es wird erwartet, dass die shortcuts im array
+		 * nach source-knoten aufsteigend sortiert sind
+		 */
+		void initShortcutOffsets(S* scarray, unsigned int scc);
 
 		/*
 		 * Shortcutliste komplett löschen

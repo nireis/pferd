@@ -128,23 +128,50 @@ template <typename T>
 class SListExt : public SList<T> {
 	protected:
 		unsigned int siz;
+		typename SList<T>::SListData* end;
 	public:
 		SListExt(){
 			siz = 0;
+			end = 0;
 		}
 		~SListExt(){
+			end = 0;
 		}
 
 		void push(T d){
 			siz++;
-			SList<T>::push(d);
+			typename SList<T>::SListData* t = new typename SList<T>::SListData;
+			if(SList<T>::root == 0){
+				SList<T>::root = t;
+				SList<T>::root->next = 0;
+				SList<T>::root->data = d;
+				end = SList<T>::root;
+			} else {
+				t->next = 0;
+				t->data = d;
+				end->next = t;
+				end = t;
+			}
+			t = 0;
 		}
 		T pop(){
 			siz--;
-			return SList<T>::pop();
+			T d = T();
+			if(SList<T>::root != 0){
+				typename SList<T>::SListData* t = SList<T>::root->next;
+				if(t == 0)
+					end = 0;
+				d = SList<T>::root->data;
+				delete SList<T>::root;
+				SList<T>::root = t;
+			}// wenn Liste leer,
+			// gibt es für T hoffentlich
+			// sinnvole default belegungen
+			return d;
 		}
 		void clear(){
 			siz = 0;
+			end = 0;
 			SList<T>::clear();
 		}
 

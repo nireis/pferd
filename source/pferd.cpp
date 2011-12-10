@@ -186,16 +186,52 @@ start = clock();
 	 * Test der Graphalgs Klasse!
 	 */
 	cout << "Dijkstra angefangen." << endl;
-	cin.get();
 	Graphalgs ga = Graphalgs(&g);
 	ga.Dijkstra(0);
-	cout << "Dijkstra beendet." << endl;
-	cout << "Fange Erfinden der Shortcuts an : " << endl;
-
-	cin.get();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Dijkstra beendet. Zeit: " << time <<  endl;
+	cout << "Fange Erfinden der Shortcuts an. " << endl;
+	cout << "Sollen die Shortcuts in einer Liste(1) oder einem Array(2) angelegt werden?" << endl;
+	cout << "Eingabe: (1 oder 2) ";
+	int mode;
+	cin >> mode;
+if(mode == 2){
 	start = clock();
+	unsigned int scc = g.getEdgeCount()*2;
+	Shortcut* sc = new Shortcut[scc];
 	//Shortcut* s = new Shortcut[g.getEdgeCount()];
-	for(unsigned int i = 0; i < g.getEdgeCount()*2; i++){
+	for(unsigned int i = 0; i < scc; i++){
+		Shortcut s;
+		s.distance = ((int)( i*i*3.141592)) % 100;
+		s.source = i%g.getNodeCount();
+		s.target = i*(i+1)%(g.getNodeCount());
+		s.edge_s = 0;
+		s.edge_t = 0;
+		s.id = 0;
+		s.type = 0;
+		sc[i] = s;
+		//g.addShortcut(s);
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Shortcuts angelegt. Nun initialisieren. Benötigte Zeit:" << time << endl;
+	cout << "Taste drücken zum Fortfahren! " << endl;
+	cin.get();
+
+	start = clock();
+	g.initShortcutOffsets(sc, scc);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
+	cout << "Taste drücken zum Fortfahren. " << endl;
+	cin.get(); 
+} else if(mode == 1){
+
+	start = clock();
+	unsigned int scc = g.getEdgeCount()*2;
+	//Shortcut* s = new Shortcut[g.getEdgeCount()];
+	for(unsigned int i = 0; i < scc; i++){
 		Shortcut s;
 		s.distance = ((int)( i*i*3.141592)) % 100;
 		s.source = i%g.getNodeCount();
@@ -208,8 +244,8 @@ start = clock();
 	}
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Shortcuts angelegt. Nun initialisieren. " << time << endl;
-
+	cout << "Shortcuts angelegt. Nun initialisieren. Benötigte Zeit:" << time << endl;
+	cout << "Taste drücken zum Fortfahren! " << endl;
 	cin.get();
 
 	start = clock();
@@ -217,16 +253,16 @@ start = clock();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
+	cout << "Taste drücken zum Fortfahren. " << endl;
+	cin.get(); 
 
-	p.~parser();
-
+}
 //	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
 //	cin.get(); 
 		
-	g.~Graph<Edge, Node, Shortcut>();
 }
 
-	cout << "Taste drücken zum beenden ... "; 
+	cout << "Taste drücken zum beenden ... " << endl; 
 	cin.get(); 
 
 	return 0;

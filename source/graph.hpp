@@ -4,8 +4,6 @@
  * ja nicht irgendwo includieren ausser in die graph.h
  */
 
-#include <iostream>
-
 #ifndef graph_hpp
 #define graph_hpp
 
@@ -150,14 +148,16 @@ void Graph<E, N, S>::initShortcutOffsets(){
 	shortcuts = new S[shortcut_count];
 	in_shortcuts = new S*[shortcut_count];
 
+	for(unsigned int i = 0; i < shortcut_count; i++){
+		in_shortcuts[i] = 0;
+	}
+
 	typename SListExt<S>::Iterator it = shortcutlist.getIterator();
 
 	S s;
 	unsigned int j = 0;
 	// bereits offsets und in_shortcuts vor
-	while ( it.hasNext() ){
-		in_shortcuts[j] = 0;
-		shortcuts[j] = s;
+	while( it.hasNext() ){
 		j++;
 		s = it.getNext();
 		nodes[ s.source +1 ].out_shortcut_offset++;
@@ -168,22 +168,6 @@ void Graph<E, N, S>::initShortcutOffsets(){
 		nodes[i+1].in_shortcut_offset = nodes[i+1].in_shortcut_offset + nodes[i].in_shortcut_offset;
 		nodes[i+1].out_shortcut_offset = nodes[i+1].out_shortcut_offset + nodes[i].out_shortcut_offset;
 	}
-
-//	it = shortcutlist.getIterator();
-//	j = 0;
-//	unsigned int off = 0;
-//	while( !shortcutlist.empty() ){
-//		s = shortcutlist.pop();
-//		j = 0;
-//		off = nodes[ s.source ].out_shortcut_offset;
-//		shortcuts[j] = s;
-//		std::cout << s.id << " off: " << off  << " - s.id: " << s.id << " - off-diff: " << nodes[ s.source +1 ].out_shortcut_offset - nodes[ s.source ].out_shortcut_offset << std::endl;
-//		j++;
-//	}
-//	std::cout << nodes[0].out_shortcut_offset <<  "/" << shortcut_count << std::endl;
-
-
-
 	// trage shortcuts in das array für ausgehende sc ein / umsetzung von liste auf array	
 	while( !shortcutlist.empty() ){
 		j = 0;
@@ -198,7 +182,7 @@ void Graph<E, N, S>::initShortcutOffsets(){
 	// trage in_shortcuts ein 
 	for(unsigned int i = 0; i < shortcut_count; i++){
 		j = 0;
-		shortcuts[i].id = edge_count + i;
+		shortcuts[i].id = edge_count + i + 1;
 		// dies wird uns später arbeit sparen
 		// hierdurch sind shortcuts (fast) normale edges,
 		// die wir sofort erkennen können
@@ -212,9 +196,57 @@ void Graph<E, N, S>::initShortcutOffsets(){
 		in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] 
 			= & shortcuts[i];
 	}
-
-
 }
+
+template <typename E, typename N, typename S>
+/* initShortcutOffsets
+ *
+ * siehe oben, nur bekommen wir eine
+ * nach source-knoten aufsteigend sortiertes
+ * array von shortcuts
+ *
+ * auch hier löschen wir alle bisher angelegten shortcuts
+ */
+void Graph<E, N, S>::initShortcutOffsets(S* scarray, unsigned int scc){
+	if(in_shortcuts != 0)
+		delete[] in_shortcuts;
+
+	if(shortcuts != 0)
+		delete[] shortcuts;
+
+	shortcut_count = scc;
+	shortcuts = scarray;
+	in_shortcuts = new S*[shortcut_count];
+
+	for(unsigned int i = 0; i < shortcut_count; i++){
+		in_shortcuts[i] = 0;
+	}
+
+	// bereits offsets und in_shortcuts vor
+	for(unsigned int i = 0; i < shortcut_count; i++){
+		nodes[ shortcuts[i].source +1 ].out_shortcut_offset++;
+		nodes[ shortcuts[i].target +1 ].in_shortcut_offset++;
+	}
+	// setze offsets korrekt
+	for(unsigned int i = 0; i < node_count; i++){
+		nodes[i+1].in_shortcut_offset = nodes[i+1].in_shortcut_offset + nodes[i].in_shortcut_offset;
+		nodes[i+1].out_shortcut_offset = nodes[i+1].out_shortcut_offset + nodes[i].out_shortcut_offset;
+	}
+	unsigned int j = 0;
+	for(unsigned int i = 0; i < shortcut_count; i++){
+		j = 0;
+		shortcuts[i].id = edge_count + i + 1;
+		// suche in diesem bereich einen noch leeren eintrag,
+		// trage dort die entsprechende kante ein
+		while( in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] != 0 ){
+			j++;
+		}
+		in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] 
+			= & shortcuts[i];
+	}
+}
+
+
 
 template <typename E, typename N, typename S>
 void Graph<E, N, S>::clearShortcuts(){
