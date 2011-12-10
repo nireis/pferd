@@ -186,12 +186,37 @@ start = clock();
 	 * Test der Graphalgs Klasse!
 	 */
 	cout << "Dijkstra angefangen." << endl;
+	cin.get();
 	Graphalgs ga = Graphalgs(&g);
 	ga.Dijkstra(0);
-	g.initShortcutOffsets();
 	cout << "Dijkstra beendet." << endl;
+	cout << "Fange Erfinden der Shortcuts an : " << endl;
 
+	cin.get();
+	start = clock();
+	//Shortcut* s = new Shortcut[g.getEdgeCount()];
+	for(unsigned int i = 0; i < g.getEdgeCount()*2; i++){
+		Shortcut s;
+		s.distance = ((int)( i*i*3.141592)) % 100;
+		s.source = i%g.getNodeCount();
+		s.target = i*(i+1)%(g.getNodeCount());
+		s.edge_s = 0;
+		s.edge_t = 0;
+		s.id = 0;
+		s.type = 0;
+		g.addShortcut(s);
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Shortcuts angelegt. Nun initialisieren. " << time << endl;
+
+	cin.get();
+
+	start = clock();
 	g.initShortcutOffsets();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
 
 	p.~parser();
 

@@ -20,18 +20,31 @@ struct Edge : public Simple_Edge {
 		target = 0;
 		distance = 0;
 	}
-
-	unsigned int type; //stellt sich raus, char bringt uns nix
-	unsigned int id; // damit man kanten im kantenarray finden kann
-	// alternativ, statt ID, die differenz des zeigers auf Kante und
-	// des zeigers auf anfang des arrays benutzen...
+	unsigned int type;
+	//type nur bei nicht-shortcuts richtiger type
+	unsigned int id; 
 };
 
-struct Shortcut : public Simple_Edge {
-	Simple_Edge* srcEdg;
-	bool from_is_sc; // damit wir wissen, ob dies ein shortcut ist,
-	Simple_Edge* trgtEdg; // der weiter aufgemacht gehoert
-	bool to_is_sc;
+/*
+ * Shortcuts sind für uns ersmtal Edges, 
+ * denen wir IDs geben, die groößer sind,
+ * als wir maximal statische Kanten haben
+ * => rausfinden, ob Kante ein SC sehr leicht
+ *
+ * wenn wir in Edges noch mindestens
+ * einen unsigned int reinnehmen, der dringend
+ * nötig wird für edges, können wir uns die
+ * Shortcut-Sctruct komplett sparen;
+ * und type und "dringend notwendige zusätzl. information"
+ * als IDs für die beiden abgekürzten Kanten nutzen
+ */
+struct Shortcut : public Edge {
+	Shortcut() : Edge() {
+		edge_s = 0;
+		edge_t = 0;
+	}
+	unsigned int edge_s;
+	unsigned int edge_t;
 };
 
 struct Simple_Node {
@@ -162,9 +175,10 @@ class SListExt : public SList<T> {
 					
 					return true;
 				}
-				void getNext(T* t){
-					t = & (position->data);
+				T& getNext(){
+					typename SList<T>::SListData* t = position;
 					position = position->next;
+					return t->data;
 				}
 		};
 		Iterator getIterator(){

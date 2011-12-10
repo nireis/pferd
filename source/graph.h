@@ -86,6 +86,7 @@ class Graph {
 
 		unsigned int node_count;
 		unsigned int edge_count;
+		unsigned int shortcut_count;
 	
 		/*
 		 * statischer teil des graphen
@@ -115,33 +116,16 @@ class Graph {
 		 * ( Shortcuts anders verwaltbar als in Listen? )
 		 */
 		
-		S** shortcuts;
-		/*
-		 * eine Idee wäre, die Shortcutliste
-		 * in nen Array umzusetzen, falls uns das was bringt.
-		 * mal schauen
-		 */
 		SListExt<S> shortcutlist;
-		//std::list<S> shortcuts; 
-		/*
-		 * alle shortscuts
-		 * TODO schauen, ob vector mehr platz braucht
-		 *	     oder flexibler und schneller ist
-		 *
-		 *	     alternativ eine eigene listenstruktur, 
-		 *	     welche updates aus neu zugefügten SC's 
-		 *	     zulässt?
-		 */
-
+		S* shortcuts;
 		S** in_shortcuts; 
-		S** out_shortcuts;
 		/*
-		 * arrays mit pointern auf shortcuts
-		 * die pointer verweisen auf shortcuts, welche
-		 * in der liste eingetragen sind
+		 * wir lassen uns von aussen Shortcuts reingeben
+		 * die entstehende Liste ist hoffentlich nicht zu groß
 		 *
+		 * spätestens, wenn wir die entsprechenden arrays initialisieren,
+		 * löschen wir dir liste und unsere darstellung wird kompakt und schnell
 		 */
-
 
 	/*
 	 * Methoden und zeugs
@@ -150,14 +134,13 @@ class Graph {
 
 		typedef Andrenator_P<E> OutEdgesIterator;
 		typedef Andrenator_DP<E> InEdgesIterator;
-		typedef Andrenator_DP<S> OutShortcutsIterator;
+		typedef Andrenator_P<S> OutShortcutsIterator;
 		typedef Andrenator_DP<S> InShortcutsIterator;
 
 		Graph();
-		Graph(unsigned int nc, unsigned int ec, 
+		Graph(unsigned int nc, unsigned int ec, unsigned int sc, 
 				N* n, E* e,
-				E** ie, E** oe,
-				S** is, S** os);
+				S* s);
 		/*
 		 * Dies ist der für uns interessante Konstruktor
 		 * Merke: es gibt NodeCount 'nc' viele Nodes, aber
@@ -198,6 +181,7 @@ class Graph {
 
 		unsigned int getNodeCount();
 		unsigned int getEdgeCount();
+		unsigned int getShortcutCount();
 
 		/*
 		 * hier werden iteratoren über kanten nach aussen gegeben
@@ -224,15 +208,15 @@ class Graph {
 		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
 			return InEdgesIterator
 				(node
-				 ,&(in_edges[nodes[node].in_edge_offset]) 
-				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
+				 ,&(shortcuts[nodes[node].out_shortcut_offset]) 
+				 ,nodes[node+1].out_shortcut_offset-nodes[node].out_shortcut_offset);
 		}
 		
 		InShortcutsIterator getInShortcutsIt(unsigned int node){
 			return InEdgesIterator
 				(node
-				 ,&(in_edges[nodes[node].in_edge_offset]) 
-				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
+				 ,&(in_shortcuts[nodes[node].in_shortcut_offset]) 
+				 ,nodes[node+1].in_shortcut_offset-nodes[node].in_shortcut_offset);
 		}
 
 		/*
