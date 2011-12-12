@@ -67,10 +67,11 @@ class Graph {
 				}
 				
 				bool hasNext(){
-					return (0 < max--);
+					return max != 0;
 				}
 
 				T* getNext(){
+					--max;
 					return start++;
 				}
 		};
@@ -215,7 +216,7 @@ class Graph {
 		 */
 		OutEdgesIterator getOutEdgesIt(unsigned int node){
 			return OutEdgesIterator
-					( &(edges[nodes[node].out_edge_offset])
+					(&(edges[nodes[node].out_edge_offset])
 					,nodes[node+1].out_edge_offset-nodes[node].out_edge_offset);
 		}
 
@@ -228,7 +229,7 @@ class Graph {
 		
 		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
 			return InEdgesIterator
-				( &(shortcuts[nodes[node].out_shortcut_offset]) 
+				(&(shortcuts[nodes[node].out_shortcut_offset]) 
 				 ,nodes[node+1].out_shortcut_offset-nodes[node].out_shortcut_offset);
 		}
 		

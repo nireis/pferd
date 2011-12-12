@@ -80,7 +80,7 @@ if(i == 1){
 	start = clock();
 	while(it.hasNext()){
 		//Simple_Edge &e(it.getNext());
-		Simple_Edge *e = it.getNext();
+		Simple_Edge* e = it.getNext();
 		cout <<" -- next edge --" << endl;
 		cout <<" source: " << e->source << endl;
 		cout <<" target: " << e->target<< endl;
@@ -148,7 +148,7 @@ start = clock();
 	start = clock();
 	while(it.hasNext()){
 		//Simple_Edge &e(it.getNext());
-		Edge *e = it.getNext();
+		Edge* e = it.getNext();
 		cout <<" -- next edge --" << endl;
 		cout <<" source: " << e->source << endl;
 		cout <<" target: " << e->target<< endl;
@@ -186,8 +186,7 @@ start = clock();
 	 * Test der Graphalgs Klasse!
 	 */
 	cout << "Dijkstra angefangen." << endl;
-	Graphalgs ga = Graphalgs(&g);
-	ga.Dijkstra(0);
+	Dijkstra(&g, 0);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Dijkstra beendet. Zeit: " << time <<  endl;

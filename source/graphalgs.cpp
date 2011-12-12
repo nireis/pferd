@@ -5,11 +5,34 @@
 #include <iostream>
 using namespace std;
 
-Graphalgs::Graphalgs(Graph<Edge, Node, Shortcut>* g){
-	this->g = g;
-}
+// struct für die Elemente aus U incl. Vergleich
+struct U_element{
+	unsigned int distance;
+	unsigned int id; 
+	unsigned int eid;
 
-void Graphalgs::Dijkstra(unsigned int node_id){
+	U_element(unsigned int d, unsigned int i, unsigned int ei){
+		distance = d;
+		id = i;
+		eid = ei; 
+	}   
+
+	U_element(){
+		distance = 0;
+		id = 0;
+		eid = 0;
+	}   
+};  
+
+// Vergleich für structs um der kleinsten Distanz die höchste Priorität zu geben.
+class Compare_U_element{
+	public:
+		bool operator()(U_element& u1, U_element& u2){
+			return u1.distance > u2.distance;
+		}   
+};
+
+void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 	// TEST mit Iterator
 	for(int i=0; i<10; i++){
 		// Iterator für die ausgehenden Kanten eines Knotens
@@ -186,5 +209,4 @@ void Graphalgs::Dijkstra(unsigned int node_id){
 			}
 		}
 	}
-
 }
