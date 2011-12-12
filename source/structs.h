@@ -216,14 +216,7 @@ class SListExt : public SList<T> {
 
 
 
-
-
-
-
-
-
-
-template <typename T, typename D>
+template <typename T>
 class Heap {
 	private:
 		struct HeapElement;
@@ -238,7 +231,7 @@ class Heap {
 		struct HeapElement {
 			T key;
 			unsigned int id;
-			D data;
+			unsigned int data;
 		};
 
 		void heapify(unsigned int key_id){
@@ -365,7 +358,7 @@ class Heap {
 			max_heap_element = 0;
 		}
 
-		Heap(unsigned int max_elements, T first_key,D d, unsigned int id){
+		Heap(unsigned int max_elements, T first_key,unsigned int eid, unsigned int id){
 			max_element_count = max_elements;
 			heap_array = new HeapElement[max_element_count];
 			element_ids = new unsigned int[max_element_count];
@@ -379,7 +372,7 @@ class Heap {
 			HeapElement t;
 			t.key = first_key;
 			t.id = id;
-			t.data = d;
+			t.data = eid;
 			heap_array[0] = t;
 			element_ids[id] = 0;
 		}
@@ -390,12 +383,12 @@ class Heap {
 		 * wie vorher angegeben
 		 * die bereichsprüfung sparen wir uns nämlich!
 		 */
-		void push(T key, D d, unsigned int id){
+		void push(T key, unsigned int  eid, unsigned int id){
 			if(emty){
 				HeapElement t;
 				t.key = key;
 				t.id = id;
-				t.data = d;
+				t.data = eid;
 				heap_array[0] = t;
 				element_ids[id] = 0;
 				emty = false;		
@@ -405,16 +398,14 @@ class Heap {
 				HeapElement t;
 				t.key = key;
 				t.id = id;
-				t.data = d;
+				t.data = eid;
 				heap_array[max_heap_element] = t;
 				element_ids[id] = max_heap_element;
 				reheap(max_heap_element);
 			}
 		}
 
-		T pop(){
-			T ret;
-			ret = heap_array[0].key;
+		void pop(){
 			//find_new_min();
 			if(max_heap_element > 0){
 				swap(0, max_heap_element);
@@ -423,7 +414,6 @@ class Heap {
 			} else {
 				emty = true;
 			}
-			return ret;
 		}
 
 		void decrease_key(T newkey, unsigned int key_id){
@@ -435,12 +425,16 @@ class Heap {
 			return emty;
 		}
 		
-		D top_data(){
+		unsigned int top_eid(){
 			return heap_array[0].data;
 		}
 
 		T top_key(){
 			return heap_array[0].key;
+		}
+
+		unsigned int top_id(){
+			return heap_array[0].id;
 		}
 		
 //		void print(){
@@ -450,12 +444,19 @@ class Heap {
 //			}
 //			cout << "HEAP PRINTED !"  << endl;
 //		}
-//		
-//		D top(){
+		
+//		unsigned int top(){
 //			return heap_array[0].data;
 //		//	return heap_array[0].key;
 //		}
 };
+
+
+
+
+
+
+
 
 
 

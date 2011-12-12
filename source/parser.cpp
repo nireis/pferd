@@ -229,9 +229,9 @@ Edge* parser::getEdges()
 }
 
 bool parser::writeGraphFile(string filename){
-
+	return false;
 }
 
 bool parser::readGraphFile(string filename){
-
+	return false;
 }
