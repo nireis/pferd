@@ -65,6 +65,18 @@ public:
 	 * getEdges - Gibt Kantenarray zurück
 	 */
 	Edge* getEdges();
+
+	/*
+	 * schreibt geparsten Graph
+	 * in eine Datei, die später
+	 * schneller einlesbar sein soll
+	 *
+	 * liest besagte datei wieder ein
+	 *
+	 * gibt zurück, ob schreiben/lesen erfolgreich war
+	 */
+	bool writeGraphFile(string);
+	bool readGraphFile(string);
 };
 
 #endif

@@ -191,6 +191,16 @@ class Graph {
 		unsigned int getShortcutCount();
 
 		/*
+		 * Knoten und Kanten abfragen
+		 *
+		 * bei uns hat alles eine id,
+		 * nur die nodes wissen ihre eigene nicht
+		 */
+		N getNode(unsigned int id);
+		E getEdge(unsigned int id);
+		S getShortcut(unsigned int id);
+
+		/*
 		 * hier werden iteratoren über kanten nach aussen gegeben
 		 * 
 		 * ein iterator funktioniert 

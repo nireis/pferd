@@ -227,3 +227,11 @@ Edge* parser::getEdges()
 {
 	return graphEdges;
 }
+
+bool parser::writeGraphFile(string filename){
+
+}
+
+bool parser::readGraphFile(string filename){
+
+}
