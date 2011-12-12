@@ -163,6 +163,13 @@ class Graph {
 		void initOffsets();
 
 		/*
+		 * andres stuff
+		 */
+		unsigned int getLowerEdgeBound(unsigned int id);
+
+		unsigned int getUpperEdgeBound(unsigned int id);
+
+		/*
 		 * initialisiert die Offsets der Shortcuts
 		 * Zeit/Platzaufwand abhängig von größe der Shortcut Liste
 		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
@@ -197,7 +204,8 @@ class Graph {
 		 * nur die nodes wissen ihre eigene nicht
 		 */
 		N getNode(unsigned int id);
-		E getEdge(unsigned int id);
+		//E getEdge(unsigned int id);
+		E* getEdge(unsigned int id); // andres stuff
 		S getShortcut(unsigned int id);
 
 		/*

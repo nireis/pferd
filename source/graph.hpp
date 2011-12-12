@@ -59,6 +59,22 @@ Graph<E, N, S>::~Graph(){
 	shortcutlist.clear();
 }
 
+// TODO andres studd
+//template <typename E, typename N, typename S>
+//Edge* Graph<E, N, S>::getEdge(unsigned int id){
+//	return &edges[id];
+//}
+
+template <typename E, typename N, typename S>
+unsigned int Graph<E, N, S>::getLowerEdgeBound(unsigned int id){
+	return nodes[id].out_edge_offset;
+}
+
+template <typename E, typename N, typename S>
+unsigned int Graph<E, N, S>::getUpperEdgeBound(unsigned int id){
+	return nodes[id+1].out_edge_offset;
+}
+
 template <typename E, typename N, typename S>
 unsigned int Graph<E, N, S>::getNodeCount(){
 	return node_count;
@@ -282,14 +298,23 @@ void Graph<E, N, S>::addShortcut(S sc){
 	shortcutlist.push(sc);
 }
 
+//TODO andres stuff
 template <typename E, typename N, typename S>
-E Graph<E, N, S>::getEdge(unsigned int id){
+E* Graph<E, N, S>::getEdge(unsigned int id){
 	if(id < edge_count)
-		return edges[id];
+		return &edges[id];
 
-	E e;
+	E* e=0;
 	return e;
 }
+//template <typename E, typename N, typename S>
+//E Graph<E, N, S>::getEdge(unsigned int id){
+//	if(id < edge_count)
+//		return edges[id];
+//
+//	E e;
+//	return e;
+//}
 
 template <typename E, typename N, typename S>
 N Graph<E, N, S>::getNode(unsigned int id){
