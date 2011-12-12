@@ -50,18 +50,15 @@ class Graph {
 		class Andrenator_P {
 			private:
 				unsigned int max;
-				unsigned int pos;
 				T* start;
 			public:
 				Andrenator_P(){
-					pos = 0;
 					max = 0;
 					start = 0;
 				}
 
-				Andrenator_P(unsigned int node, T* strt, unsigned int mx){
+				Andrenator_P(T* strt, unsigned int mx){
 					start = strt;
-					pos = 0;
 					max = mx;
 				}
 
@@ -70,11 +67,12 @@ class Graph {
 				}
 				
 				bool hasNext(){
-					return (pos < max);
+					return max != 0;
 				}
 
 				T* getNext(){
-					return &start[pos++];
+					--max;
+					return start++;
 				}
 		};
 
@@ -218,8 +216,7 @@ class Graph {
 		 */
 		OutEdgesIterator getOutEdgesIt(unsigned int node){
 			return OutEdgesIterator
-					(node
-					, &(edges[nodes[node].out_edge_offset])
+					(&(edges[nodes[node].out_edge_offset])
 					,nodes[node+1].out_edge_offset-nodes[node].out_edge_offset);
 		}
 
@@ -232,8 +229,7 @@ class Graph {
 		
 		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
 			return InEdgesIterator
-				(node
-				 ,&(shortcuts[nodes[node].out_shortcut_offset]) 
+				(&(shortcuts[nodes[node].out_shortcut_offset]) 
 				 ,nodes[node+1].out_shortcut_offset-nodes[node].out_shortcut_offset);
 		}
 		
