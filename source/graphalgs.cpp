@@ -32,11 +32,11 @@ class Compare_U_element{
 		}   
 };
 
-void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
+void Dijkstra(Graph* g, unsigned int node_id){
 	// TEST mit Iterator
 	for(int i=0; i<10; i++){
 		// Iterator für die ausgehenden Kanten eines Knotens
-		Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g->getOutEdgesIt(node_id);
+		Graph::OutEdgesIterator it = g->getOutEdgesIt(node_id);
 		// Pointer um die akutelle Kante zu behandeln
 		Edge* nextEdge;
 		// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -94,7 +94,7 @@ void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 		//	}
 		// Test: Dijkstra verifizieren
 		// Schauen ob die Distanzen stimmen und auch minimal sind
-		Graph<Edge, Node, Shortcut>::InEdgesIterator iit;
+		Graph::InEdgesIterator iit;
 		Edge* inEdge;
 		for(unsigned int i=0; i < g->getNodeCount(); i++){
 			iit = g->getInEdgesIt(i);
@@ -127,7 +127,7 @@ void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 	// TEST mit direkt auf Graphstrukturen arbeiten
 	for(int i=0; i<10; i++){
 		// Pointer um die akutelle Kante zu behandeln
-		Edge* nextEdge;
+		Edge nextEdge;
 		// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 		std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -145,28 +145,30 @@ void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 		dist[node_id] = 0;
 		found[node_id] = true;
 		for(unsigned int i=g->getLowerEdgeBound(node_id); i<g->getUpperEdgeBound(node_id); i++){
-			nextEdge = g->getEdge(i);
+			nextEdge = * g->getEdge(i);
 			// Die Knoten mit ihrer Distanz in U stecken
-			U.push(U_element(nextEdge->distance,nextEdge->target,nextEdge->id));
+			U.push(U_element(nextEdge.distance,nextEdge.target,nextEdge.id));
 		}
 
 		// Die restlichen Knoten abarbeiten
 		unsigned int tmpid;
+		U_element t;
 		while(!U.empty()){
 			// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
-			tmpid = U.top().id;
+			t = U.top();
+			tmpid = t.id;
 			if(!found[tmpid]){
-				dist[tmpid] = U.top().distance;
+				dist[tmpid] = t.distance;
 				found[tmpid] = true;
-				in_edge_id[tmpid] = U.top().eid;
+				in_edge_id[tmpid] = t.eid;
 				// Die ausgehenden Kanten durchgehen und in U werfen
 				for(unsigned int i=g->getLowerEdgeBound(tmpid); i<g->getUpperEdgeBound(tmpid); i++){
-					nextEdge = g->getEdge(i);
+					nextEdge = * g->getEdge(i);
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found[nextEdge->target]){
+					if(!found[nextEdge.target]){
 						// ...tu sie in U
 						U.push(U_element(
-									nextEdge->distance+dist[tmpid],nextEdge->target,nextEdge->id));
+									nextEdge.distance+dist[tmpid],nextEdge.target,nextEdge.id));
 					}
 				}
 			}
@@ -182,7 +184,7 @@ void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 		//	}
 		// Test: Dijkstra verifizieren
 		// Schauen ob die Distanzen stimmen und auch minimal sind
-		Graph<Edge, Node, Shortcut>::InEdgesIterator iit;
+		Graph::InEdgesIterator iit;
 		Edge* inEdge;
 		for(unsigned int i=0; i < g->getNodeCount(); i++){
 			iit = g->getInEdgesIt(i);

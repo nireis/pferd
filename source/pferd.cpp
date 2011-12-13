@@ -3,6 +3,8 @@
 #include "parser.h"
 #include <ctime>
 
+using namespace std;
+
 int main(int argc, char *argv[]){
 	
 	
@@ -64,8 +66,8 @@ time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Parsen fertig. Gebrauchte Sekunden: "<< time << endl 
 		<< "Erstelle und initialisiere Graph." << endl;
 start = clock();
-	Graph<Edge, Node, Shortcut> g = 
-		Graph<Edge, Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
+	Graph g = 
+		Graph(p.getNodeCount(), p.getEdgeCount(), 
 				p.getNodes(), p.getEdges());
 
 //	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
@@ -77,8 +79,8 @@ start = clock();
 		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
 			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
 	start = clock();
-	Graph<Edge, Node, Shortcut>::OutEdgesIterator it = g.getOutEdgesIt(0);
-	Graph<Edge, Node, Shortcut>::InEdgesIterator iit = g.getInEdgesIt(0);
+	Graph::OutEdgesIterator it = g.getOutEdgesIt(0);
+	Graph::InEdgesIterator iit = g.getInEdgesIt(0);
 	finish = clock();
 		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
 	
@@ -137,17 +139,16 @@ start = clock();
 if(mode == 2){
 	start = clock();
 	unsigned int scc = g.getEdgeCount()*2;
-	Shortcut* sc = new Shortcut[scc];
-	//Shortcut* s = new Shortcut[g.getEdgeCount()];
+	Edge* sc = new Edge[scc];
+	//Edge* s = new Edge[g.getEdgeCount()];
 	for(unsigned int i = 0; i < scc; i++){
-		Shortcut s;
+		Edge s;
 		s.distance = ((int)( i*i*3.141592)) % 100;
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
-		s.edge_s = 0;
-		s.edge_t = 0;
 		s.id = 0;
 		s.type = 0;
+		s.load = 0;
 		sc[i] = s;
 		//g.addShortcut(s);
 	}
@@ -170,14 +171,13 @@ if(mode == 2){
 	unsigned int scc = g.getEdgeCount()*2;
 	//Shortcut* s = new Shortcut[g.getEdgeCount()];
 	for(unsigned int i = 0; i < scc; i++){
-		Shortcut s;
+		Edge s;
 		s.distance = ((int)( i*i*3.141592)) % 100;
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
-		s.edge_s = 0;
-		s.edge_t = 0;
 		s.id = 0;
 		s.type = 0;
+		s.load = 0;
 		g.addShortcut(s);
 	}
 	finish = clock();

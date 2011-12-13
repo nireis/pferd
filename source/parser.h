@@ -10,7 +10,6 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-using namespace std;
 
 class parser
 {
@@ -25,7 +24,7 @@ private:
 	 * string - aus datei eingelesene Zeile
 	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createNode(string, Node*);
+	void createNode(std::string, Node*);
 
 	/*
 	 * createEdge - erstellt eine neue Kante
@@ -34,7 +33,7 @@ private:
 	 * unsinged int - Indexstelle des Arrays, KantenID
 	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createEdge(string,unsigned int, Edge*);
+	void createEdge(std::string,unsigned int, Edge*);
 public:
 	/*
 	 *default constructer
@@ -48,7 +47,7 @@ public:
 	/*
 	 * readFile - bekommt den Pfad einer Datei als String übergeben und liest sie ein
 	 */
-	bool readFile(string);
+	bool readFile(std::string);
 	/*
 	 * getNodeCount - Gibt Knotenanzahl zurück
 	 */
@@ -75,8 +74,8 @@ public:
 	 *
 	 * gibt zurück, ob schreiben/lesen erfolgreich war
 	 */
-	bool writeGraphFile(string);
-	bool readGraphFile(string);
+	bool writeGraphFile(std::string);
+	bool readGraphFile(std::string);
 };
 
 #endif
