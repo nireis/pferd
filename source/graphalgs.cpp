@@ -210,3 +210,6 @@ void Dijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
 		}
 	}
 }
+
+void BiDijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id){
+}
