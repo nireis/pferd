@@ -1,7 +1,6 @@
 #include "graph.h"
 #include "graphalgs.h"
 #include "parser.h"
-#include "simple_parser.h"
 #include <ctime>
 
 int main(int argc, char *argv[]){
