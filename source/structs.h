@@ -216,7 +216,6 @@ class SListExt : public SList<T> {
 
 
 
-template <typename T>
 class Heap {
 	private:
 		struct HeapElement;
@@ -229,7 +228,7 @@ class Heap {
 		unsigned int* element_ids;
 	
 		struct HeapElement {
-			T key;
+			unsigned int  key;
 			unsigned int id;
 			unsigned int data;
 		};
@@ -358,7 +357,7 @@ class Heap {
 			max_heap_element = 0;
 		}
 
-		Heap(unsigned int max_elements, T first_key,unsigned int eid, unsigned int id){
+		Heap(unsigned int max_elements, unsigned int first_key,unsigned int eid, unsigned int id){
 			max_element_count = max_elements;
 			heap_array = new HeapElement[max_element_count];
 			element_ids = new unsigned int[max_element_count];
@@ -383,7 +382,7 @@ class Heap {
 		 * wie vorher angegeben
 		 * die bereichsprüfung sparen wir uns nämlich!
 		 */
-		void push(T key, unsigned int  eid, unsigned int id){
+		void push(unsigned int key, unsigned int  eid, unsigned int id){
 			if(emty){
 				HeapElement t;
 				t.key = key;
@@ -416,7 +415,7 @@ class Heap {
 			}
 		}
 
-		void decrease_key(T newkey, unsigned int key_id){
+		void decrease_key(unsigned int newkey, unsigned int key_id){
 			heap_array[ element_ids[key_id] ].key = newkey;
 			reheap( element_ids[key_id] );
 		}
@@ -429,7 +428,7 @@ class Heap {
 			return heap_array[0].data;
 		}
 
-		T top_key(){
+		unsigned int top_key(){
 			return heap_array[0].key;
 		}
 

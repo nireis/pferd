@@ -19,18 +19,15 @@ class Graph {
 		class Andrenator_DP {
 			private:
 				unsigned int max;
-				unsigned int pos;
 				T** start;
 			public:
 				Andrenator_DP(){
-					pos = 0;
 					max = 0;
 					start = 0;
 				}
 
 				Andrenator_DP(unsigned int node, T** strt, unsigned int mx){
 					start = strt;
-					pos = 0;
 					max = mx;
 				}
 
@@ -39,11 +36,12 @@ class Graph {
 				}
 				
 				bool hasNext(){
-					return (pos < max);
+					return max != 0;
 				}
 
 				T* getNext(){
-					return start[pos++];
+					max--;
+					return *start++;
 				}
 		}; 
 		template <typename T>

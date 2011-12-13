@@ -7,7 +7,22 @@
 int main(int argc, char *argv[]){
 	
 	
-	// Test des Graphen: instanziieren und alles mal ausprobieren 
+	/***  Hallo Michi
+	 ***  dies ist unser akteller Testlauf
+	 ***  Er besteht im groben aus:
+	 ***  
+	 ***  - Graphdatei parsen
+	 ***  - Graphobjekt erstellen und initialisieren
+	 ***  - ein paar Kanten zum ersten Knoten des Graphen ausgeben
+	 ***  - Dijkstra auf dem Graphen laufen lassen
+	 ***  - Shortcuts erfinden und dem Graphen hinzufügen
+	 ***  - Shortcuts im Graph initialisieren lassen
+	 *** 
+	 ***  Obwohl ein paar Funktionalitäten noch hinukommen/sich ändern
+	 ***  werden, ist das erstmal eine gute Grundlage.
+	 ***
+	 ***  Viel Spaß!
+	 */
 
 cout << "            _|\\__/|, " << endl;
 cout << "          ,((\\````\\\\_" << endl;
@@ -21,17 +36,15 @@ cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 cout << " " << endl;
 cout << " " << endl;
 
-	if(argc == 1 || argc == 2 || argc > 3){
+	if(argc != 2){
 		cout << "---" << endl 
-				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Modus"<< " Graphendatei " << endl
-				<< "-- Modus: 1==Simple_Structs ; sonstige Zahl==Structs" << endl 
+				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Graphendatei " << endl
 				<< "-- Graphdatei: Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
 				<< "---" << endl;
 		return 0;
 	} 
 
-	string file = argv[2];
-	int i = atoi(argv[1]);
+	string file = argv[1];
 
 	ifstream checkfile(file.c_str());
 	if(!checkfile){
@@ -41,79 +54,6 @@ cout << " " << endl;
 
 	clock_t start,finish;
 	double time;
-
-	// file = "../data/15K.txt";
-
-if(i == 1){
-
-	cout << "Hallo! willkommen im Testlauf!" << endl 
-		<< "Starte parsen der Datei '" << file << "'" << endl;
-	start = clock();
-		simple_parser p = simple_parser();
-		p.readFile(file);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Parsen fertig. Benötigte Sekunden: "<< time << endl 
-			<< "Erstelle und initialisiere Graph." << endl;
-	start = clock();
-		cout <<"Graph(NodeCount, EdgeCount, Nodes, Edges)" << p.getNodeCount() <<" " << p.getEdgeCount() <<" " << p.getNodes() <<" " << p.getEdges() << endl;
-		Graph<Simple_Edge, Simple_Node, Shortcut> g = 
-			Graph<Simple_Edge, Simple_Node, Shortcut>(p.getNodeCount(), p.getEdgeCount(), 
-					p.getNodes(), p.getEdges());
-	
-//	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
-//	cin.get(); 
-
-		g.initOffsets();
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
-			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
-	start = clock();
-	Graph<Simple_Edge, Simple_Node, Shortcut>::OutEdgesIterator it = g.getOutEdgesIt(0);
-	Graph<Simple_Edge, Simple_Node, Shortcut>::InEdgesIterator iit = g.getInEdgesIt(0);
-	finish = clock();
-		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
-	
-	cout << "Nun mit einem OutEdgesIterator "<< endl 
-		<< "   die AUSgehenden Kanten von Node 0:" << endl;
-	start = clock();
-	while(it.hasNext()){
-		//Simple_Edge &e(it.getNext());
-		Simple_Edge* e = it.getNext();
-		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e->source << endl;
-		cout <<" target: " << e->target<< endl;
-		cout <<" distance: " << e->distance << endl;
-		
-	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
-		
-	cout << "Nun mit einem OutEdgesIterator "<< endl 
-		<< "   die EINgehenden Kanten von Node 0:" << endl;
-	start = clock();
-	while(iit.hasNext()){
-		//Simple_Edge &e(it.getNext());
-		Simple_Edge *e = iit.getNext();
-		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e->source << endl;
-		cout <<" target: " << e->target<< endl;
-		cout <<" distance: " << e->distance << endl;
-		
-	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
-	
-	p.~simple_parser();
-//	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
-//	cin.get(); 
-		
-	g.~Graph<Simple_Edge, Simple_Node, Shortcut>();
-	
-} else {
 
 	cout << "Hallo! willkommen im Testlauf!" << endl 
 		<< "Starte parsen der Datei '" << file << "'" << endl;
@@ -161,7 +101,7 @@ start = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
 		
-	cout << "Nun mit einem OutEdgesIterator "<< endl 
+	cout << "Nun mit einem InEdgesIterator "<< endl 
 		<< "   die EINgehenden Kanten von Node 0:" << endl;
 	start = clock();
 	while(iit.hasNext()){
@@ -255,10 +195,6 @@ if(mode == 2){
 	cout << "Taste drücken zum Fortfahren. " << endl;
 	cin.get(); 
 
-}
-//	cout << "Taste drücken, damit   GRAPH-Objekt   zerstört wird. "; 
-//	cin.get(); 
-		
 }
 
 	cout << "Taste drücken zum beenden ... " << endl; 
