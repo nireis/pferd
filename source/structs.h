@@ -6,25 +6,14 @@
 #ifndef structs_h
 #define structs_h
 
-struct Simple_Edge {
+struct Edge {
 	unsigned int distance;
 	unsigned int source;
 	unsigned int target;
-};
-
-struct Edge : public Simple_Edge {
-	Edge(){
-		type = 0;
-		id = 0;
-		source = 0;
-		target = 0;
-		distance = 0;
-	}
 	unsigned int type;
-	//type nur bei nicht-shortcuts richtiger type
 	unsigned int id; 
+	unsigned int load;
 };
-
 /*
  * Shortcuts sind für uns ersmtal Edges, 
  * denen wir IDs geben, die groößer sind,
@@ -33,34 +22,22 @@ struct Edge : public Simple_Edge {
  *
  * wenn wir in Edges noch mindestens
  * einen unsigned int reinnehmen, der dringend
- * nötig wird für edges, können wir uns die
- * Shortcut-Sctruct komplett sparen;
- * und type und "dringend notwendige zusätzl. information"
- * als IDs für die beiden abgekürzten Kanten nutzen
+ * nötig wird für edges, sparen wir uns
+ * die shortcut struct
  */
-struct Shortcut : public Edge {
-	Shortcut() : Edge() {
-		edge_s = 0;
-		edge_t = 0;
-	}
-	unsigned int edge_s;
-	unsigned int edge_t;
-};
 
-struct Simple_Node {
+struct Node {
 	unsigned int in_edge_offset; 
 	unsigned int out_edge_offset;
-};
-
-struct Node : public Simple_Node {
 	unsigned int in_shortcut_offset;
 	unsigned int out_shortcut_offset;
 
+	int elevation;
 	float lat;
 	float lon;
-	int elevation;
 };
 
+/* TODO anpassen */
 template <typename T>
 class SList {
 	protected:
@@ -75,7 +52,7 @@ class SList {
 		SList(){
 			root = 0;
 		}
-		virtual ~SList(){
+		~SList(){
 			clear();
 		}
 		bool empty(){
@@ -116,81 +93,11 @@ class SList {
 				root = t;
 			}
 		}
-};
- 
-template <typename T>
-/*
- * Erweiterung der push/pop Liste 
- * um Mitzählen der Größe
- * und peek()
- * und einen Iterator durch die Liste
- */
-class SListExt : public SList<T> {
-	protected:
-		unsigned int siz;
-		typename SList<T>::SListData* end;
-	public:
-		SListExt(){
-			siz = 0;
-			end = 0;
-		}
-		~SListExt(){
-			end = 0;
-		}
-
-		void push(T d){
-			siz++;
-			typename SList<T>::SListData* t = new typename SList<T>::SListData;
-			if(SList<T>::root == 0){
-				SList<T>::root = t;
-				SList<T>::root->next = 0;
-				SList<T>::root->data = d;
-				end = SList<T>::root;
-			} else {
-				t->next = 0;
-				t->data = d;
-				end->next = t;
-				end = t;
-			}
-			t = 0;
-		}
-		T pop(){
-			siz--;
-			T d = T();
-			if(SList<T>::root != 0){
-				typename SList<T>::SListData* t = SList<T>::root->next;
-				if(t == 0)
-					end = 0;
-				d = SList<T>::root->data;
-				delete SList<T>::root;
-				SList<T>::root = t;
-			}// wenn Liste leer,
-			// gibt es für T hoffentlich
-			// sinnvole default belegungen
-			return d;
-		}
-		void clear(){
-			siz = 0;
-			end = 0;
-			SList<T>::clear();
-		}
-
-		bool peek(T* t){
-			if(siz != 0){
-				t = & SList<T>::root->data;
-				return true;
-			}
-
-			return false;
-		}
-		unsigned int size(){
-			return siz;
-		}
 		class Iterator {
 			private:
-				typename SList<T>::SListData* position;
+				SListData* position;
 			public:
-				Iterator(typename SList<T>::SListData* r){
+				Iterator(SListData* r){
 					position = r;
 				}
 				~Iterator(){
@@ -203,7 +110,7 @@ class SListExt : public SList<T> {
 					return true;
 				}
 				T& getNext(){
-					typename SList<T>::SListData* t = position;
+					SListData* t = position;
 					position = position->next;
 					return t->data;
 				}
@@ -213,10 +120,62 @@ class SListExt : public SList<T> {
 			return i;
 		}
 };
-
-
-
+ 
 template <typename T>
+/*
+ * Erweiterung der push/pop Liste 
+ * um Mitzählen der Größe
+ * und peek()
+ * und einen Iterator durch die Liste
+ */
+class SListExt {
+	protected:
+		unsigned int siz;
+		SList<T> list;
+	public:
+		SListExt() : list() {
+			siz = 0;
+		}
+		~SListExt(){
+			list.clear();
+		}
+
+		void push(T d){
+			siz++;
+			list.push(d);
+		}
+		T pop(){
+			siz--;
+			T d = list.pop();
+			return d;
+		}
+		void clear(){
+			siz = 0;
+			list.clear();
+		}
+
+		T peek(){
+			T d = list.pop();
+			list.push(d);
+			return d;
+		}
+		unsigned int size(){
+			return siz;
+		}
+
+		bool empty(){
+			return list.empty();
+		}
+
+		typedef typename SList<T>::Iterator Iterator;
+
+		Iterator getIterator(){
+			return list.getIterator();
+		}
+};
+
+
+/* TODO überflüssig */
 class Heap {
 	private:
 		struct HeapElement;
@@ -229,7 +188,7 @@ class Heap {
 		unsigned int* element_ids;
 	
 		struct HeapElement {
-			T key;
+			unsigned int  key;
 			unsigned int id;
 			unsigned int data;
 		};
@@ -358,7 +317,7 @@ class Heap {
 			max_heap_element = 0;
 		}
 
-		Heap(unsigned int max_elements, T first_key,unsigned int eid, unsigned int id){
+		Heap(unsigned int max_elements, unsigned int first_key,unsigned int eid, unsigned int id){
 			max_element_count = max_elements;
 			heap_array = new HeapElement[max_element_count];
 			element_ids = new unsigned int[max_element_count];
@@ -383,7 +342,7 @@ class Heap {
 		 * wie vorher angegeben
 		 * die bereichsprüfung sparen wir uns nämlich!
 		 */
-		void push(T key, unsigned int  eid, unsigned int id){
+		void push(unsigned int key, unsigned int  eid, unsigned int id){
 			if(emty){
 				HeapElement t;
 				t.key = key;
@@ -416,7 +375,7 @@ class Heap {
 			}
 		}
 
-		void decrease_key(T newkey, unsigned int key_id){
+		void decrease_key(unsigned int newkey, unsigned int key_id){
 			heap_array[ element_ids[key_id] ].key = newkey;
 			reheap( element_ids[key_id] );
 		}
@@ -429,7 +388,7 @@ class Heap {
 			return heap_array[0].data;
 		}
 
-		T top_key(){
+		unsigned int top_key(){
 			return heap_array[0].key;
 		}
 

@@ -3,12 +3,10 @@
 
 #include "structs.h"
 
-// welche kanten/knoten der graph nutzt soll variabel sein
-// wir wollen ein wenig rumexperimentieren, wie die datenstrukturen
-// sich im platzverbrauch verhalten, ob uns also auch ne groessere 
-// struktur wehtun wuerde
-// E ~ Edges , N  ~ Nodes , S ~ Shortcuts
-template <typename E, typename N, typename S> 
+typedef Edge E;
+typedef Node N;
+typedef Edge S;
+
 class Graph {
 
 	/* 
@@ -19,18 +17,15 @@ class Graph {
 		class Andrenator_DP {
 			private:
 				unsigned int max;
-				unsigned int pos;
 				T** start;
 			public:
 				Andrenator_DP(){
-					pos = 0;
 					max = 0;
 					start = 0;
 				}
 
-				Andrenator_DP(unsigned int node, T** strt, unsigned int mx){
+				Andrenator_DP(T** strt, unsigned int mx){
 					start = strt;
-					pos = 0;
 					max = mx;
 				}
 
@@ -39,11 +34,12 @@ class Graph {
 				}
 				
 				bool hasNext(){
-					return (pos < max);
+					return max != 0;
 				}
 
 				T* getNext(){
-					return start[pos++];
+					max--;
+					return *start++;
 				}
 		}; 
 		template <typename T>
@@ -222,21 +218,19 @@ class Graph {
 
 		InEdgesIterator getInEdgesIt(unsigned int node){
 			return InEdgesIterator
-				(node
-				 ,&(in_edges[nodes[node].in_edge_offset]) 
+				( &(in_edges[nodes[node].in_edge_offset]) 
 				 ,nodes[node+1].in_edge_offset-nodes[node].in_edge_offset);
 		}
 		
 		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
-			return InEdgesIterator
-				(&(shortcuts[nodes[node].out_shortcut_offset]) 
+			return OutShortcutsIterator
+				( &(shortcuts[nodes[node].out_shortcut_offset]) 
 				 ,nodes[node+1].out_shortcut_offset-nodes[node].out_shortcut_offset);
 		}
 		
 		InShortcutsIterator getInShortcutsIt(unsigned int node){
-			return InEdgesIterator
-				(node
-				 ,&(in_shortcuts[nodes[node].in_shortcut_offset]) 
+			return InShortcutsIterator
+				( &(in_shortcuts[nodes[node].in_shortcut_offset]) 
 				 ,nodes[node+1].in_shortcut_offset-nodes[node].in_shortcut_offset);
 		}
 
@@ -278,6 +272,5 @@ class Graph {
 */
 };
 
-#include "graph.hpp"
 
 #endif

@@ -6,7 +6,7 @@
  */
 
 #include "parser.h"
-
+using namespace std;
 
 parser::parser(void)
 {
@@ -69,6 +69,7 @@ void parser::createNode(string inputString, Node* rNode)
 void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 {
 	rEdge->id = edgeID;
+	rEdge->load = 0;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;

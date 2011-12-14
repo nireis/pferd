@@ -1,14 +1,6 @@
-/*
- * Diese Datei gibt es nur, 
- * damit die graph.h nicht aufgebläht wird.
- * ja nicht irgendwo includieren ausser in die graph.h
- */
+#include "graph.h"
 
-#ifndef graph_hpp
-#define graph_hpp
-
-template <typename E, typename N, typename S>
-Graph<E, N, S>::Graph(){
+Graph::Graph(){
 	node_count = 0;
 	edge_count = 0;
 	shortcut_count = 0;
@@ -20,8 +12,8 @@ Graph<E, N, S>::Graph(){
 	shortcutlist = SListExt<S>();
 }
 
-template <typename E, typename N, typename S>
-Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, unsigned int sc,
+
+Graph::Graph(unsigned int nc, unsigned int ec, unsigned int sc,
 		N* n, E* e,
 		S* s){
 	node_count = nc;
@@ -35,8 +27,8 @@ Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, unsigned int sc,
 	shortcutlist = SListExt<S>();
 }
 
-template <typename E, typename N, typename S>
-Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec, 
+
+Graph::Graph(unsigned int nc, unsigned int ec, 
 		N* n, E* e){
 	node_count = nc;
 	edge_count = ec;
@@ -49,8 +41,8 @@ Graph<E, N, S>::Graph(unsigned int nc, unsigned int ec,
 	shortcutlist = SListExt<S>();
 }
 
-template <typename E, typename N, typename S>
-Graph<E, N, S>::~Graph(){
+
+Graph::~Graph(){
 	delete[] nodes; nodes = 0;
 	delete[] edges; edges = 0;
 	delete[] shortcuts; shortcuts = 0;
@@ -60,37 +52,37 @@ Graph<E, N, S>::~Graph(){
 }
 
 // TODO andres studd
-//template <typename E, typename N, typename S>
-//Edge* Graph<E, N, S>::getEdge(unsigned int id){
+//
+//Edge* Graph::getEdge(unsigned int id){
 //	return &edges[id];
 //}
 
-template <typename E, typename N, typename S>
-unsigned int Graph<E, N, S>::getLowerEdgeBound(unsigned int id){
+
+unsigned int Graph::getLowerEdgeBound(unsigned int id){
 	return nodes[id].out_edge_offset;
 }
 
-template <typename E, typename N, typename S>
-unsigned int Graph<E, N, S>::getUpperEdgeBound(unsigned int id){
+
+unsigned int Graph::getUpperEdgeBound(unsigned int id){
 	return nodes[id+1].out_edge_offset;
 }
 
-template <typename E, typename N, typename S>
-unsigned int Graph<E, N, S>::getNodeCount(){
+
+unsigned int Graph::getNodeCount(){
 	return node_count;
 }
 
-template <typename E, typename N, typename S>
-unsigned int Graph<E, N, S>::getEdgeCount(){
+
+unsigned int Graph::getEdgeCount(){
 	return edge_count;
 }
 
-template <typename E, typename N, typename S>
-unsigned int Graph<E, N, S>::getShortcutCount(){
+
+unsigned int Graph::getShortcutCount(){
 	return shortcut_count;
 }
 
-template <typename E, typename N, typename S>
+
 /*  initOffsets()
  *
  *  richtet die offsets der nodes ein so,
@@ -101,7 +93,7 @@ template <typename E, typename N, typename S>
  *
  *  Prinzip: Bucket-Sort 
  */
-void Graph<E, N, S>::initOffsets(){
+void Graph::initOffsets(){
 	if (!edges || !nodes || !node_count || !edge_count)
 		return; // wenn graph leer ist
 	in_edges = new E*[edge_count];
@@ -142,7 +134,7 @@ void Graph<E, N, S>::initOffsets(){
 	}
 }
 
-template <typename E, typename N, typename S>
+
 /* initShortcutOffsets
  *
  * siehe initOffsets
@@ -153,7 +145,7 @@ template <typename E, typename N, typename S>
  * wenn dies aufgerufen wird, wird davon ausgegangen,
  * dass für die alten shortcuts keine verwendung mehr besteht
  */
-void Graph<E, N, S>::initShortcutOffsets(){
+void Graph::initShortcutOffsets(){
 	if(shortcuts != 0){
 		for(unsigned int i = 0; i < node_count; i++){
 			nodes[ i ].out_shortcut_offset = 0;
@@ -222,7 +214,7 @@ void Graph<E, N, S>::initShortcutOffsets(){
 	}
 }
 
-template <typename E, typename N, typename S>
+
 /* initShortcutOffsets
  *
  * siehe oben, nur bekommen wir eine
@@ -231,7 +223,7 @@ template <typename E, typename N, typename S>
  *
  * auch hier löschen wir alle bisher angelegten shortcuts
  */
-void Graph<E, N, S>::initShortcutOffsets(S* scarray, unsigned int scc){
+void Graph::initShortcutOffsets(S* scarray, unsigned int scc){
 	if(shortcuts != 0){
 		for(unsigned int i = 0; i < node_count; i++){
 			nodes[ i ].out_shortcut_offset = 0;
@@ -282,8 +274,8 @@ void Graph<E, N, S>::initShortcutOffsets(S* scarray, unsigned int scc){
 
 
 
-template <typename E, typename N, typename S>
-void Graph<E, N, S>::clearShortcuts(){
+
+void Graph::clearShortcuts(){
 	for(unsigned int i = 0; i < node_count; i++){
 		nodes[ i ].out_shortcut_offset = 0;
 		nodes[ i ].in_shortcut_offset = 0;
@@ -293,22 +285,22 @@ void Graph<E, N, S>::clearShortcuts(){
 	shortcutlist.clear();
 }
 
-template <typename E, typename N, typename S>
-void Graph<E, N, S>::addShortcut(S sc){
+
+void Graph::addShortcut(S sc){
 	shortcutlist.push(sc);
 }
 
 //TODO andres stuff
-template <typename E, typename N, typename S>
-E* Graph<E, N, S>::getEdge(unsigned int id){
+
+E* Graph::getEdge(unsigned int id){
 	if(id < edge_count)
 		return &edges[id];
 
 	E* e=0;
 	return e;
 }
-//template <typename E, typename N, typename S>
-//E Graph<E, N, S>::getEdge(unsigned int id){
+//
+//E Graph::getEdge(unsigned int id){
 //	if(id < edge_count)
 //		return edges[id];
 //
@@ -316,8 +308,8 @@ E* Graph<E, N, S>::getEdge(unsigned int id){
 //	return e;
 //}
 
-template <typename E, typename N, typename S>
-N Graph<E, N, S>::getNode(unsigned int id){
+
+N Graph::getNode(unsigned int id){
 	if(id < node_count)
 		return nodes[id];
 	// TODO  shortcuts sidn edges, diese sollte hier aufrufbar sein
@@ -325,8 +317,8 @@ N Graph<E, N, S>::getNode(unsigned int id){
 	return n;
 }
 
-template <typename E, typename N, typename S>
-S Graph<E, N, S>::getShortcut(unsigned int id){
+
+S Graph::getShortcut(unsigned int id){
 	if(id < shortcut_count)
 		return shortcuts[id];
 
@@ -335,7 +327,3 @@ S Graph<E, N, S>::getShortcut(unsigned int id){
 }
 
 
-
-
-
-#endif
