@@ -166,7 +166,7 @@ void Graph::initShortcutOffsets(){
 		in_shortcuts[i] = 0;
 	}
 
-	typename SListExt<S>::Iterator it = shortcutlist.getIterator();
+	SListExt<S>::Iterator it = shortcutlist.getIterator();
 
 	S s;
 	unsigned int j = 0;

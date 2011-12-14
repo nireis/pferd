@@ -38,11 +38,11 @@ public:
 	/*
 	 *default constructer
 	 */
-	parser(void);
+	parser();
 	/*
 	 *default desctucter
 	 */
-	~parser(void);
+	~parser();
 
 	/*
 	 * readFile - bekommt den Pfad einer Datei als String übergeben und liest sie ein
