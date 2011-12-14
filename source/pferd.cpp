@@ -128,6 +128,8 @@ start = clock();
 	 */
 	cout << "Dijkstra angefangen." << endl;
 	Dijkstra(&g, 0);
+	cout << "Wechsle auf den Dijkstra, welcher direkt auf den Graphenstrukturen arbeitet." << endl;
+	DirectDijkstra(&g, 0);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Dijkstra beendet. Zeit: " << time <<  endl;

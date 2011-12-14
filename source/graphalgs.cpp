@@ -33,20 +33,19 @@ class Compare_U_element{
 };
 
 void Dijkstra(Graph* g, unsigned int node_id){
-	// TEST mit Iterator
 	for(int i=0; i<10; i++){
 		// Iterator für die ausgehenden Kanten eines Knotens
 		Graph::OutEdgesIterator it = g->getOutEdgesIt(node_id);
 		// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 		std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
-		unsigned int nr_of_nodes = g->getNodeCount();
-		vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
-		vector<unsigned int> in_edge_id(nr_of_nodes);
-
 		Edge* currentEdge;
 
+		unsigned int nr_of_nodes = g->getNodeCount();
 		vector<bool> found(nr_of_nodes,false);
+
+		vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+		vector<unsigned int> in_edge_id(nr_of_nodes);
 
 		//TEST
 		clock_t start,finish;
@@ -121,10 +120,9 @@ void Dijkstra(Graph* g, unsigned int node_id){
 			}
 		}
 	}
+}
 
-	cout << "Wechsel auf anderen Dijkstra!" << endl;
-
-	// TEST mit direkt auf Graphstrukturen arbeiten
+void DirectDijkstra(Graph* g, unsigned int node_id){
 	for(int i=0; i<10; i++){
 		// Pointer um die akutelle Kante zu behandeln
 		Edge currentEdge;
@@ -213,10 +211,10 @@ void Dijkstra(Graph* g, unsigned int node_id){
 	}
 }
 
-void BiDijkstra(Graph<Edge, Node, Shortcut>* g, unsigned int node_id1, unsigned int node_id2){
+void BiDijkstra(Graph* g, unsigned int node_id1, unsigned int node_id2){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
-	Graph<Edge, Node, Shortcut>::OutEdgesIterator itout = g->getOutEdgesIt(node_id1);
-	Graph<Edge, Node, Shortcut>::InEdgesIterator itin = g->getInEdgesIt(node_id2);
+	Graph::OutEdgesIterator itout = g->getOutEdgesIt(node_id1);
+	Graph::InEdgesIterator itin = g->getInEdgesIt(node_id2);
 
 	// Die priotiry_queues, welche der Menge U im Dijkstra entsprechen
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U1;
