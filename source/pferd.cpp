@@ -127,14 +127,33 @@ start = clock();
 	 * Test der Graphalgs Klasse!
 	 */
 	cout << "Dijkstra angefangen." << endl;
-	Dijkstra(&g, 0);
-	cout << "Wechsle auf den Dijkstra, welcher direkt auf den Graphenstrukturen arbeitet." << endl;
-	DirectDijkstra(&g, 0);
-	cout << "Wechsle auf den bidirektionalen Dijkstra." << endl;
-	BiDijkstra(&g,0,5000);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Dijkstra beendet. Zeit: " << time <<  endl;
+	for(unsigned int i=5010; i<5011; i++){
+		cout << "Wechsle auf den bidirektionalen Dijkstra." << endl;
+		start = clock();
+		cout << "Distanz: " << BiDijkstra(&g,0,i) << endl;
+		finish = clock();
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
+		cout << "Wechsle auf den Dijkstra, welcher direkt auf den Graphenstrukturen arbeitet." << endl;
+		start = clock();
+		cout << "Distanz: " << DirectDijkstra(&g,0,i) << endl;
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
+		cout << "Wechsle auf den normalen Dijkstra." << endl;
+		start = clock();
+		cout << "Distanz: " << Dijkstra(&g,0,i) << endl;
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+	}
+	/*for(unsigned int i=0; i < g.getNodeCount(); i++){
+		if(Dijkstra(&g,0,i) != BiDijkstra(&g,0,i)){
+			cout << "Stimmt nicht für: " << i << endl;
+		}
+	}*/
+
 	cout << "Fange Erfinden der Shortcuts an. " << endl;
 	cout << "Sollen die Shortcuts in einer Liste(1) oder einem Array(2) angelegt werden?" << endl;
 	cout << "Eingabe: (1 oder 2) ";

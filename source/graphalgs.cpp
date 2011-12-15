@@ -62,10 +62,6 @@ void Dijkstra(Graph* g, unsigned int node_id){
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
 	vector<unsigned int> in_edge_id(nr_of_nodes);
 
-	//TEST
-	clock_t start,finish;
-	start = clock();
-
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
 	found[node_id] = true;
@@ -98,9 +94,6 @@ void Dijkstra(Graph* g, unsigned int node_id){
 		}
 		U.pop();
 	}
-	// TEST
-	finish = clock();
-	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 
 	// TEST: Ergebnisse ausgeben
 	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
@@ -134,7 +127,53 @@ void Dijkstra(Graph* g, unsigned int node_id){
 			}
 		}
 	}
-	cout << "Distanz von Knoten 5000:" << dist[5000] << endl;
+}
+
+unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	Graph::OutEdgesIterator it = g->getOutEdgesIt(node_id0);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge* currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	U.push(U_element(0,node_id0,0));
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			dist[tmpid] = U.top().distance;
+			// Testen ob das unser Zielknoten ist
+			if(tmpid == node_id1){
+				break;
+			}
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge->target]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge->distance+dist[tmpid],currentEdge->target,currentEdge->id));
+				}
+			}
+		}
+		U.pop();
+	}
+	return dist[node_id1];
 }
 
 void DirectDijkstra(Graph* g, unsigned int node_id){
@@ -148,10 +187,6 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
 	vector<bool> found(nr_of_nodes,false);
 	vector<unsigned int> in_edge_id(nr_of_nodes);
-
-	//TEST
-	clock_t start,finish;
-	start = clock();
 
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
@@ -186,9 +221,6 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 		}
 		U.pop();
 	}
-	// TEST
-	finish = clock();
-	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 
 	// TEST: Ergebnisse ausgeben
 	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
@@ -224,7 +256,52 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 	}
 }
 
-void BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+	// Pointer um die akutelle Kante zu behandeln
+	Edge currentEdge;
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	// Die ganzen Vektoren initialisieren
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<bool> found(nr_of_nodes,false);
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	U.push(U_element(0,node_id0,0));
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	U_element t;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		t = U.top();
+		tmpid = t.id;
+		if(!found[tmpid]){
+			dist[tmpid] = t.distance;
+			if(tmpid == node_id1){
+				break;
+			}
+			found[tmpid] = true;
+			in_edge_id[tmpid] = t.eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			for(unsigned int i=g->getLowerEdgeBound(tmpid); i<g->getUpperEdgeBound(tmpid); i++){
+				currentEdge = * g->getEdge(i);
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge.target]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge.distance+dist[tmpid],currentEdge.target,currentEdge.id));
+				}
+			}
+		}
+		U.pop();
+	}
+	return dist[node_id1];
+}
+
+unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
 	Graph::OutEdgesIterator itout = g->getOutEdgesIt(node_id0);
 	Graph::InEdgesIterator itin = g->getInEdgesIt(node_id1);
@@ -239,38 +316,38 @@ void BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	unsigned int tmpid;
 	unsigned int tmptgtsrc;
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
-	vector<unsigned int> dijk_edge_id(nr_of_nodes);
-
-	Edge* currentEdge;
 
 	vector<bool> found0(nr_of_nodes,false);
 	vector<bool> found1(nr_of_nodes,false);
+	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
 
-	//TEST
-	clock_t start,finish;
-	start = clock();
+	Edge* currentEdge;
 
 	// Die ersten Knoten abarbeiten
-	U.push(U_element_bi(0,node_id0,0,0));
-	U.push(U_element_bi(0,node_id1,0,1));
+	if(node_id0 == node_id1){
+		return 0;
+	}
+	else{
+		U.push(U_element_bi(0,node_id0,0,0));
+		U.push(U_element_bi(0,node_id1,0,1));
+	}
 
 	// Die restlichen Knoten abarbeiten
 	while(current_min_path > 2*U.top().distance && !U.empty()){
 		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
 		tmpid = U.top().id;
-		if(!(found0[tmpid] || found1[tmpid])){
+		if(!(found[0][tmpid] || found[1][tmpid])){
 			dist[tmpid] = U.top().distance;
-	 		dijk_edge_id[tmpid] = U.top().eid;
 			if(!U.top().found_by){
-				found0[tmpid] = true;
+				found[0][tmpid] = true;
 				itout = g->getOutEdgesIt(tmpid);
 				while(itout.hasNext()){
 					currentEdge = itout.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found0[currentEdge->target]){
+					if(!found[0][currentEdge->target]){
 						tmptgtsrc = currentEdge->target;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
-						if(found1[tmptgtsrc]){
+						if(found[1][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
 							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->distance;
 							if(prob_min_val < current_min_path){
@@ -287,15 +364,15 @@ void BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				}
 			}
 			else{
-				found1[tmpid] = true;
+				found[1][tmpid] = true;
 				itin = g->getInEdgesIt(tmpid);
 				while(itin.hasNext()){
 					currentEdge = itin.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found1[currentEdge->source]){
+					if(!found[1][currentEdge->source]){
 						tmptgtsrc = currentEdge->source;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
-						if(found0[tmptgtsrc]){
+						if(found[0][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
 							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->distance;
 							if(prob_min_val < current_min_path){
@@ -314,8 +391,5 @@ void BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 		}
 		U.pop();
 	}
-	// TEST
-	finish = clock();
-	cout << "Zeit für Dijkstra in Sek: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
-	cout << "Distanz: " << current_min_path << endl;
+	return current_min_path;
 }
