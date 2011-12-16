@@ -1,43 +1,61 @@
-/* Aus einigen Ueberlegungen heraus stellen wir fest,
- * dass die ganzen Structs nicht wuerdig sind, 
- * in der Naehe anderen Codes zu verweilen
- */
-
 #ifndef structs_h
 #define structs_h
 
+struct ParserNode {
+	unsigned int id;
+	unsigned int distance;
+	int elevation;
+	double lan;
+	double lon;
+};
+struct ParserEdge {
+	unsigned int source;
+	unsigned int target;
+	unsigned int distance;
+	unsigned int type;
+};
+
+
 struct Edge {
+	unsigned int id; 
+	unsigned int value;
+	unsigned int other_node;
+};
+struct EdgeData {
+	unsigned int out_index;
+	unsigned int in_index;
+	unsigned int distance;
+	unsigned int type;
+	unsigned int load;
+};
+
+
+struct Shortcut {
+	unsigned int id;
 	unsigned int distance;
 	unsigned int source;
 	unsigned int target;
-	unsigned int type;
-	unsigned int id; 
-	unsigned int load;
+	unsigned int papa_edge_id;
+	unsigned int mama_edge_id;
 };
-/*
- * Shortcuts sind für uns ersmtal Edges, 
- * denen wir IDs geben, die groößer sind,
- * als wir maximal statische Kanten haben
- * => rausfinden, ob Kante ein SC sehr leicht
- *
- * wenn wir in Edges noch mindestens
- * einen unsigned int reinnehmen, der dringend
- * nötig wird für edges, sparen wir uns
- * die shortcut struct
- */
+struct ShortcutData {
+	unsigned int papa_edge;
+	unsigned int mama_edge;
+};
+
 
 struct Node {
-	unsigned int in_edge_offset; 
-	unsigned int out_edge_offset;
-	unsigned int in_shortcut_offset;
-	unsigned int out_shortcut_offset;
-
+	unsigned int edge_offset; 
+	unsigned int shortcut_offset;
+};
+struct NodeData {
+	unsigned int id;
 	int elevation;
-	float lat;
-	float lon;
+	double lat;
+	double lon;
 };
 
-/* TODO anpassen */
+
 template <typename T>
 class SList {
 	protected:
@@ -126,7 +144,6 @@ template <typename T>
  * Erweiterung der push/pop Liste 
  * um Mitzählen der Größe
  * und peek()
- * und einen Iterator durch die Liste
  */
 class SListExt {
 	protected:

@@ -5,49 +5,41 @@ Graph::Graph(){
 	edge_count = 0;
 	shortcut_count = 0;
 	nodes = 0;
-	edges = 0;
-	shortcuts = 0;
+	out_edges = 0;
 	in_edges = 0;
+	edge_data = 0;
+	out_shortcuts = 0;
 	in_shortcuts = 0;
-	shortcutlist = SListExt<S>();
-}
-
-
-Graph::Graph(unsigned int nc, unsigned int ec, unsigned int sc,
-		N* n, E* e,
-		S* s){
-	node_count = nc;
-	edge_count = ec;
-	shortcut_count = sc;
-	nodes = n;
-	edges = e;
-	shortcuts = s;
-	in_edges = 0;
-	in_shortcuts = 0;
+	shortcut_data = 0;
 	shortcutlist = SListExt<S>();
 }
 
 
 Graph::Graph(unsigned int nc, unsigned int ec, 
-		N* n, E* e){
+		N* n, E* oe, E* ie, ED* ed){
 	node_count = nc;
 	edge_count = ec;
 	shortcut_count = 0;
 	nodes = n;
-	edges = e;
+	out_edges = oe;
+	in_edges = ie;
+	edge_data = ed;
 	shortcuts = 0;
-	in_edges = 0;
+	out_shortcuts = 0;
 	in_shortcuts = 0;
+	shortcut_data = 0;
 	shortcutlist = SListExt<S>();
 }
 
 
 Graph::~Graph(){
 	delete[] nodes; nodes = 0;
-	delete[] edges; edges = 0;
-	delete[] shortcuts; shortcuts = 0;
+	delete[] out_edges; out_edges = 0;
 	delete[] in_edges; in_edges = 0;
+	delete[] edge_data; edge_data = 0;
+	delete[] out_shortcuts; out_shortcuts = 0;
 	delete[] in_shortcuts; in_shortcuts = 0;
+	delete[] shortcut_data; shortcut_data = 0;
 	shortcutlist.clear();
 }
 
@@ -94,44 +86,51 @@ unsigned int Graph::getShortcutCount(){
  *  Prinzip: Bucket-Sort 
  */
 void Graph::initOffsets(){
-	if (!edges || !nodes || !node_count || !edge_count)
-		return; // wenn graph leer ist
-	in_edges = new E*[edge_count];
+	if (!out_edges || !in_edges || !nodes || !node_count || !edge_count)
+		return; 
 
-	/* 
-	 * voraussetzung, damit das alles funktioniert, ist,
-	 * dass die kanten den sources nach aufsteigend sortiert sind,
-	 * so, wie die nodes den IDs nach selbst aufsteigend sortiert sin 
-	 * 
-	 * das ganze geht in (n + 2*m)
-	 */
 
-	for(unsigned int j = 0; j < edge_count; j++){
-		// bereite in targets offsets vor
-		nodes[ edges[j].target +1 ].in_edge_offset ++; 
-		// bereite in sources offsets vor
-		nodes[ edges[j].source +1 ].out_edge_offset ++; 
-		in_edges[j] = 0;
-	}
+	
 
-	for(unsigned int i = 0; i < node_count; i++){
-		// summiere offsets von vorne, damit die differenzen spaeter stimmen
-		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
-		nodes[i+1].out_edge_offset = nodes[i+1].out_edge_offset + nodes[i].out_edge_offset;
-	}
 
-	unsigned int j = 0;
-	for(unsigned int i = 0; i < edge_count; i++){
-		j = 0;
-		// suche dir das Offset für in_edges im target, 
-		// suche in diesem bereich einen noch leeren eintrag,
-		// trage dort die entsprechende kante ein
-		while( in_edges[ nodes[ edges[i].target ].in_edge_offset + j] != 0 ){
-			j++;
-		}
-		in_edges[ nodes[ edges[i].target ].in_edge_offset + j] 
-			= & edges[i];
-	}
+//	if (!out_edges || !in_edges || !nodes || !node_count || !edge_count)
+//		return; // wenn graph leer ist
+//	in_edges = new E*[edge_count];
+//
+//	/* 
+//	 * voraussetzung, damit das alles funktioniert, ist,
+//	 * dass die kanten den sources nach aufsteigend sortiert sind,
+//	 * so, wie die nodes den IDs nach selbst aufsteigend sortiert sin 
+//	 * 
+//	 * das ganze geht in (n + 2*m)
+//	 */
+//
+//	for(unsigned int j = 0; j < edge_count; j++){
+//		// bereite in targets offsets vor
+//		nodes[ edges[j].target +1 ].in_edge_offset ++; 
+//		// bereite in sources offsets vor
+//		nodes[ edges[j].source +1 ].out_edge_offset ++; 
+//		in_edges[j] = 0;
+//	}
+//
+//	for(unsigned int i = 0; i < node_count; i++){
+//		// summiere offsets von vorne, damit die differenzen spaeter stimmen
+//		nodes[i+1].in_edge_offset = nodes[i+1].in_edge_offset + nodes[i].in_edge_offset;
+//		nodes[i+1].out_edge_offset = nodes[i+1].out_edge_offset + nodes[i].out_edge_offset;
+//	}
+//
+//	unsigned int j = 0;
+//	for(unsigned int i = 0; i < edge_count; i++){
+//		j = 0;
+//		// suche dir das Offset für in_edges im target, 
+//		// suche in diesem bereich einen noch leeren eintrag,
+//		// trage dort die entsprechende kante ein
+//		while( in_edges[ nodes[ edges[i].target ].in_edge_offset + j] != 0 ){
+//			j++;
+//		}
+//		in_edges[ nodes[ edges[i].target ].in_edge_offset + j] 
+//			= & edges[i];
+//	}
 }
 
 
@@ -299,6 +298,18 @@ E* Graph::getEdge(unsigned int id){
 	E* e=0;
 	return e;
 }
+
+
+ND Graph::getNodeData(unsigned int id){
+	return node_data[id];
+}
+ED Graph::getEdgeData(unsigned int id){
+	return edge_data[id];
+}
+SD Graph::getShortcutData(unsigned int id){
+	return shortcut_data[id];
+}
+
 //
 //E Graph::getEdge(unsigned int id){
 //	if(id < edge_count)

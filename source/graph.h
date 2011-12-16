@@ -3,9 +3,12 @@
 
 #include "structs.h"
 
-typedef Edge E;
 typedef Node N;
-typedef Edge S;
+typedef NodeData ND;
+typedef Edge E;
+typedef EdgeData ED;
+typedef Shortcut S;
+typedef ShortcutData SD;
 
 class Graph {
 
@@ -85,33 +88,26 @@ class Graph {
 		 * statischer teil des graphen
 		 */
 
+		N* nodes_in_offs;
+		N* nodes_out_offs;
+		ND* node_data;
 		/* 
-		 * arrays aller kanten und knoten 
-		 * */
-
-		N* nodes; 
-		/* 
-		 * nodes muss groesse node_count+1 haben! 
+		 * nodes arrays müssen groesse node_count+1 haben! 
 		 * der letzte ist ein dummy, damit das mit den offsets klappt
 		 */
 
-		E* edges;
-		E** in_edges; 
-		/* 
-		 * arrays von pointern auf kanten
-		 * hierrin suchen wir mit den offsets nach kanten
-		 * anhand der offsets in den nodes kann man direkt 
-		 * in E* und E** die ausgehenden/eingehenden kanten finden
-		 */
+		E* out_edges;
+		E* in_edges; 
+		ED* edge_data;
 
 		/*
 		 * dynamischer teil des graphen
-		 * ( Shortcuts anders verwaltbar als in Listen? )
 		 */
 		
 		SListExt<S> shortcutlist;
-		S* shortcuts;
-		S** in_shortcuts; 
+		S* out_shortcuts;
+		S* in_shortcuts; 
+		SD* shortcut_data;
 		/*
 		 * wir lassen uns von aussen Shortcuts reingeben
 		 * die entstehende Liste ist hoffentlich nicht zu groß
@@ -127,27 +123,20 @@ class Graph {
 
 		typedef Andrenator_P<E> OutEdgesIterator;
 		typedef Andrenator_DP<E> InEdgesIterator;
-		typedef Andrenator_P<S> OutShortcutsIterator;
-		typedef Andrenator_DP<S> InShortcutsIterator;
+		typedef Andrenator_P<E> OutShortcutsIterator;
+		typedef Andrenator_DP<E> InShortcutsIterator;
 
 		Graph();
-		Graph(unsigned int nc, unsigned int ec, unsigned int sc, 
-				N* n, E* e,
-				S* s);
+		Graph(unsigned int nc, unsigned int ec,
+				N* n, E* oe, E* ie, ED* ed);
 		/*
 		 * Dies ist der für uns interessante Konstruktor
 		 * Merke: es gibt NodeCount 'nc' viele Nodes, aber
 		 * das Nodearray ist n+1 lang. 
 		 * Der Dummy am Ende darf nie nach aussen gelangen.
 		 */
-		Graph(unsigned int nc, unsigned int ec, 
-				N* n, E* e);
 		
-		/*
-		 * falls jemand von uns ableitet
-		 * wer auch immer sowas wollen würde...
-		 */
-		virtual ~Graph();
+		~Graph();
 		
 		/*
 		 * initialisiert die Offsets für out/in edges der nodes
@@ -176,7 +165,7 @@ class Graph {
 		 * es wird erwartet, dass die shortcuts im array
 		 * nach source-knoten aufsteigend sortiert sind
 		 */
-		void initShortcutOffsets(S* scarray, unsigned int scc);
+		void initShortcutOffsets(S* osc, S* isc, SD* sd, unsigned int scc);
 
 		/*
 		 * Shortcutliste komplett löschen
@@ -198,9 +187,12 @@ class Graph {
 		 * nur die nodes wissen ihre eigene nicht
 		 */
 		N getNode(unsigned int id);
+		ND getNodeData(unsigned int id);//TODO TODO
 		//E getEdge(unsigned int id);
 		E* getEdge(unsigned int id); // andres stuff
+		ED getEdgeData(unsigned int id);//TODO TODO
 		S getShortcut(unsigned int id);
+		SD getShortcutData(unsigned int id);//TODO TODO
 
 		/*
 		 * hier werden iteratoren über kanten nach aussen gegeben

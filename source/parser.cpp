@@ -44,14 +44,14 @@ void parser::createNode(string inputString, Node* rNode)
 			else if(currentComponent == 2)
 			{
 				tempStr.assign(itr2, itr1);
-				rNode->lat = atof(tempStr.c_str());
+				//rNode->lat = atof(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
 			else if(currentComponent == 3)
 			{
 				tempStr.assign(itr2, itr1);
-				rNode->lon = atof(tempStr.c_str());
+				//rNode->lon = atof(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
@@ -63,13 +63,13 @@ void parser::createNode(string inputString, Node* rNode)
 	 * und somit kann das letzte Element der Zeile nicht innerhalb der Schleife eingelesen werde
 	 */
 	tempStr.assign(itr2, itr1);
-	rNode->elevation = atoi(tempStr.c_str());
+	//rNode->elevation = atoi(tempStr.c_str());
 }
 
 void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 {
 	rEdge->id = edgeID;
-	rEdge->load = 0;
+	//rEdge->load = 0;
 
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
@@ -116,7 +116,7 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 	tempStr.assign(itr2, itr1);
 	// Vorsicht! Die Doku der Quelldatei spricht hier zwar von integer, aber nirei hielt char* für eine gute Idee
 	
-	rEdge->type =(unsigned int) atoi(tempStr.c_str());
+	//rEdge->type =(unsigned int) atoi(tempStr.c_str());
 //	strcpy(tempChar, tempStr.c_str());
 //	
 //	rEdge->type = tempChar;
@@ -194,9 +194,9 @@ bool parser::readFile(string filename)
 		file.close();
 		//Dummy Node als letzten Eintrag im Knotenarray
 		Node DummyNode;
-		DummyNode.lat=0;
-		DummyNode.lon=0;
-		DummyNode.elevation=0;
+		//DummyNode.lat=0;
+		//DummyNode.lon=0;
+		//DummyNode.elevation=0;
 		DummyNode.in_edge_offset=0;
 		DummyNode.out_edge_offset=0;
 		graphNodes[NodeCount] = DummyNode;

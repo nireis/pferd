@@ -68,7 +68,7 @@ time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 start = clock();
 	Graph g = 
 		Graph(p.getNodeCount(), p.getEdgeCount(), 
-				p.getNodes(), p.getEdges());
+				p.getNodes(), p.getEdges(), 0);
 
 //	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
 //	cin.get(); 
@@ -94,7 +94,7 @@ start = clock();
 		cout <<" source: " << e->source << endl;
 		cout <<" target: " << e->target<< endl;
 		cout <<" distance: " << e->distance << endl;
-		cout << " type : " << e->type << endl;
+		//cout << " type : " << e->type << endl;
 		cout << " id : "<< e->id << endl;
 		
 	}
@@ -112,7 +112,7 @@ start = clock();
 		cout <<" source: " << e->source << endl;
 		cout <<" target: " << e->target<< endl;
 		cout <<" distance: " << e->distance << endl;
-		cout << " type : " << e->type << endl;
+		//cout << " type : " << e->type << endl;
 		cout << " id : "<< e->id << endl;
 		
 	}
@@ -149,8 +149,8 @@ if(mode == 2){
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
 		s.id = 0;
-		s.type = 0;
-		s.load = 0;
+		//s.type = 0;
+		//s.load = 0;
 		sc[i] = s;
 		//g.addShortcut(s);
 	}
@@ -178,8 +178,8 @@ if(mode == 2){
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
 		s.id = 0;
-		s.type = 0;
-		s.load = 0;
+		//s.type = 0;
+		//s.load = 0;
 		g.addShortcut(s);
 	}
 	finish = clock();
