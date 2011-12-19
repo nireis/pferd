@@ -188,26 +188,6 @@ bool Graph::readBinaryGraphFile(std::string graphdata){
 	}
 }
 
-// TODO später noch nötig?
-/*
-unsigned int Graph::getLowerEdgeBound(unsigned int id){
-	return nodes[id].out_edge_offset;
-}
-unsigned int Graph::getUpperEdgeBound(unsigned int id){
-	return nodes[id+1].out_edge_offset;
-}
-*/
-
-unsigned int Graph::getNodeCount(){
-	return node_count;
-}
-unsigned int Graph::getEdgeCount(){
-	return edge_count;
-}
-unsigned int Graph::getShortcutCount(){
-	return shortcut_count;
-}
-
 
 void Graph::initShortcutOffsets(){
 //	if(shortcuts != 0){
@@ -353,6 +333,15 @@ void Graph::addShortcut(S sc){
 }
 
 
+unsigned int Graph::getNodeCount(){
+	return node_count;
+}
+unsigned int Graph::getEdgeCount(){
+	return edge_count;
+}
+unsigned int Graph::getShortcutCount(){
+	return shortcut_count;
+}
 ND Graph::getNodeData(unsigned int id){
 	return node_data[id];
 }
@@ -363,11 +352,30 @@ SD Graph::getShortcutData(unsigned int id){
 	return shortcut_data[id]; // TODO indexprüfung 
 }
 
-
+// Andres stuff
+unsigned int Graph::getLowerOutEdgeBound(unsigned int id){
+	return nodes_out_offs[id].edge_offset;
+}
+unsigned int Graph::getUpperOutEdgeBound(unsigned int id){
+	return nodes_out_offs[id+1].edge_offset;
+}
+unsigned int Graph::getLowerInEdgeBound(unsigned int id){
+	return nodes_in_offs[id].edge_offset;
+}
+unsigned int Graph::getUpperInEdgeBound(unsigned int id){
+	return nodes_in_offs[id+1].edge_offset;
+}
 //TODO andres stuff
-E* Graph::getEdge(unsigned int id){
-//	if(id < edge_count)
-//		return &edges[id];
+E* Graph::getOutEdge(unsigned int id){
+	if(id < edge_count)
+		return & out_edges[id ];
+
+	E* e=0;
+	return e;
+}
+E* Graph::getInEdge(unsigned int id){
+	if(id < edge_count)
+		return & in_edges[ edge_data[id].in_index ];
 
 	E* e=0;
 	return e;

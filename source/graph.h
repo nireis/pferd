@@ -103,16 +103,6 @@ class Graph {
 		bool setGraph(std::string graphdata);
 		
 		/*
-		 * andres stuff
-		 *
-		unsigned int getLowerEdgeBound(unsigned int id);
-		unsigned int getUpperEdgeBound(unsigned int id); */
-	
-		unsigned int getNodeCount();
-		unsigned int getEdgeCount();
-		unsigned int getShortcutCount();
-
-		/*
 		 * initialisiert die Offsets der Shortcuts
 		 * Zeit/Platzaufwand abhängig von größe der Shortcut Liste
 		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
@@ -138,11 +128,21 @@ class Graph {
 		/*
 		 * daten zu strukturen abfragen
 		 */
+		unsigned int getNodeCount();
+		unsigned int getEdgeCount();
+		unsigned int getShortcutCount();
 		ND getNodeData(unsigned int id);//TODO TODO
 		ED getEdgeData(unsigned int id);//TODO TODO
 		SD getShortcutData(unsigned int id);//TODO TODO
-
-		E* getEdge(unsigned int id); // andres stuff
+		/*
+		 * andres stuff
+		 */
+		unsigned int getLowerOutEdgeBound(unsigned int id);
+		unsigned int getUpperOutEdgeBound(unsigned int id); 
+		unsigned int getLowerInEdgeBound(unsigned int id);
+		unsigned int getUpperInEdgeBound(unsigned int id); 
+		E* getOutEdge(unsigned int id);
+		E* getInEdge(unsigned int id);
 
 		/*
 		 * hier werden iteratoren über kanten nach aussen gegeben

@@ -83,14 +83,51 @@ for(unsigned int i = 0; i <= node; i++){
 
 //	g.print(20);
 
+
+cout << "Dijkstra angefangen." << endl;
 start = clock();
 
-Dijkstra(&g, 0);
+unsigned int k = 0;
+
+Dijkstra(&g, k);
 
 finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit für normalen Dijkstra von 0 aus: "<< time << endl;
 
+start = clock();
+
+DirectDijkstra(&g, k);
+
+finish = clock();
+time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit für Dijkstra direkt auf dem Graphen: "<< time << endl;
+
+	for(unsigned int i=5010; i<5011; i++){
+		cout << "Wechsle auf den bidirektionalen Dijkstra." << endl;
+		start = clock();
+		cout << "Distanz: " << BiDijkstra(&g,0,i) << endl;
+		finish = clock();
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
+		cout << "Wechsle auf den Dijkstra, welcher direkt auf den Graphenstrukturen arbeitet." << endl;
+		start = clock();
+		cout << "Distanz: " << DirectDijkstra(&g,0,i) << endl;
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+
+		cout << "Wechsle auf den normalen Dijkstra." << endl;
+		start = clock();
+		cout << "Distanz: " << Dijkstra(&g,0,i) << endl;
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
+	}
+
+
+cout << "Taste drücken zum Beenden..."<< endl;
 cin.get();
-cout << "zeit: "<< time << endl;
+
 	return 0;
 }

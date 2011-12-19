@@ -9,13 +9,26 @@
 void Dijkstra(Graph* g, unsigned int node_id);
 
 /*
+ * Dijkstra mit Iterator, welcher sobal er node_id1 gefunden hat abbricht.
+ */
+unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
+
+/*
  * Dijkstra, welcher direkt auf den Graphstrukturen arbeitet.
  */
 void DirectDijkstra(Graph* g, unsigned int node_id);
 
 /*
- * Ein Bidirektionaler Dijkstra, welcher mit Iterator arbeitet.
+ * Dijkstra, welcher direkt auf den Graphstrukturen arbeitet und abbricht sobald er
+ * node_id1 gefunden hat.
  */
-void BiDijkstra(Graph* g, unsigned int node_id1, unsigned int node_id2);
+unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
+
+/*
+ * Ein Bidirektionaler Dijkstra, welcher mit Iterator arbeitet.
+ *
+ * @return Gibt die minimale Distanz zwischen node_id0 und node_id1 zurück.
+ */
+unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
 
 #endif
