@@ -1,5 +1,5 @@
 #include "graph.h"
-//#include "graphalgs.h"
+#include "graphalgs.h"
 #include "parser.h"
 #include <ctime>
 
@@ -48,7 +48,6 @@ g.setGraph(file);
 finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
-start = clock();
 
 
 unsigned int node = 3;
@@ -84,6 +83,11 @@ for(unsigned int i = 0; i <= node; i++){
 
 //	g.print(20);
 
+start = clock();
+
+Dijkstra(&g, 0);
+
+finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 cin.get();
