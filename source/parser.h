@@ -15,8 +15,9 @@ class parser
 {
 private:
 	unsigned int NodeCount, EdgeCount;
-	Node* graphNodes;
-	Edge* graphEdges;
+	ParserNode* graphNodes;
+	ParserEdge* graphEdges;
+	std::string graphfile;
 
 	/*
 	 * createNode - erstellt einen neuen Knoten
@@ -24,7 +25,7 @@ private:
 	 * string - aus datei eingelesene Zeile
 	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createNode(std::string, Node*);
+	void createNode(std::string, ParserNode*);
 
 	/*
 	 * createEdge - erstellt eine neue Kante
@@ -33,12 +34,14 @@ private:
 	 * unsinged int - Indexstelle des Arrays, KantenID
 	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createEdge(std::string,unsigned int, Edge*);
+	void createEdge(std::string,unsigned int, ParserEdge*);
 public:
 	/*
 	 *default constructer
 	 */
 	parser();
+	parser(std::string graphdata);
+	void getNodesAndEdges(ParserNode* n,ParserEdge* e );
 	/*
 	 *default desctucter
 	 */
@@ -59,11 +62,11 @@ public:
 	/*
 	 * getNodes - Gibt Knotenarray zurück
 	 */
-	Node* getNodes();
+	ParserNode* getNodes();
 	/*
 	 * getEdges - Gibt Kantenarray zurück
 	 */
-	Edge* getEdges();
+	ParserEdge* getEdges();
 
 	/*
 	 * schreibt geparsten Graph
