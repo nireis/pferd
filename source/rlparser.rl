@@ -6,18 +6,67 @@ struct ParseContext{
 
 	unsigned int node_count;
 	unsigned int edge_count;
+
+	int tmpint;
+	unsigned int tmpsint;
+	double tmpdouble;
+	double tmpexp;
 };
 
 %%{
 	machine graphparser;
 	variable cs pc.cs;
 
+	action StartInt{
+		pc.tmpint = 0;
+	}
+
+	action ReadInt{
+		pc.tmpint = pc.tmpint*10 + (fc - '0');
+	}
+
+	unit = '+'? [0-9]+ >StartInt $ReadInt;
+
+	action NegSint{
+		pc.tmpsint = -pc.tmpsint
+	}
+
+	action StartSint{
+		pc.tmpsint = 0;
+	}
+
+	action ReadSint{
+		pc.tmpsint = pc.tmpsint*10 + (fc - '0');
+	}
+
+	snit = ('-' [0-9]+ $ReadSint %NegSint | '+'? [0-9]+ $ReadSInt) >StartSint;
+
+	action NetDouble{
+		pc.tmpdouble = -pc.tmpdouble
+	}
+
+	action StartDouble{
+		tmpdouble = 0;
+		tmpexp = 0.1;
+	}
+
+	action ReadPreDouble{
+		pc.tmpdouble = pc.tmpdouble*10 + (fc - '0');
+	}
+
+	action ReadPostDouble{
+		pc.tmpdouble += pc.tmpexp * (fc - '0');
+		pc.tmpexp /= 10.0;
+	}
+
+	double = ('-' [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)? %NegDouble | '+'? [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)?) >StartDouble;
+
 	action NodeCount{
-		
+		pc.node_count = pc.tmpint;
 	}
 
 	action EdgeCount{
-
+		pc.edge_count = pc.tmpint;
 	}
 
 	action NodeID{
@@ -63,16 +112,12 @@ struct ParseContext{
 	NL = '\n' | '\r\n';
 	WS = ' '+;
 
-	unit = ;
-	snit = ;
-	float = ;
-
 	fileend := (NL | SP)*;
 
 	edge = (uint %EdgeSrc WS uint %EdgeTgt WS uint %EdgeDist WS uint %EdgeType) %EdgesCheckEnd NL;
 	edges := (edge)*;
 
-	node = (uint %NodeID WS float %NodeLat WS float %NodeLon WS sint %NodeEle) %NodesCheckEnd NL;
+	node = (uint %NodeID WS double %NodeLat WS double %NodeLon WS sint %NodeEle) %NodesCheckEnd NL;
 	data = (node)*;
 	
 	main := uint %NodeCount NL uint %EdgeCount NL data;
