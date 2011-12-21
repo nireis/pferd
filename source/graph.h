@@ -107,7 +107,7 @@ class Graph {
 		 * Zeit/Platzaufwand abhängig von größe der Shortcut Liste
 		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
 		 */
-		void initShortcutOffsets();
+		void setShortcutOffsets();
 
 		/*
 		 * siehe initShortcutOffsets(),
@@ -115,13 +115,15 @@ class Graph {
 		 * es wird erwartet, dass die shortcuts im array
 		 * nach source-knoten aufsteigend sortiert sind
 		 */
-		void initShortcutOffsets(S* scarray, unsigned int scc);
+		//void initShortcutOffsets(S* scarray, unsigned int scc);
 
 		/*
 		 * Shortcutliste komplett löschen
 		 * impliziert auch löschen der dazugehörigen offsets etc...
 		 */
 		void clearShortcuts();
+		void clearShortcutlist();
+		void clearShortcutOffsets();
 
 		void addShortcut(S sc);
 

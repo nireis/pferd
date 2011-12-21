@@ -50,7 +50,7 @@ time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
 
-unsigned int node = 3;
+unsigned int node = 0;
 for(unsigned int i = 0; i <= node; i++){
 	
 	NodeData nd = g.getNodeData(i);
@@ -70,6 +70,7 @@ for(unsigned int i = 0; i <= node; i++){
 		cout << "value: " << e->value << endl;
 		cout << "type: " << g.getEdgeData(e->id).type << endl;
 		cout << "id: " << e->id << endl << endl;
+				cout << "   alle einkommenden Kanten von " << e->other_node << endl;
 				while(ieit.hasNext()){
 					Edge* ee = ieit.getNext();
 					cout << "   v: " << ee->value << endl;
@@ -79,9 +80,6 @@ for(unsigned int i = 0; i <= node; i++){
 	}
 	cout << " === === " << endl;
 }
-
-
-//	g.print(20);
 
 
 cout << "Dijkstra angefangen." << endl;
@@ -124,6 +122,38 @@ cout << "Zeit für Dijkstra direkt auf dem Graphen: "<< time << endl;
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 	}
+
+
+
+cout << "Taste drücken zum Erstellen von Shortcuts. " << endl;
+cin.get();
+start = clock();
+	unsigned int scc = g.getEdgeCount()*2;
+		for(unsigned int i = 0; i < scc; i++){
+		Shortcut s;
+		s.value = ((int)( i*i*3.141592)) % 100;
+		s.source = i%g.getNodeCount();
+		s.target = i*(i+1)%(g.getNodeCount());
+		s.id = g.getEdgeCount() + i;
+      s.papa_edge = i*i % g.getEdgeCount();
+      s.mama_edge = i*(i+1) % g.getEdgeCount();
+		g.addShortcut(s);
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Shortcuts angelegt. Nun initialisieren. Benötigte Zeit:" << time << endl;
+	cout << "Taste drücken zum Fortfahren! " << endl;
+	cin.get();
+
+	start = clock();
+	g.setShortcutOffsets();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
+	cout << "Taste drücken zum Fortfahren. " << endl;
+	cin.get(); 
+
+	g.clearShortcutlist();
 
 
 cout << "Taste drücken zum Beenden..."<< endl;

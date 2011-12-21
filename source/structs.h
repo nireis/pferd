@@ -62,13 +62,17 @@ struct NodeData {
 
 struct Shortcut {
 	unsigned int id;
-	unsigned int distance;
+	unsigned int value;
 	unsigned int source;
 	unsigned int target;
-	unsigned int papa_edge_id;
-	unsigned int mama_edge_id;
+	unsigned int papa_edge;
+	unsigned int mama_edge;
 };
 struct ShortcutData {
+	ShortcutData() : papa_edge(0), mama_edge(0) {}
+	ShortcutData(unsigned int p, unsigned int m) :
+		papa_edge(p), mama_edge(m) {}
+
 	unsigned int papa_edge;
 	unsigned int mama_edge;
 };
@@ -146,7 +150,7 @@ class SList {
 					
 					return true;
 				}
-				T& getNext(){
+				T/*T&*/ getNext(){
 					SListData* t = position;
 					position = position->next;
 					return t->data;

@@ -189,73 +189,45 @@ bool Graph::readBinaryGraphFile(std::string graphdata){
 }
 
 
-void Graph::initShortcutOffsets(){
-//	if(shortcuts != 0){
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes[ i ].out_shortcut_offset = 0;
-//			nodes[ i ].in_shortcut_offset = 0;
-//		}
-//	}
-//	if(in_shortcuts != 0)
-//		delete[] in_shortcuts;
-//
-//	if(shortcuts != 0)
-//		delete[] shortcuts;
-//
-//	shortcut_count = shortcutlist.size();
-//	shortcuts = new S[shortcut_count];
-//	in_shortcuts = new S*[shortcut_count];
-//
-//	for(unsigned int i = 0; i < shortcut_count; i++){
-//		in_shortcuts[i] = 0;
-//	}
-//
-//	SListExt<S>::Iterator it = shortcutlist.getIterator();
-//
-//	S s;
-//	unsigned int j = 0;
-//	// bereits offsets und in_shortcuts vor
-//	while( it.hasNext() ){
-//		j++;
-//		s = it.getNext();
-//		nodes[ s.source +1 ].out_shortcut_offset++;
-//		nodes[ s.target +1 ].in_shortcut_offset++;
-//	}
-//	// setze offsets korrekt
-//	for(unsigned int i = 0; i < node_count; i++){
-//		nodes[i+1].in_shortcut_offset 
-//			= nodes[i+1].in_shortcut_offset + nodes[i].in_shortcut_offset;
-//		nodes[i+1].out_shortcut_offset 
-//			= nodes[i+1].out_shortcut_offset + nodes[i].out_shortcut_offset;
-//	}
-//	// trage shortcuts in das array für ausgehende sc ein / umsetzung von liste auf array	
-//	while( !shortcutlist.empty() ){
-//		j = 0;
-//		s = shortcutlist.pop();
-//		while( shortcuts[ nodes [ s.source ].out_shortcut_offset + j].id != 0 ){
-//			j++;
-//		}
-//		s.id = 1;
-//		shortcuts[ nodes [ s.source ].out_shortcut_offset + j] 
-//			= s;
-//	}
-//	// trage in_shortcuts ein 
-//	for(unsigned int i = 0; i < shortcut_count; i++){
-//		j = 0;
-//		shortcuts[i].id = edge_count + i + 1; //TODO nochmal überdenken
-//		// dies wird uns später arbeit sparen
-//		// hierdurch sind shortcuts (fast) normale edges,
-//		// die wir sofort erkennen können
-//
-//		// suche dir das Offset für in_edges im target, 
-//		// suche in diesem bereich einen noch leeren eintrag,
-//		// trage dort die entsprechende kante ein
-//		while( in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] != 0 ){
-//			j++;
-//		}
-//		in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] 
-//			= & shortcuts[i];
-//	}
+void Graph::setShortcutOffsets(){
+	clearShortcutOffsets();
+
+	shortcut_count = shortcutlist.size();
+	out_shortcuts = new E[shortcut_count];
+	in_shortcuts = new E[shortcut_count];
+	shortcut_data = new SD[shortcut_count];
+
+	SListExt<S>::Iterator it = shortcutlist.getIterator();
+
+	S s;
+	while( it.hasNext() ){
+		s = it.getNext();
+		nodes_in_offs[ s.target +1 ].shortcut_offset++;
+		nodes_out_offs[ s.source +1 ].shortcut_offset++;
+	}
+	for(unsigned int i = 0; i < node_count; i++){
+		nodes_in_offs[i+1].shortcut_offset 
+			= nodes_in_offs[i+1].shortcut_offset + nodes_in_offs[i].shortcut_offset;
+		nodes_out_offs[i+1].shortcut_offset 
+			= nodes_out_offs[i+1].shortcut_offset + nodes_out_offs[i].shortcut_offset;
+	}
+	unsigned int o;
+	unsigned int i;
+	it = shortcutlist.getIterator();
+	while( it.hasNext() ){
+		s = it.getNext();
+		o = nodes_out_offs[ s.source ].shortcut_offset;
+		i = nodes_in_offs[ s.target ].shortcut_offset;
+		while( out_shortcuts[ o ].id != 0 ){
+			o++;
+		}
+		while( in_shortcuts[ i ].id != 0 ){
+			i++;
+		}
+		out_shortcuts[ o ] = E(s.id, s.value, s.target);
+		in_shortcuts[ i ] = E(s.id, s.value, s.target);
+		shortcut_data[s.id - edge_count] = SD(s.papa_edge, s.mama_edge);
+	}
 }
 
 /* 
@@ -265,7 +237,7 @@ void Graph::initShortcutOffsets(){
  *
  * auch hier löschen wir alle bisher angelegten shortcuts
  */
-void Graph::initShortcutOffsets(S* scarray, unsigned int scc){
+// void Graph::initShortcutOffsets(S* scarray, unsigned int scc){
 //	if(shortcuts != 0){
 //		for(unsigned int i = 0; i < node_count; i++){
 //			nodes[ i ].out_shortcut_offset = 0;
@@ -312,20 +284,39 @@ void Graph::initShortcutOffsets(S* scarray, unsigned int scc){
 //		in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] 
 //			= & shortcuts[i];
 //	}
-}
+// }
 
 void Graph::clearShortcuts(){
-	for(unsigned int i = 0; i < node_count; i++){
-		nodes_out_offs[ i ].shortcut_offset = 0;
+	if(shortcut_data != 0){
+		for(unsigned int i = 0; i < node_count; i++){
+			nodes_out_offs[ i ].shortcut_offset = 0;
+		}
+		for(unsigned int i = 0; i < node_count; i++){
+			nodes_in_offs[ i ].shortcut_offset = 0;
+		}
+		delete[] shortcut_data; shortcut_data = 0;
+		delete[] in_shortcuts; in_shortcuts = 0;
+		delete[] out_shortcuts; out_shortcuts = 0;
+		shortcut_count = 0;
+		shortcutlist.clear();
 	}
-	for(unsigned int i = 0; i < node_count; i++){
-		nodes_in_offs[ i ].shortcut_offset = 0;
-	}
-	delete[] shortcut_data; shortcut_data = 0;
-	delete[] in_shortcuts; in_shortcuts = 0;
-	delete[] out_shortcuts; out_shortcuts = 0;
-	shortcut_count = 0;
+}
+void Graph::clearShortcutlist(){
 	shortcutlist.clear();
+}
+void Graph::clearShortcutOffsets(){
+	if(shortcut_data != 0){
+		for(unsigned int i = 0; i < node_count; i++){
+			nodes_out_offs[ i ].shortcut_offset = 0;
+		}
+		for(unsigned int i = 0; i < node_count; i++){
+			nodes_in_offs[ i ].shortcut_offset = 0;
+		}
+		delete[] shortcut_data; shortcut_data = 0;
+		delete[] in_shortcuts; in_shortcuts = 0;
+		delete[] out_shortcuts; out_shortcuts = 0;
+		shortcut_count = 0;
+	}
 }
 
 void Graph::addShortcut(S sc){
