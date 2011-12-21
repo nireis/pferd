@@ -6,24 +6,6 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-	
-	
-	/***  Hallo Michi
-	 ***  dies ist unser akteller Testlauf
-	 ***  Er besteht im groben aus:
-	 ***  
-	 ***  - Graphdatei parsen
-	 ***  - Graphobjekt erstellen und initialisieren
-	 ***  - ein paar Kanten zum ersten Knoten des Graphen ausgeben
-	 ***  - Dijkstra auf dem Graphen laufen lassen
-	 ***  - Shortcuts erfinden und dem Graphen hinzufügen
-	 ***  - Shortcuts im Graph initialisieren lassen
-	 *** 
-	 ***  Obwohl ein paar Funktionalitäten noch hinukommen/sich ändern
-	 ***  werden, ist das erstmal eine gute Grundlage.
-	 ***
-	 ***  Viel Spaß!
-	 */
 
 cout << "            _|\\__/|, " << endl;
 cout << "          ,((\\````\\\\_" << endl;
@@ -53,80 +35,72 @@ cout << " " << endl;
 		return 0;
 	}
 
+
 	clock_t start,finish;
 	double time;
 
-	cout << "Hallo! willkommen im Testlauf!" << endl 
-		<< "Starte parsen der Datei '" << file << "'" << endl;
+Graph g = Graph();
+
 start = clock();
-	parser p = parser();
-	p.readFile(file);
+
+g.setGraph(file);
+
 finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Parsen fertig. Gebrauchte Sekunden: "<< time << endl 
-		<< "Erstelle und initialisiere Graph." << endl;
-start = clock();
-	Graph g = 
-		Graph(p.getNodeCount(), p.getEdgeCount(), 
-				p.getNodes(), p.getEdges());
+cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
-//	cout << "Taste drücken, damit   GRAPH   initialisiert wird. "; 
-//	cin.get(); 
 
-		g.initOffsets();
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Graph initialisiert! Benötigte Sekunden: "<<time << endl
-			<< "Hier die Informationen zur den Kanten des Knotens 0:" << endl;
-	start = clock();
-	Graph::OutEdgesIterator it = g.getOutEdgesIt(0);
-	Graph::InEdgesIterator iit = g.getInEdgesIt(0);
-	finish = clock();
-		cout << "-CPU-Clocks, um alle Kanten eines Knotens zu bestimmen: " << (finish-start) << endl;
+unsigned int node = 0;
+for(unsigned int i = 0; i <= node; i++){
 	
-	cout << "Nun mit einem OutEdgesIterator "<< endl 
-		<< "   die AUSgehenden Kanten von Node 0:" << endl;
-	start = clock();
+	NodeData nd = g.getNodeData(i);
+	cout.precision(15);
+
+	cout << "node: " << i << endl;
+	cout << "ID: " << nd.id << endl;
+	cout << "Lat: " << nd.lat << endl;
+	cout << "Lon: " << nd.lon << endl;
+	cout << "El: " << nd.elevation << endl << endl;
+	
+	Graph::OutEdgesIterator it = g.getOutEdgesIt(i);
 	while(it.hasNext()){
-		//Simple_Edge &e(it.getNext());
 		Edge* e = it.getNext();
-		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e->source << endl;
-		cout <<" target: " << e->target<< endl;
-		cout <<" distance: " << e->distance << endl;
-		cout << " type : " << e->type << endl;
-		cout << " id : "<< e->id << endl;
-		
+		cout << "other_node: " << e->other_node << endl;
+				Graph::InEdgesIterator ieit = g.getInEdgesIt(e->other_node);
+		cout << "value: " << e->value << endl;
+		cout << "type: " << g.getEdgeData(e->id).type << endl;
+		cout << "id: " << e->id << endl << endl;
+				cout << "   alle einkommenden Kanten von " << e->other_node << endl;
+				while(ieit.hasNext()){
+					Edge* ee = ieit.getNext();
+					cout << "   v: " << ee->value << endl;
+					cout << "   other: " << ee->other_node << endl;
+					cout << "   id: " << ee->id << endl;
+				}
 	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
-		
-	cout << "Nun mit einem InEdgesIterator "<< endl 
-		<< "   die EINgehenden Kanten von Node 0:" << endl;
-	start = clock();
-	while(iit.hasNext()){
-		//Simple_Edge &e(it.getNext());
-		Edge *e = iit.getNext();
-		cout <<" -- next edge --" << endl;
-		cout <<" source: " << e->source << endl;
-		cout <<" target: " << e->target<< endl;
-		cout <<" distance: " << e->distance << endl;
-		cout << " type : " << e->type << endl;
-		cout << " id : "<< e->id << endl;
-		
-	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Betnötigte Zeit zum iterieren über die Kanten: " << time << endl;
+	cout << " === === " << endl;
+}
 
-//	cout << "Taste drücken, damit   DIJKSTRA   beginnt. "; 
-//	cin.get(); 
 
-	/*
-	 * Test der Graphalgs Klasse!
-	 */
-	cout << "Dijkstra angefangen." << endl;
+cout << "Dijkstra angefangen." << endl;
+start = clock();
+
+unsigned int k = 0;
+
+Dijkstra(&g, k);
+
+finish = clock();
+time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit für normalen Dijkstra von 0 aus: "<< time << endl;
+
+start = clock();
+
+DirectDijkstra(&g, k);
+
+finish = clock();
+time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit für Dijkstra direkt auf dem Graphen: "<< time << endl;
+
 	for(unsigned int i=5010; i<5011; i++){
 		cout << "Wechsle auf den bidirektionalen Dijkstra." << endl;
 		start = clock();
@@ -148,59 +122,21 @@ start = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 	}
-	/*for(unsigned int i=0; i < g.getNodeCount(); i++){
-		if(Dijkstra(&g,0,i) != BiDijkstra(&g,0,i)){
-			cout << "Stimmt nicht für: " << i << endl;
-		}
-	}*/
 
-	cout << "Fange Erfinden der Shortcuts an. " << endl;
-	cout << "Sollen die Shortcuts in einer Liste(1) oder einem Array(2) angelegt werden?" << endl;
-	cout << "Eingabe: (1 oder 2) ";
-	int mode;
-	cin >> mode;
-if(mode == 2){
-	start = clock();
+
+
+cout << "Taste drücken zum Erstellen von Shortcuts. " << endl;
+cin.get();
+start = clock();
 	unsigned int scc = g.getEdgeCount()*2;
-	Edge* sc = new Edge[scc];
-	//Edge* s = new Edge[g.getEdgeCount()];
-	for(unsigned int i = 0; i < scc; i++){
-		Edge s;
-		s.distance = ((int)( i*i*3.141592)) % 100;
+		for(unsigned int i = 0; i < scc; i++){
+		Shortcut s;
+		s.value = ((int)( i*i*3.141592)) % 100;
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
-		s.id = 0;
-		s.type = 0;
-		s.load = 0;
-		sc[i] = s;
-		//g.addShortcut(s);
-	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Shortcuts angelegt. Nun initialisieren. Benötigte Zeit:" << time << endl;
-	cout << "Taste drücken zum Fortfahren! " << endl;
-	cin.get();
-
-	start = clock();
-	g.initShortcutOffsets(sc, scc);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
-	cout << "Taste drücken zum Fortfahren. " << endl;
-	cin.get(); 
-} else if(mode == 1){
-
-	start = clock();
-	unsigned int scc = g.getEdgeCount()*2;
-	//Shortcut* s = new Shortcut[g.getEdgeCount()];
-	for(unsigned int i = 0; i < scc; i++){
-		Edge s;
-		s.distance = ((int)( i*i*3.141592)) % 100;
-		s.source = i%g.getNodeCount();
-		s.target = i*(i+1)%(g.getNodeCount());
-		s.id = 0;
-		s.type = 0;
-		s.load = 0;
+		s.id = g.getEdgeCount() + i;
+      s.papa_edge = i*i % g.getEdgeCount();
+      s.mama_edge = i*(i+1) % g.getEdgeCount();
 		g.addShortcut(s);
 	}
 	finish = clock();
@@ -210,17 +146,18 @@ if(mode == 2){
 	cin.get();
 
 	start = clock();
-	g.initShortcutOffsets();
+	g.setShortcutOffsets();
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
 	cout << "Taste drücken zum Fortfahren. " << endl;
 	cin.get(); 
 
-}
+	g.clearShortcutlist();
 
-	cout << "Taste drücken zum beenden ... " << endl; 
-	cin.get(); 
+
+cout << "Taste drücken zum Beenden..."<< endl;
+cin.get();
 
 	return 0;
 }

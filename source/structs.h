@@ -1,43 +1,84 @@
-/* Aus einigen Ueberlegungen heraus stellen wir fest,
- * dass die ganzen Structs nicht wuerdig sind, 
- * in der Naehe anderen Codes zu verweilen
- */
-
 #ifndef structs_h
 #define structs_h
 
-struct Edge {
-	unsigned int distance;
+struct ParserNode {
+	ParserNode() : id(0), elevation(0), lat(0), lon(0) {}
+	ParserNode(unsigned int i, double la, double lo, int e) :
+		id(i), elevation(e), lat(la), lon(lo) {}
+	
+	unsigned int id;
+	int elevation;
+	double lat;
+	double lon;
+};
+struct ParserEdge {
+	ParserEdge() : source(0), target(0), distance(0), type(0) {}
+	ParserEdge(unsigned int s, unsigned int t, unsigned int d, unsigned int ty) : 
+		source(s), target(t), distance(d), type(ty) {}
+	
 	unsigned int source;
 	unsigned int target;
+	unsigned int distance;
 	unsigned int type;
+};
+
+struct Edge {
+	Edge() : id(0), value(0), other_node(0) {}
+	Edge(unsigned int i, unsigned int v, unsigned int o) : 
+		id(i), value(v), other_node(o) {}
+	
 	unsigned int id; 
+	unsigned int value;
+	unsigned int other_node;
+};
+struct EdgeData {
+	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
+	EdgeData(unsigned int o, unsigned int i, unsigned int d, unsigned int t, unsigned int l) : 
+		out_index(o), in_index(i), distance(d), type(t), load(l) {}
+	
+	unsigned int out_index;
+	unsigned int in_index;
+	unsigned int distance;
+	unsigned int type;
 	unsigned int load;
 };
-/*
- * Shortcuts sind für uns ersmtal Edges, 
- * denen wir IDs geben, die groößer sind,
- * als wir maximal statische Kanten haben
- * => rausfinden, ob Kante ein SC sehr leicht
- *
- * wenn wir in Edges noch mindestens
- * einen unsigned int reinnehmen, der dringend
- * nötig wird für edges, sparen wir uns
- * die shortcut struct
- */
 
 struct Node {
-	unsigned int in_edge_offset; 
-	unsigned int out_edge_offset;
-	unsigned int in_shortcut_offset;
-	unsigned int out_shortcut_offset;
-
+	Node() : edge_offset(0), shortcut_offset(0) {}
+	
+	unsigned int edge_offset; 
+	unsigned int shortcut_offset;
+};
+struct NodeData {
+	NodeData() : id(0), elevation(0), lat(0), lon(0) {}
+	NodeData(unsigned int i, int e, double la, double lo) : 
+		id(i), elevation(e), lat(la), lon(lo) {}
+	
+	unsigned int id;
 	int elevation;
-	float lat;
-	float lon;
+	double lat;
+	double lon;
 };
 
-/* TODO anpassen */
+struct Shortcut {
+	unsigned int id;
+	unsigned int value;
+	unsigned int source;
+	unsigned int target;
+	unsigned int papa_edge;
+	unsigned int mama_edge;
+};
+struct ShortcutData {
+	ShortcutData() : papa_edge(0), mama_edge(0) {}
+	ShortcutData(unsigned int p, unsigned int m) :
+		papa_edge(p), mama_edge(m) {}
+
+	unsigned int papa_edge;
+	unsigned int mama_edge;
+};
+
+
+
 template <typename T>
 class SList {
 	protected:
@@ -109,7 +150,7 @@ class SList {
 					
 					return true;
 				}
-				T& getNext(){
+				T/*T&*/ getNext(){
 					SListData* t = position;
 					position = position->next;
 					return t->data;
@@ -126,7 +167,6 @@ template <typename T>
  * Erweiterung der push/pop Liste 
  * um Mitzählen der Größe
  * und peek()
- * und einen Iterator durch die Liste
  */
 class SListExt {
 	protected:
@@ -173,249 +213,6 @@ class SListExt {
 			return list.getIterator();
 		}
 };
-
-
-/* TODO überflüssig */
-class Heap {
-	private:
-		struct HeapElement;
-		
-		unsigned int max_element_count;
-		unsigned int max_heap_element;
-		bool emty;
-	
-		HeapElement* heap_array;
-		unsigned int* element_ids;
-	
-		struct HeapElement {
-			unsigned int  key;
-			unsigned int id;
-			unsigned int data;
-		};
-
-		void heapify(unsigned int key_id){
-			unsigned int lc, rc;
-			lc = key_id*2 + 1;
-			rc = key_id*2 + 2;
-
-			if( rc>max_heap_element ){
-				if( lc> max_heap_element ){
-					return ; // schon ganz unten
-				} else {
-					if(heap_array[key_id].key > heap_array[lc].key)  // hat linkes kind
-						swap(key_id, lc);
-				}
-			} else { // beide kinder vorhanden
-				if(heap_array[rc].key > heap_array[lc].key){
-					if(heap_array[key_id].key > heap_array[lc].key){
-						swap(key_id, lc);
-						heapify(lc);
-					}
-				} else {
-					if(heap_array[key_id].key > heap_array[rc].key){
-						swap(key_id, rc);
-						heapify(rc);
-					}
-				}
-			}  
-		}
-
-		void reheap(unsigned int key_id){
-			if(key_id > 0){
-				unsigned int p = (key_id - 1)/2;
-				if(heap_array[key_id].key < heap_array[p].key){
-					swap(key_id, p);
-					reheap(p);
-				}
-			}
-		}
-
-		void find_new_min(){
-		}
-
-
-		
-//			unsigned int lc, rc, akt;
-//			akt = 0;
-//			lc = 1;
-//			rc = 2;
-//			bool on_bottom = false;
-//			// element ganz nach unten schieben
-//			while( !on_bottom ){
-//				// wenn es kein rechtes kind gibt
-//				if( (rc>max_heap_element) ){
-//					//gibt es ein linkes?
-//					if( (lc>max_heap_element) ){
-//						on_bottom = true; // wenn nein=>ende
-//					} else {
-//						on_bottom = true; // ja => letztes mal tauschen
-//						swap(lc, akt); // dann ende
-//						akt = lc;
-//					}
-//				} else { // es gibt ein rechtes kind 
-//					// => es gibt ein linkes 
-//					// => weiter absteigen
-//					if( (heap_array[lc].key < heap_array[rc].key) ){
-//						swap(lc, akt);	
-//						akt = lc;
-//						lc = akt*2 + 1;
-//						rc = akt*2 + 2;
-//					} else {
-//						swap(rc, akt);
-//						akt = rc;
-//						lc = akt*2 + 1;
-//						rc = akt*2 + 2;
-//					}
-//				}
-//			}
-//			// nun sind wir ganz unten:
-//			// hole neues element hervor 
-//			// und schiebe dieses hoch
-//
-//			swap(akt, max_heap_element);
-//			max_heap_element--;
-//			
-//			reheap(akt);
-//		}
-
-		void swap(unsigned int ido, unsigned int idt){
-			HeapElement temp;
-			unsigned int temp_id;
-
-			temp = heap_array[ido];
-			heap_array[ido] = heap_array[idt];
-			heap_array[idt] = temp;
-
-			temp_id = element_ids[heap_array[ido].id];
-			element_ids[heap_array[ido].id] = element_ids[heap_array[idt].id];
-			element_ids[heap_array[idt].id] = temp_id;
-		}
-
-	public:
-		Heap(){
-			max_element_count = 0;
-			max_heap_element = 0;
-			heap_array = 0;
-			element_ids = 0;
-			emty = true;
-		}
-
-		~Heap(){
-			delete[] heap_array; heap_array = 0;
-			delete[] element_ids; element_ids = 0;
-		}
-
-		Heap(unsigned int max_elements){
-			max_element_count = max_elements;
-			heap_array = new HeapElement[max_element_count];
-			element_ids = new unsigned int[max_element_count];
-			emty = true;
-
-			for(unsigned int i = 0; i < max_element_count; i++){
-				element_ids[i] = max_element_count;
-			}
-			max_heap_element = 0;
-		}
-
-		Heap(unsigned int max_elements, unsigned int first_key,unsigned int eid, unsigned int id){
-			max_element_count = max_elements;
-			heap_array = new HeapElement[max_element_count];
-			element_ids = new unsigned int[max_element_count];
-			emty = false;
-
-			for(unsigned int i = 0; i < max_element_count; i++){
-				element_ids[i] = max_element_count;
-			}
-			max_heap_element = 0;
-
-			HeapElement t;
-			t.key = first_key;
-			t.id = id;
-			t.data = eid;
-			heap_array[0] = t;
-			element_ids[id] = 0;
-		}
-
-		/*
-		 * bitte bitte bitte
-		 * nur maximal so viele elemente einfügen, 
-		 * wie vorher angegeben
-		 * die bereichsprüfung sparen wir uns nämlich!
-		 */
-		void push(unsigned int key, unsigned int  eid, unsigned int id){
-			if(emty){
-				HeapElement t;
-				t.key = key;
-				t.id = id;
-				t.data = eid;
-				heap_array[0] = t;
-				element_ids[id] = 0;
-				emty = false;		
-			} else {
-				max_heap_element++;
-				
-				HeapElement t;
-				t.key = key;
-				t.id = id;
-				t.data = eid;
-				heap_array[max_heap_element] = t;
-				element_ids[id] = max_heap_element;
-				reheap(max_heap_element);
-			}
-		}
-
-		void pop(){
-			//find_new_min();
-			if(max_heap_element > 0){
-				swap(0, max_heap_element);
-				max_heap_element--;
-				heapify(0);
-			} else {
-				emty = true;
-			}
-		}
-
-		void decrease_key(unsigned int newkey, unsigned int key_id){
-			heap_array[ element_ids[key_id] ].key = newkey;
-			reheap( element_ids[key_id] );
-		}
-
-		bool empty(){
-			return emty;
-		}
-		
-		unsigned int top_eid(){
-			return heap_array[0].data;
-		}
-
-		unsigned int top_key(){
-			return heap_array[0].key;
-		}
-
-		unsigned int top_id(){
-			return heap_array[0].id;
-		}
-		
-//		void print(){
-//			cout << "PRINTING HEAP: " << endl;
-//			for(unsigned int i = 0; i <= max_heap_element; i++){
-//				cout << heap_array[i].key << endl;
-//			}
-//			cout << "HEAP PRINTED !"  << endl;
-//		}
-		
-//		unsigned int top(){
-//			return heap_array[0].data;
-//		//	return heap_array[0].key;
-//		}
-};
-
-
-
-
-
-
-
 
 
 

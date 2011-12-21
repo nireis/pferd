@@ -68,7 +68,7 @@ void Dijkstra(Graph* g, unsigned int node_id){
 	while(it.hasNext()){
 		currentEdge = it.getNext();
 		// Die Knoten mit ihrer Distanz in U stecken
-		U.push(U_element(currentEdge->distance,currentEdge->target,currentEdge->id));
+		U.push(U_element(currentEdge->value,currentEdge->other_node,currentEdge->id));
 	}
 
 	// Die restlichen Knoten abarbeiten
@@ -85,48 +85,48 @@ void Dijkstra(Graph* g, unsigned int node_id){
 			while(it.hasNext()){
 				currentEdge = it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge->target]){
+				if(!found[currentEdge->other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge->distance+dist[tmpid],currentEdge->target,currentEdge->id));
+								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id));
 				}
 			}
 		}
 		U.pop();
 	}
 
-	// TEST: Ergebnisse ausgeben
-	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
-	//		cout << dist[i] << endl;
-	//	}
-	// Test: Dijkstra verifizieren
-	// Schauen ob die Distanzen stimmen und auch minimal sind
-	Graph::InEdgesIterator iit;
-	Edge* inEdge;
-	for(unsigned int i=0; i < g->getNodeCount(); i++){
-		iit = g->getInEdgesIt(i);
-		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
-		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
-			Edge* tmpedge = g->getEdge(in_edge_id[i]);
-			// Wenn die Distanz nicht stimmt...
-			if(tmpedge->distance + dist[tmpedge->source] != dist[i]){
-				// DISTANZ in Dijkstra nicht konsistent!!
-				cout << "Distanz stimmt nicht für: " << i << endl;
-			}
-		}
-		while(iit.hasNext()){
-			inEdge = iit.getNext();		
-			if(dist[i] > inEdge->distance + dist[inEdge->source] && dist[inEdge->source] != numeric_limits<unsigned int>::max()){
-				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
-				cout << "Minimal stimmt nicht für: ";
-				cout << "Edge ID: " << in_edge_id[i];
-				cout << " Source Node: " << inEdge->source;
-				cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
-				cout << " Dijkstra Dist: " << dist[i];
-				cout << " Scheinbar min Dist: " << inEdge->distance + dist[inEdge->source] << endl;
-			}
-		}
-	}
+//	// TEST: Ergebnisse ausgeben
+//	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//	//		cout << dist[i] << endl;
+//	//	}
+//	// Test: Dijkstra verifizieren
+//	// Schauen ob die Distanzen stimmen und auch minimal sind
+//	Graph::InEdgesIterator iit;
+//	Edge* inEdge;
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		iit = g->getInEdgesIt(i);
+//		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+//		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
+//			Edge* tmpedge = g->getInEdge(in_edge_id[i]);
+//			// Wenn die Distanz nicht stimmt...
+//			if(tmpedge->value + dist[tmpedge->other_node] != dist[i]){
+//				// DISTANZ in Dijkstra nicht konsistent!!
+//				cout << "Distanz stimmt nicht für: " << i << endl;
+//			}
+//		}
+//		while(iit.hasNext()){
+//			inEdge = iit.getNext();		
+//			if(dist[i] > inEdge->value + dist[inEdge->other_node] && dist[inEdge->other_node] != numeric_limits<unsigned int>::max()){
+//				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+//				cout << "Minimal stimmt nicht für: ";
+//				cout << "Edge ID: " << in_edge_id[i];
+//				cout << " Other Node: " << inEdge->other_node;
+//				//cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+//				cout << " Dijkstra Dist: " << dist[i];
+//				cout << " Scheinbar min Dist: " << inEdge->value + dist[inEdge->other_node] << endl;
+//			}
+//		}
+//	}
 }
 
 unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
@@ -164,10 +164,10 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 			while(it.hasNext()){
 				currentEdge = it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge->target]){
+				if(!found[currentEdge->other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge->distance+dist[tmpid],currentEdge->target,currentEdge->id));
+								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id));
 				}
 			}
 		}
@@ -191,10 +191,10 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 	// Den ersten Knoten abarbeiten
 	dist[node_id] = 0;
 	found[node_id] = true;
-	for(unsigned int i=g->getLowerEdgeBound(node_id); i<g->getUpperEdgeBound(node_id); i++){
-		currentEdge = * g->getEdge(i);
+	for(unsigned int i=g->getLowerOutEdgeBound(node_id); i<g->getUpperOutEdgeBound(node_id); i++){
+		currentEdge = * g->getOutEdge(i);
 		// Die Knoten mit ihrer Distanz in U stecken
-		U.push(U_element(currentEdge.distance,currentEdge.target,currentEdge.id));
+		U.push(U_element(currentEdge.value,currentEdge.other_node,currentEdge.id));
 	}
 
 	// Die restlichen Knoten abarbeiten
@@ -209,51 +209,51 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 			found[tmpid] = true;
 			in_edge_id[tmpid] = t.eid;
 			// Die ausgehenden Kanten durchgehen und in U werfen
-			for(unsigned int i=g->getLowerEdgeBound(tmpid); i<g->getUpperEdgeBound(tmpid); i++){
-				currentEdge = * g->getEdge(i);
+			for(unsigned int i=g->getLowerOutEdgeBound(tmpid); i<g->getUpperOutEdgeBound(tmpid); i++){
+				currentEdge = * g->getOutEdge(i);
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge.target]){
+				if(!found[currentEdge.other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge.distance+dist[tmpid],currentEdge.target,currentEdge.id));
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
 				}
 			}
 		}
 		U.pop();
 	}
 
-	// TEST: Ergebnisse ausgeben
-	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
-	//		cout << dist[i] << endl;
-	//	}
-	// Test: Dijkstra verifizieren
-	// Schauen ob die Distanzen stimmen und auch minimal sind
-	Graph::InEdgesIterator iit;
-	Edge* inEdge;
-	for(unsigned int i=0; i < g->getNodeCount(); i++){
-		iit = g->getInEdgesIt(i);
-		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
-		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
-			Edge* tmpedge = g->getEdge(in_edge_id[i]);
-			// Wenn die Distanz nicht stimmt...
-			if(tmpedge->distance + dist[tmpedge->source] != dist[i]){
-				// DISTANZ in Dijkstra nicht konsistent!!
-				cout << "Distanz stimmt nicht für: " << i << endl;
-			}
-		}
-		while(iit.hasNext()){
-			inEdge = iit.getNext();		
-			if(dist[i] > inEdge->distance + dist[inEdge->source] && dist[inEdge->source] != numeric_limits<unsigned int>::max()){
-				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
-				cout << "Minimal stimmt nicht für: ";
-				cout << "Edge ID: " << in_edge_id[i];
-				cout << " Source Node: " << inEdge->source;
-				cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
-				cout << " Dijkstra Dist: " << dist[i];
-				cout << " Scheinbar min Dist: " << inEdge->distance + dist[inEdge->source] << endl;
-			}
-		}
-	}
+//	// TEST: Ergebnisse ausgeben
+//	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//	//		cout << dist[i] << endl;
+//	//	}
+//	// Test: Dijkstra verifizieren
+//	// Schauen ob die Distanzen stimmen und auch minimal sind
+//	Graph::InEdgesIterator iit;
+//	Edge* inEdge;
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		iit = g->getInEdgesIt(i);
+//		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+//		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
+//			Edge* tmpedge = g->getInEdge(in_edge_id[i]);
+//			// Wenn die Distanz nicht stimmt...
+//			if(tmpedge->value + dist[tmpedge->other_node] != dist[i]){
+//				// DISTANZ in Dijkstra nicht konsistent!!
+//				cout << "Distanz stimmt nicht für: " << i << endl;
+//			}
+//		}
+//		while(iit.hasNext()){
+//			inEdge = iit.getNext();		
+//			if(dist[i] > inEdge->value + dist[inEdge->other_node] && dist[inEdge->other_node] != numeric_limits<unsigned int>::max()){
+//				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+//				cout << "Minimal stimmt nicht für: ";
+//				cout << "Edge ID: " << in_edge_id[i];
+//				cout << " Other Node: " << inEdge->other_node;
+//				//cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+//				cout << " Dijkstra Dist: " << dist[i];
+//				cout << " Scheinbar min Dist: " << inEdge->value + dist[inEdge->other_node] << endl;
+//			}
+//		}
+//	}
 }
 
 unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
@@ -286,13 +286,13 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
 			found[tmpid] = true;
 			in_edge_id[tmpid] = t.eid;
 			// Die ausgehenden Kanten durchgehen und in U werfen
-			for(unsigned int i=g->getLowerEdgeBound(tmpid); i<g->getUpperEdgeBound(tmpid); i++){
-				currentEdge = * g->getEdge(i);
+			for(unsigned int i=g->getLowerOutEdgeBound(tmpid); i<g->getUpperOutEdgeBound(tmpid); i++){
+				currentEdge = * g->getOutEdge(i);
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge.target]){
+				if(!found[currentEdge.other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge.distance+dist[tmpid],currentEdge.target,currentEdge.id));
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
 				}
 			}
 		}
@@ -344,12 +344,12 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				while(itout.hasNext()){
 					currentEdge = itout.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found[0][currentEdge->target]){
-						tmptgtsrc = currentEdge->target;
+					if(!found[0][currentEdge->other_node]){
+						tmptgtsrc = currentEdge->other_node;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
 						if(found[1][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
-							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->distance;
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
 							if(prob_min_val < current_min_path){
 								current_min_path = prob_min_val;
 								min_edge_id = currentEdge->id;
@@ -358,7 +358,7 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 						else{
 							// ...tu sie in U
 							U.push(U_element_bi(
-										currentEdge->distance+dist[tmpid],currentEdge->target,currentEdge->id,0));
+										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,0));
 						}
 					}
 				}
@@ -369,12 +369,12 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				while(itin.hasNext()){
 					currentEdge = itin.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found[1][currentEdge->source]){
-						tmptgtsrc = currentEdge->source;
+					if(!found[1][currentEdge->other_node]){
+						tmptgtsrc = currentEdge->other_node;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
 						if(found[0][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
-							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->distance;
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
 							if(prob_min_val < current_min_path){
 								current_min_path = prob_min_val;
 								min_edge_id = currentEdge->id;
@@ -383,7 +383,7 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 						else{
 							// ...tu sie in U
 							U.push(U_element_bi(
-										currentEdge->distance+dist[tmpid],currentEdge->source,currentEdge->id,1));
+										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,1));
 						}
 					}
 				}
