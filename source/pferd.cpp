@@ -83,23 +83,22 @@ for(unsigned int i = 0; i <= node; i++){
 
 
 cout << "Dijkstra angefangen." << endl;
-start = clock();
 
-unsigned int k = 0;
+for(int i=0; i<1; i++){
+	start = clock();
+	Dijkstra(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+}
 
-Dijkstra(&g, k);
-
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit für normalen Dijkstra von 0 aus: "<< time << endl;
-
-start = clock();
-
-DirectDijkstra(&g, k);
-
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit für Dijkstra direkt auf dem Graphen: "<< time << endl;
+for(int i=0; i<1; i++){
+	start = clock();
+	DirectDijkstra(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Dijkstra direkt auf dem Graphen von " << i << " aus: "<< time << endl;
+}
 
 	for(unsigned int i=5010; i<5011; i++){
 		cout << "Wechsle auf den bidirektionalen Dijkstra." << endl;
