@@ -1,48 +1,46 @@
-struct ParseContext{
-	ParseContext()
-		:cs(0),node_count(0),edge_count(0){}
+#include <string>
+#include <iostream>
 
-	int cs;
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
-	unsigned int node_count;
-	unsigned int edge_count;
-
-	int tmpint;
-	unsigned int tmpsint;
-	double tmpdouble;
-	double tmpexp;
-};
+#include "structs.h"
+#include "rlparser.h"
 
 %%{
 	machine graphparser;
-	variable cs pc.cs;
+	variable cs cs;
 
 	action StartInt{
-		pc.tmpint = 0;
+		tmpint = 0;
 	}
 
 	action ReadInt{
-		pc.tmpint = pc.tmpint*10 + (fc - '0');
+		tmpint = tmpint*10 + (fc - '0');
 	}
 
-	unit = '+'? [0-9]+ >StartInt $ReadInt;
+	uint = '+'? [0-9]+ >StartInt $ReadInt;
 
 	action NegSint{
-		pc.tmpsint = -pc.tmpsint
+		tmpsint = -tmpsint
 	}
 
 	action StartSint{
-		pc.tmpsint = 0;
+		tmpsint = 0;
 	}
 
 	action ReadSint{
-		pc.tmpsint = pc.tmpsint*10 + (fc - '0');
+		tmpsint = tmpsint*10 + (fc - '0');
 	}
 
-	snit = ('-' [0-9]+ $ReadSint %NegSint | '+'? [0-9]+ $ReadSInt) >StartSint;
+	sint = ('-' [0-9]+ $ReadSint %NegSint | '+'? [0-9]+ $ReadSint) >StartSint;
 
-	action NetDouble{
-		pc.tmpdouble = -pc.tmpdouble
+	action NegDouble{
+		tmpdouble = -tmpdouble
 	}
 
 	action StartDouble{
@@ -51,68 +49,75 @@ struct ParseContext{
 	}
 
 	action ReadPreDouble{
-		pc.tmpdouble = pc.tmpdouble*10 + (fc - '0');
+		tmpdouble = tmpdouble*10 + (fc - '0');
 	}
 
 	action ReadPostDouble{
-		pc.tmpdouble += pc.tmpexp * (fc - '0');
-		pc.tmpexp /= 10.0;
+		tmpdouble += tmpexp * (fc - '0');
+		tmpexp /= 10.0;
 	}
 
 	double = ('-' [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)? %NegDouble | '+'? [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)?) >StartDouble;
 
 	action NodeCount{
-		pc.node_count = pc.tmpint;
+		node_count = tmpint;
 	}
 
 	action EdgeCount{
-		pc.edge_count = pc.tmpint;
+		edge_count = tmpint;
 	}
 
 	action NodeID{
-
+		nodes[current_node].id = tmpint;
 	}
 
 	action NodeLat{
-
+		nodes[current_node].lat = tmpdouble;
 	}
 
 	action NodeLon{
-
+		nodes[current_node].lon = tmpdouble;
 	}
 
 	action NodeEle{
-
+		nodes[current_node].elevation = tmpsint;
 	}
 
 	action NodesCheckEnd{
-
+		current_node++;
+		if(current_node == node_count){
+			fgoto edges;
+		}
 	}
 
 	action EdgeSrc{
-
+		edges[current_edge].in_index = tmpint;
 	}
 
 	action EdgeTgt{
-
+		edges[current_edge].out_index = tmpint;
 	}
 
 	action EdgeDist{
-
+		edges[current_edge].distance = tmpint;
 	}
 
 	action EdgeType{
-
+		edges[current_edge].type = tmpint;
 	}
 
 	action EdgesCheckEnd{
-
+		edges[current_edge].id = current_edge;
+		current_edge++;
+		if(current_edge == edge_count){
+			fgoto fileend;
+		} 
 	}
 
 	NL = '\n' | '\r\n';
 	WS = ' '+;
 
-	fileend := (NL | SP)*;
+	fileend := (NL | WS)*;
 
 	edge = (uint %EdgeSrc WS uint %EdgeTgt WS uint %EdgeDist WS uint %EdgeType) %EdgesCheckEnd NL;
 	edges := (edge)*;
@@ -123,18 +128,55 @@ struct ParseContext{
 	main := uint %NodeCount NL uint %EdgeCount NL data;
 }%%
 
-void initParser(){
+RlParser::RlParser(std::string filename){
+	cs = 0;
+	current_node = 0;
+	current_edge = 0;
+	fd = open(filename, O_RDONLY);
 
+	%%write data;
+	%%write init;
 }
 
-unsigned int getNodeCount(){
+unsigned int RlParser::getNodeCount(){
+	std::string buf;
+	int r;
 
+	r = getline(fd, buf, '\n');
+	const char *p = buf;
+	const char *pe = buf + r;
+	const char *eof = 0;
+	%% write exec;
+
+	return node_count;
 }
 
-unsigned int getEdgeCount(){
+unsigned int RlParser::getEdgeCount(){
+	std::string buf;
+	int r;
 
+	r = getline(fd, buf, '\n');
+	const char *p = buf;
+	const char *pe = buf + r;
+	const char *eof = 0;
+	%% write exec;
+
+	return edge_count;
 }
 
-void getNodesAndEdges(Node* n, Edge* e){
+void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
+	nodes = n;
+	edges = e;
 
+	char buf[1024*1024];
+	int r;
+
+	while(0 < (r = read(fd, buf, sizeof(buf)))) {
+		const char *p = buf;
+		const char *pe = buf + r;
+		const char *eof = 0;
+	
+		%% write exec;
+	}
+	close(fd);
 }
