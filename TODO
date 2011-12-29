@@ -1,0 +1,44 @@
+=== allgemein ===
+
+* Visualisierung des Graphen
+
+* CH + entsprechende Dijkstras
+
+* wie werden straßenlasten berechnet ? welche informationen brauchen wir dafür in kanten?
+
+* allgemeine, menübasierte test-main aufstellen; erweiterbar um weitere routinen
+
+* genaue zeitmessung für die simulation / initialisierung der objekte => in log?
+
+* interne log/error struktur einführen
+
+
+
+=== Stefan ===
+
+Pferd
+Created Sunday 11 December 2011
+
+* Keine ISO-8859-1 Umlaute (UTF-8 oder ascii)
+
+* Funktionen, die den Container nicht verändern und keine ("nicht-const") Zeiger auf interne Daten zurückgeben als "const" methods:
+* unsigned int size() const { return siz; }
+
+* Empfehlung: konsistentes namens-schema für protected/private variablen, z.bsp. m_size
+* verwenden von std iterators:
+* nach möglichkeit den ::const_iterator (und dinge wie std::string als const std::string& übergeben)
+
+* temporäre variable für das ende, d.h. so: for (std::string::const_iterator i = s.begin(), e = s.end(); i != e; i++)
+
+* atoi() ist unschöne funktion (kein error-handling), evtl. strtol(), strtoll()
+
+* empfehlung: bei vergleichen die konstante auf die linke seite: (' ' == *itr1), (2 == currentComponent), ...
+
+* Copy Constructors/operator =: entweder verbieten oder saubere semantik (d.h. keine leaks und double frees)
+
+Ideen:
+* Verwenden eines Parsergenerators zum lesen, http://www.complang.org/ragel/:
+* da nur Zahlen im Spiel sind das Einlesen blockweise möglich, ohne den vorigen block zu kennen; zahlen können dabei über blockgrenzen gehen
+* besseres error handling möglich
+* für die iterators auf c-arrays könnte man theoretisch auch { T* current, *end; bool hasNext() { return current != end; } T getNext() {return *current++;}} verwenden
+
