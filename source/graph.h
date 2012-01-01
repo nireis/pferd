@@ -5,60 +5,33 @@
 #include "structs.h"
 #include "parser.h"
 
-typedef Node N;
+typedef unsigned int N;
 typedef NodeData ND;
 
 typedef Edge E;
 typedef EdgeData ED;
 
-typedef Shortcut S;
-typedef ShortcutData SD;
-
 class Graph {
 
-	/* 
-	 * Iteratoren für Kanten von Nodes
-	 */
-	public:
-		template <typename T>
-		class Andrenator_P {
-			private:
-				unsigned int max;
-				T* start;
-			public:
-				Andrenator_P() : max(0), start(0) {}
-
-				Andrenator_P(T* strt, unsigned int mx) : 
-					max(mx), start(strt) {}
-
-				~Andrenator_P(){
-					start = 0;
-				}
-				
-				bool hasNext(){
-					return max != 0;
-				}
-
-				T* getNext(){
-					--max;
-					return start++;
-				}
-		};
-
 	/*
-	 * Eigentliche interne Daten des Graphen
+	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
+	 *		*_data
+	 *	Hierdurch sollen Zugriffe auf die anderen Informationen
+	 *	schnell und kompakt werden.
 	 */
 	private:
 		/*
-		 * statischer teil des graphen
+		 * statischer Teil des Graphen
 		 */
+		bool is_set;
+		int BinID;
 
 		unsigned int node_count;
 		N* nodes_in_offs;
 		N* nodes_out_offs;
 		ND* node_data;
 		/* 
-		 * nodes arrays müssen groesse node_count+1 haben
+		 * nodes_{in,out} arrays müssen groesse node_count+1 haben
 		 * der letzte ist ein dummy, damit das mit den offsets klappt
 		 */
 
@@ -68,76 +41,49 @@ class Graph {
 		ED* edge_data;
 
 		/*
-		 * dynamischer teil des graphen
+		 * private Methoden
 		 */
-		
-		unsigned int shortcut_count;
-		SListExt<S> shortcutlist;
-		E* out_shortcuts;
-		E* in_shortcuts; 
-		SD* shortcut_data;
-		/*
-		 * wir lassen uns von aussen Shortcuts reingeben
-		 * die entstehende Liste ist hoffentlich nicht zu groß
-		 *
-		 * spätestens, wenn wir die entsprechenden arrays initialisieren,
-		 * löschen wir dir liste und unsere darstellung wird kompakt und schnell
-		 */
-
 		void writeBinaryGraphFile(std::string graphdata);
 		bool readBinaryGraphFile(std::string graphdata);
 
 	/*
-	 * Methoden und zeugs
+	 * public Methoden und zeugs
 	 */
 	public:
-
-		typedef Andrenator_P<E> OutEdgesIterator;
-		typedef Andrenator_P<E> InEdgesIterator;
-		typedef Andrenator_P<E> OutShortcutsIterator;
-		typedef Andrenator_P<E> InShortcutsIterator;
 
 		Graph();
 		~Graph();
 
+		bool isSet(){ return is_set; }
 		bool setGraph(std::string graphdata);
+		/*
+		 * graphdata ist ein String, der den Namen einer
+		 * gültigen Graphdatei enthält; entweder eine rohe .txt Datei
+		 * in parsbarem Format, oder eine .grp Binärdatei,
+		 * die von uns geschrieben wurde.
+		 *
+		 * Die übergebene Datei wird eingelesen und der Graph entsprechend
+		 * initialisiert. 
+		 *		TODO optional machen, ob .grp neu geschrieben wird
+		 */
 		
 		/*
-		 * initialisiert die Offsets der Shortcuts
-		 * Zeit/Platzaufwand abhängig von größe der Shortcut Liste
-		 * wird aber allgemein um Faktor 2 mehr sein, als bei initOffsets
-		 */
-		void setShortcutOffsets();
-
-		/*
-		 * siehe initShortcutOffsets(),
-		 * nur wird hier ein array mit den shortcuts entgegen genommen
-		 * es wird erwartet, dass die shortcuts im array
-		 * nach source-knoten aufsteigend sortiert sind
-		 */
-		//void initShortcutOffsets(S* scarray, unsigned int scc);
-
-		/*
-		 * Shortcutliste komplett löschen
-		 * impliziert auch löschen der dazugehörigen offsets etc...
-		 */
-		void clearShortcuts();
-		void clearShortcutlist();
-		void clearShortcutOffsets();
-
-		void addShortcut(S sc);
-
-		/*
-		 * daten zu strukturen abfragen
+		 * Daten zu Strukturen abfragen
 		 */
 		unsigned int getNodeCount();
 		unsigned int getEdgeCount();
-		unsigned int getShortcutCount();
-		ND getNodeData(unsigned int id);//TODO TODO
-		ED getEdgeData(unsigned int id);//TODO TODO
-		SD getShortcutData(unsigned int id);//TODO TODO
+
 		/*
-		 * andres stuff
+		 * get*Data - jeweils mit indexprüfung,
+		 * ob die angegebene ID gültig ist.
+		 * Ist diese nicht gültig, wird ein 
+		 * Default-Initialisiertes Objekt zurück gegeben
+		 */
+		ND getNodeData(unsigned int id);
+		ED getEdgeData(unsigned int id);
+
+		/*
+		 * ohne Indexprüfung !
 		 */
 		unsigned int getLowerOutEdgeBound(unsigned int id);
 		unsigned int getUpperOutEdgeBound(unsigned int id); 
@@ -147,38 +93,27 @@ class Graph {
 		E* getInEdge(unsigned int id);
 
 		/*
-		 * hier werden iteratoren über kanten nach aussen gegeben
+		 * hier werden Iteratoren über Kanten nach Aussen gegeben
 		 * 
-		 * ein iterator funktioniert 
-		 *		* nur ein mal, wenn man damit alle kanten anschaut
-		 *		* für nur einen knoten
-		 *		* für genau alle kanten der angeforderten richtung 
+		 * ein Iterator funktioniert 
+		 *		* nur ein mal, wenn man damit alle Kanten anschaut
+		 *		* für nur einen Knoten
+		 *		* für genau alle Kanten der angeforderten Richtung 
 		 */
-		OutEdgesIterator getOutEdgesIt(unsigned int node){
-			return OutEdgesIterator
-					(&(out_edges[nodes_out_offs[node].edge_offset])
-					,nodes_out_offs[node+1].edge_offset-nodes_out_offs[node].edge_offset);
+		EdgesIterator getOutEdgesIt(unsigned int node){
+			return EdgesIterator
+					(&(out_edges[nodes_out_offs[node] ])
+					,nodes_out_offs[node+1] - nodes_out_offs[node] );
 		}
-
-		InEdgesIterator getInEdgesIt(unsigned int node){
-			return InEdgesIterator
-				( &(in_edges[nodes_in_offs[node].edge_offset]) 
-				 ,nodes_in_offs[node+1].edge_offset-nodes_in_offs[node].edge_offset);
-		}
-		
-		OutShortcutsIterator getOutShortcutsIt(unsigned int node){
-			return OutShortcutsIterator
-				( &(out_shortcuts[nodes_out_offs[node].shortcut_offset]) 
-				 ,nodes_out_offs[node+1].shortcut_offset-nodes_out_offs[node].shortcut_offset);
+		EdgesIterator getInEdgesIt(unsigned int node){
+			return EdgesIterator
+				( &(in_edges[nodes_in_offs[node] ]) 
+				 ,nodes_in_offs[node+1] - nodes_in_offs[node] );
 		}
 		
-		InShortcutsIterator getInShortcutsIt(unsigned int node){
-			return InShortcutsIterator
-				( &(in_shortcuts[nodes_in_offs[node].shortcut_offset]) 
-				 ,nodes_in_offs[node+1].shortcut_offset-nodes_in_offs[node].shortcut_offset);
-		}
-
-
+		/*
+		 * stuff
+		 */
 		void print(unsigned int i){
 			for(unsigned int j = 0; j <= i; j++){
 			E e = in_edges[j];
@@ -188,6 +123,9 @@ class Graph {
 				std::cout << " type: " << edge_data[ e.id ].type << std::endl;
 			}
 		}
+
+
+
 };
 
 

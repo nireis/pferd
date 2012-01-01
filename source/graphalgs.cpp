@@ -3,6 +3,7 @@
 #include <ctime>
 #include <limits>
 #include <iostream>
+#include "structs.h"
 using namespace std;
 
 // struct für die Elemente aus U incl. Vergleich
@@ -50,7 +51,7 @@ class Compare_U_element_bi{
 
 void Dijkstra(Graph* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::OutEdgesIterator it = g->getOutEdgesIt(node_id);
+	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -101,7 +102,7 @@ void Dijkstra(Graph* g, unsigned int node_id){
 //	//	}
 //	// Test: Dijkstra verifizieren
 //	// Schauen ob die Distanzen stimmen und auch minimal sind
-//	Graph::InEdgesIterator iit;
+//	EdgesIterator iit;
 //	Edge* inEdge;
 //	for(unsigned int i=0; i < g->getNodeCount(); i++){
 //		iit = g->getInEdgesIt(i);
@@ -131,7 +132,7 @@ void Dijkstra(Graph* g, unsigned int node_id){
 
 unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::OutEdgesIterator it = g->getOutEdgesIt(node_id0);
+	EdgesIterator it = g->getOutEdgesIt(node_id0);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -228,7 +229,7 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 //	//	}
 //	// Test: Dijkstra verifizieren
 //	// Schauen ob die Distanzen stimmen und auch minimal sind
-//	Graph::InEdgesIterator iit;
+//	EdgesIterator iit;
 //	Edge* inEdge;
 //	for(unsigned int i=0; i < g->getNodeCount(); i++){
 //		iit = g->getInEdgesIt(i);
@@ -303,8 +304,8 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
 
 unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
-	Graph::OutEdgesIterator itout = g->getOutEdgesIt(node_id0);
-	Graph::InEdgesIterator itin = g->getInEdgesIt(node_id1);
+	EdgesIterator itout = g->getOutEdgesIt(node_id0);
+	EdgesIterator itin = g->getInEdgesIt(node_id1);
 
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;

@@ -5,6 +5,8 @@
 using namespace std;
 
 Graph::Graph() : 
+	is_set(0),
+	BinID(43),
 	node_count(0), 
 	nodes_in_offs(0), 
 	nodes_out_offs(0),
@@ -13,13 +15,7 @@ Graph::Graph() :
 	edge_count(0), 
 	out_edges(0), 
 	in_edges(0), 
-	edge_data(0), 
-
-	shortcut_count(0), 
-	out_shortcuts(0), 
-	in_shortcuts(0), 
-	shortcut_data(0) {
-	shortcutlist = SListExt<S>();
+	edge_data(0) {
 }
 
 
@@ -31,15 +27,12 @@ Graph::~Graph(){
 	delete[] out_edges; out_edges = 0;
 	delete[] in_edges; in_edges = 0;
 	delete[] edge_data; edge_data = 0;
-
-	delete[] out_shortcuts; out_shortcuts = 0;
-	delete[] in_shortcuts; in_shortcuts = 0;
-	delete[] shortcut_data; shortcut_data = 0;
-
-	shortcutlist.clear();
 }
 
 bool Graph::setGraph(std::string graphdata){
+	if( is_set )
+		return false;
+
 	/*
 	 * 1. datei existiert und ist keine von uns erstellte datei => parser aufrufen
 	 * 2. datei existiert und ist von uns geschriebene .grp datei => einlesen
@@ -55,12 +48,26 @@ bool Graph::setGraph(std::string graphdata){
 		cout << "Angegebene Datei nicht gefunden: " << tmp << endl;
 		return false;
 	} 
+	checkfile.close();
 
 	tmp =  graphdata;
 
-	if( tmp.erase(0, tmp.size()-4) == ".grp" ){
-		s = 2;
-		cout << "Lese aus Binärdatei: " << graphdata<< endl;
+	if( tmp.erase(0, tmp.size()-4) == ".grp"){
+		tmp =  graphdata;
+		checkfile.open( tmp.c_str(), ios::in|ios::binary);
+		int check;
+		checkfile.read((char*) &check, sizeof(int));
+		if(check!=BinID){
+			s = 1;
+			//cout << "check: " << check << ", " << "binid : " << BinID << endl;
+			graphdata.erase( graphdata.size() - 4, graphdata.size() ) ;
+			cout << "Parse Textdatei: " << graphdata << endl;
+		} else {
+			s = 2;
+			//cout << "check: " << check << ", " << "binid : " << BinID << endl;
+			cout << "Lese aus Binärdatei: " << graphdata<< endl;
+		}
+		checkfile.close();
 	} else {
 		s = 1;
 		cout << "Parse Textdatei: " << graphdata << endl;
@@ -69,7 +76,6 @@ bool Graph::setGraph(std::string graphdata){
 	switch(s){
 		case 1: 
 	{
-			// parser case
 			parser p = parser(graphdata);
 		
 			node_count = p.getNodeCount();
@@ -89,45 +95,53 @@ bool Graph::setGraph(std::string graphdata){
 			p.getNodesAndEdges(nodes, edges);
 		
 			// nodes/edges verarbeiten
+			for(unsigned int i = 0; i <= node_count; i++){
+				nodes_in_offs[ i ] = 0 ;
+				nodes_out_offs[ i ] = 0 ;
+			}
 			for(unsigned int i = 0; i < edge_count; i++){
-				nodes_in_offs[ edges[i].target +1 ].edge_offset++ ;
-				nodes_out_offs[ edges[i].source +1 ].edge_offset++ ;
+				nodes_in_offs[ edges[i].target +1 ] ++ ;
+				nodes_out_offs[ edges[i].source +1 ] ++ ;
 			}
 			for(unsigned int i = 0; i < node_count; i++){
-				nodes_in_offs[ i +1 ].edge_offset = 
-					nodes_in_offs[ i +1 ].edge_offset + nodes_in_offs[ i ].edge_offset;
-				nodes_out_offs[ i +1 ].edge_offset = 
-					nodes_out_offs[ i +1 ].edge_offset + nodes_out_offs[ i ].edge_offset;
+				nodes_in_offs[ i +1 ] = 
+					nodes_in_offs[ i +1 ] + nodes_in_offs[ i ] ;
+				nodes_out_offs[ i +1 ] = 
+					nodes_out_offs[ i +1 ] + nodes_out_offs[ i ] ;
 			}
 			for(unsigned int i = 0; i < node_count; i++){
 				node_data[i] = 
 					NodeData( nodes[i].id, nodes[i].elevation, nodes[i].lat, nodes[i].lon );
 			}
 			for(unsigned int i = 0; i < edge_count; i++){
-				out_edges[i] = Edge( i, edges[i].distance, edges[i].target );
+				out_edges[i] = E( i, edges[i].distance, edges[i].target );
 				in_edges[i].other_node = node_count;
-				edge_data[i] = EdgeData( i, 0, edges[i].distance, edges[i].type, 0 );
+				edge_data[i] = ED( i, 0, edges[i].distance, edges[i].type, 0 );
 			}
 			
 			for(unsigned int i = 0; i < edge_count; i++){
-				unsigned int index = nodes_in_offs[ edges[i].target ].edge_offset;
+				unsigned int index = nodes_in_offs[ edges[i].target ] ;
 				while( in_edges[index].other_node != node_count ){
 					index++;
 				}
-				in_edges[index] = Edge( i, edges[i].distance, edges[i].source );
+				in_edges[index] = E( i, edges[i].distance, edges[i].source );
 				edge_data[i].in_index = index;
 			}
 
-			delete[] nodes;
-			delete[] edges;
+			delete[] nodes; nodes = 0;
+			delete[] edges; edges = 0;
 			
+			// TODO optional machen, ob binärdatei
+			// geschrieben wird
 			writeBinaryGraphFile(graphdata);
 
+			is_set = 1;
 			return true;
 			break;
 	}
 		case 2:
 	{
+			is_set = 1;
 			return readBinaryGraphFile(graphdata);
 			break;
 	}
@@ -138,8 +152,8 @@ bool Graph::setGraph(std::string graphdata){
 
 void Graph::writeBinaryGraphFile(std::string graphdata){
 	fstream f(graphdata.append(".grp").c_str(), ios::out|ios::binary);
-	int i = 42;
-	f.write((char*)&i, sizeof(int));
+	
+	f.write((char*) &BinID, sizeof(int));
 
 	f.write((char*) &node_count, sizeof(unsigned int));
 	f.write((char*) &edge_count, sizeof(unsigned int));
@@ -160,7 +174,7 @@ bool Graph::readBinaryGraphFile(std::string graphdata){
 	
 	int i;
 	f.read((char*) &i, sizeof(int));
-	if(i!=42){
+	if(i!=BinID){
 		f.close();
 		return false;
 	} else {
@@ -188,175 +202,47 @@ bool Graph::readBinaryGraphFile(std::string graphdata){
 	}
 }
 
-
-void Graph::setShortcutOffsets(){
-	clearShortcutOffsets();
-
-	shortcut_count = shortcutlist.size();
-	out_shortcuts = new E[shortcut_count];
-	in_shortcuts = new E[shortcut_count];
-	shortcut_data = new SD[shortcut_count];
-
-	SListExt<S>::Iterator it = shortcutlist.getIterator();
-
-	S s;
-	while( it.hasNext() ){
-		s = it.getNext();
-		nodes_in_offs[ s.target +1 ].shortcut_offset++;
-		nodes_out_offs[ s.source +1 ].shortcut_offset++;
-	}
-	for(unsigned int i = 0; i < node_count; i++){
-		nodes_in_offs[i+1].shortcut_offset 
-			= nodes_in_offs[i+1].shortcut_offset + nodes_in_offs[i].shortcut_offset;
-		nodes_out_offs[i+1].shortcut_offset 
-			= nodes_out_offs[i+1].shortcut_offset + nodes_out_offs[i].shortcut_offset;
-	}
-	unsigned int o;
-	unsigned int i;
-	it = shortcutlist.getIterator();
-	while( it.hasNext() ){
-		s = it.getNext();
-		o = nodes_out_offs[ s.source ].shortcut_offset;
-		i = nodes_in_offs[ s.target ].shortcut_offset;
-		while( out_shortcuts[ o ].id != 0 ){
-			o++;
-		}
-		while( in_shortcuts[ i ].id != 0 ){
-			i++;
-		}
-		out_shortcuts[ o ] = E(s.id, s.value, s.target);
-		in_shortcuts[ i ] = E(s.id, s.value, s.target);
-		shortcut_data[s.id - edge_count] = SD(s.papa_edge, s.mama_edge);
-	}
-}
-
-/* 
- * siehe oben, nur bekommen wir eine
- * nach source-knoten aufsteigend sortiertes
- * array von shortcuts
- *
- * auch hier löschen wir alle bisher angelegten shortcuts
- */
-// void Graph::initShortcutOffsets(S* scarray, unsigned int scc){
-//	if(shortcuts != 0){
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes[ i ].out_shortcut_offset = 0;
-//			nodes[ i ].in_shortcut_offset = 0;
-//		}
-//	}
-//	if(in_shortcuts != 0)
-//		delete[] in_shortcuts;
-//
-//	if(shortcuts != 0)
-//		delete[] shortcuts;
-//
-//	shortcut_count = scc;
-//	shortcuts = scarray;
-//	in_shortcuts = new S*[shortcut_count];
-//
-//	for(unsigned int i = 0; i < node_count; i++){
-//		nodes[ i ].out_shortcut_offset = 0;
-//		nodes[ i ].in_shortcut_offset = 0;
-//	}
-//
-//	// bereits offsets und in_shortcuts vor
-//	for(unsigned int i = 0; i < shortcut_count; i++){
-//		in_shortcuts[i] = 0;
-//		nodes[ shortcuts[i].source +1 ].out_shortcut_offset++;
-//		nodes[ shortcuts[i].target +1 ].in_shortcut_offset++;
-//	}
-//	// setze offsets korrekt
-//	for(unsigned int i = 0; i < node_count; i++){
-//		nodes[i+1].in_shortcut_offset 
-//			= nodes[i+1].in_shortcut_offset + nodes[i].in_shortcut_offset;
-//		nodes[i+1].out_shortcut_offset 
-//			= nodes[i+1].out_shortcut_offset + nodes[i].out_shortcut_offset;
-//	}
-//	unsigned int j = 0;
-//	for(unsigned int i = 0; i < shortcut_count; i++){
-//		j = 0;
-//		shortcuts[i].id = edge_count + i + 1; //TODO nochmal überdenken
-//		// suche in diesem bereich einen noch leeren eintrag,
-//		// trage dort die entsprechende kante ein
-//		while( in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] != 0 ){
-//			j++;
-//		}
-//		in_shortcuts[ nodes[ shortcuts[i].target ].in_shortcut_offset + j] 
-//			= & shortcuts[i];
-//	}
-// }
-
-void Graph::clearShortcuts(){
-	if(shortcut_data != 0){
-		for(unsigned int i = 0; i < node_count; i++){
-			nodes_out_offs[ i ].shortcut_offset = 0;
-		}
-		for(unsigned int i = 0; i < node_count; i++){
-			nodes_in_offs[ i ].shortcut_offset = 0;
-		}
-		delete[] shortcut_data; shortcut_data = 0;
-		delete[] in_shortcuts; in_shortcuts = 0;
-		delete[] out_shortcuts; out_shortcuts = 0;
-		shortcut_count = 0;
-		shortcutlist.clear();
-	}
-}
-void Graph::clearShortcutlist(){
-	shortcutlist.clear();
-}
-void Graph::clearShortcutOffsets(){
-	if(shortcut_data != 0){
-		for(unsigned int i = 0; i < node_count; i++){
-			nodes_out_offs[ i ].shortcut_offset = 0;
-		}
-		for(unsigned int i = 0; i < node_count; i++){
-			nodes_in_offs[ i ].shortcut_offset = 0;
-		}
-		delete[] shortcut_data; shortcut_data = 0;
-		delete[] in_shortcuts; in_shortcuts = 0;
-		delete[] out_shortcuts; out_shortcuts = 0;
-		shortcut_count = 0;
-	}
-}
-
-void Graph::addShortcut(S sc){
-	shortcutlist.push(sc);
-}
-
-
 unsigned int Graph::getNodeCount(){
 	return node_count;
 }
 unsigned int Graph::getEdgeCount(){
 	return edge_count;
 }
-unsigned int Graph::getShortcutCount(){
-	return shortcut_count;
-}
+
 ND Graph::getNodeData(unsigned int id){
-	return node_data[id];
+	if(id < node_count)
+		return node_data[id];
+
+	ND nd;
+	return nd;
 }
 ED Graph::getEdgeData(unsigned int id){
-	return edge_data[id];
-}
-SD Graph::getShortcutData(unsigned int id){
-	return shortcut_data[id]; // TODO indexprüfung 
+	if(id < edge_count)
+		return edge_data[id];
+	
+	ED ed;
+	return ed;
 }
 
-// Andres stuff
+/* 
+ * keine Indexprüfung !
+ */
 unsigned int Graph::getLowerOutEdgeBound(unsigned int id){
-	return nodes_out_offs[id].edge_offset;
+	return nodes_out_offs[id] ;
 }
 unsigned int Graph::getUpperOutEdgeBound(unsigned int id){
-	return nodes_out_offs[id+1].edge_offset;
+	return nodes_out_offs[id+1] ;
 }
 unsigned int Graph::getLowerInEdgeBound(unsigned int id){
-	return nodes_in_offs[id].edge_offset;
+	return nodes_in_offs[id] ;
 }
 unsigned int Graph::getUpperInEdgeBound(unsigned int id){
-	return nodes_in_offs[id+1].edge_offset;
+	return nodes_in_offs[id+1] ;
 }
-//TODO andres stuff
+
+// andres stuff
+// später weg, oder behalten wir das arbeiten
+// direkt auf dem Graph?
 E* Graph::getOutEdge(unsigned int id){
 	if(id < edge_count)
 		return & out_edges[id ];

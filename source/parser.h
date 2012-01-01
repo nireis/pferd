@@ -25,7 +25,7 @@ private:
 	 * string - aus datei eingelesene Zeile
 	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createNode(std::string, ParserNode*);
+	void createNode(std::string inputString, ParserNode* rNode);
 
 	/*
 	 * createEdge - erstellt eine neue Kante
@@ -34,7 +34,7 @@ private:
 	 * unsinged int - Indexstelle des Arrays, KantenID
 	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createEdge(std::string,unsigned int, ParserEdge*);
+	void createEdge(std::string inputString,unsigned int, ParserEdge* rEdge);
 public:
 	/*
 	 *default constructer
@@ -47,10 +47,6 @@ public:
 	 */
 	~parser();
 
-	/*
-	 * readFile - bekommt den Pfad einer Datei als String übergeben und liest sie ein
-	 */
-	bool readFile(std::string);
 	/*
 	 * getNodeCount - Gibt Knotenanzahl zurück
 	 */
@@ -67,18 +63,6 @@ public:
 	 * getEdges - Gibt Kantenarray zurück
 	 */
 	ParserEdge* getEdges();
-
-	/*
-	 * schreibt geparsten Graph
-	 * in eine Datei, die später
-	 * schneller einlesbar sein soll
-	 *
-	 * liest besagte datei wieder ein
-	 *
-	 * gibt zurück, ob schreiben/lesen erfolgreich war
-	 */
-	bool writeGraphFile(std::string);
-	bool readGraphFile(std::string);
 };
 
 #endif

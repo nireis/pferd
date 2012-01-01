@@ -1,6 +1,10 @@
 #ifndef structs_h
 #define structs_h
 
+/*
+ * vom Parser zu setzende Strukturen, 
+ * wie sie aus der Datei gelesen werden können
+ */
 struct ParserNode {
 	ParserNode() : id(0), elevation(0), lat(0), lon(0) {}
 	ParserNode(unsigned int i, double la, double lo, int e) :
@@ -22,6 +26,15 @@ struct ParserEdge {
 	unsigned int type;
 };
 
+/*
+ * "kleine" Strukturen, die optionale Daten
+ * von wichtigen trennen
+ *
+ * eine Kante hat einen Wert value, der nicht zwingend der Distanz
+ * entsprechen muss. Da man eine Kante von einem bestimmten Knoten aus
+ * aufruft, interessiert nur der "andere Knoten"
+ * die ID verweist auf die zugehörige Stelle im Daten-Array
+ */
 struct Edge {
 	Edge() : id(0), value(0), other_node(0) {}
 	Edge(unsigned int i, unsigned int v, unsigned int o) : 
@@ -44,10 +57,11 @@ struct EdgeData {
 };
 
 struct Node {
-	Node() : edge_offset(0), shortcut_offset(0) {}
+	Node() : v(0) {} //edge_offset(0), shortcut_offset(0) {}
 	
-	unsigned int edge_offset; 
-	unsigned int shortcut_offset;
+	unsigned int v;
+	//unsigned int edge_offset; 
+	//unsigned int shortcut_offset;
 };
 struct NodeData {
 	NodeData() : id(0), elevation(0), lat(0), lon(0) {}
@@ -60,6 +74,12 @@ struct NodeData {
 	double lon;
 };
 
+/*
+ * Shortcut, wie der Graph ihn als Eingabe erwartet
+ *
+ * die ID muss >= edge_count gewählt sein,
+ * damit später Shortcuts und Edges unterschieden werden können
+ */
 struct Shortcut {
 	unsigned int id;
 	unsigned int value;
@@ -68,6 +88,11 @@ struct Shortcut {
 	unsigned int papa_edge;
 	unsigned int mama_edge;
 };
+
+/*
+ * die einzigen Informationen eines Shortcuts, 
+ * die ausgelagert werden sollten.
+ */
 struct ShortcutData {
 	ShortcutData() : papa_edge(0), mama_edge(0) {}
 	ShortcutData(unsigned int p, unsigned int m) :
@@ -77,8 +102,9 @@ struct ShortcutData {
 	unsigned int mama_edge;
 };
 
-
-
+/*
+ * eine LIFO mit Iterator
+ */
 template <typename T>
 class SList {
 	protected:
@@ -90,17 +116,14 @@ class SList {
 			SListData* next;
 		};
 	public:
-		SList(){
-			root = 0;
+		SList() : root(0) {
 		}
 		~SList(){
-			clear();
+			//clear();
+			root = 0;
 		}
-		bool empty(){
-			if(root == 0)
-				return true;
-
-			return false;
+		bool empty() const {
+			return (root == 0);
 		}
 		void push(T d){
 				SListData* t = new SListData;
@@ -128,8 +151,9 @@ class SList {
 			return d;
 		}
 		void clear(){
+			SListData* t;
 			while(root != 0){
-				SListData* t = root->next;
+				t = root->next;
 				delete root;
 				root = t;
 			}
@@ -138,17 +162,13 @@ class SList {
 			private:
 				SListData* position;
 			public:
-				Iterator(SListData* r){
-					position = r;
+				Iterator(SListData* r) : position(r) {
 				}
 				~Iterator(){
 					position = 0;
 				}
-				bool hasNext(){
-					if(position == 0)
-						return false;
-					
-					return true;
+				bool hasNext() const {
+					return (position != 0);
 				}
 				T/*T&*/ getNext(){
 					SListData* t = position;
@@ -164,20 +184,19 @@ class SList {
  
 template <typename T>
 /*
- * Erweiterung der push/pop Liste 
+ * Erweiterung der LIFO
  * um Mitzählen der Größe
- * und peek()
+ * und "peek()"
  */
 class SListExt {
 	protected:
 		unsigned int siz;
 		SList<T> list;
 	public:
-		SListExt() : list() {
-			siz = 0;
+		SListExt() : siz(0), list() {
 		}
-		~SListExt(){
-			list.clear();
+		~SListExt() {
+			//list.clear();
 		}
 
 		void push(T d){
@@ -199,11 +218,11 @@ class SListExt {
 			list.push(d);
 			return d;
 		}
-		unsigned int size(){
+		unsigned int size() const {
 			return siz;
 		}
 
-		bool empty(){
+		bool empty() const {
 			return list.empty();
 		}
 
@@ -214,9 +233,34 @@ class SListExt {
 		}
 };
 
+/*
+ * Ein Iterator für gewisse Strukturen
+ */
+template <typename T>
+class Andrenator_P {
+	private:
+		unsigned int max;
+		T* start;
+	public:
+		Andrenator_P() : max(0), start(0) {}
 
+		Andrenator_P(T* strt, unsigned int mx) : 
+			max(mx), start(strt) {}
 
+		~Andrenator_P(){
+			start = 0;
+		}
+		
+		bool hasNext() const {
+			return max != 0;
+		}
 
+		T* getNext() {
+			--max;
+			return start++;
+		}
+};
+typedef Andrenator_P<Edge> EdgesIterator;
 
 
 #endif

@@ -2,6 +2,8 @@
 #include "graphalgs.h"
 #include "parser.h"
 #include <ctime>
+#include "structs.h"
+#include "ch.h"
 
 using namespace std;
 
@@ -49,8 +51,84 @@ finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
+cout << "Taste drücken zum Erstellen einer CH mit m Shortcuts. " << endl;
+cin.get();
 
-unsigned int node = 0;
+CH h = CH(&g);
+start = clock();
+	unsigned int scc = g.getEdgeCount();//*2;
+		for(unsigned int i = 0; i < scc; i++){
+		Shortcut s;
+		s.value = ((int)( i*i*3.141592)) % 100;
+		s.source = i%g.getNodeCount();
+		s.target = i*(i+1)%(g.getNodeCount());
+		s.id = g.getEdgeCount() + i;
+      s.papa_edge = i*i % g.getEdgeCount();
+      s.mama_edge = i*(i+1) % g.getEdgeCount();
+		h.addShortcut(s);
+	}
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Shortcuts bereitgelegt. Benötigte Zeit:" << time << endl;
+	cout << "Nun initialisieren der Shortcuts.Taste drücken. " << endl;
+	cin.get();
+
+	start = clock();
+	h.setShortcuts();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit, m Shortcuts und m vorhandene Kanten zu initialisieren: " << time << endl;
+	cout << "Nun löschen der Shortcuts. Taste drücken. " << endl;
+	cin.get(); 
+
+	h.clearShortcutlist();
+	h.clearShortcuts();
+
+	start = clock();
+	unsigned int is = h.calcIndepSet();
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+
+	cout << "Habe Independent Set der Größe > " << is << " < aufgebaut in: " << time << endl;
+
+cout << "Es folgt weiteres Testzeug. Taste drücken." << endl;
+cin.get();
+
+long double dd = 0;
+unsigned int node = 0;//g.getNodeCount() - 1;
+//for(unsigned int i = 0; i <= node; i++){
+//	NodeData nd = g.getNodeData(i);
+//	dd+= nd.id ;
+//	dd+= nd.elevation ;
+//	dd+= nd.lon ;
+//	dd+= nd.lat ;
+//	EdgesIterator it = g.getOutEdgesIt(i);
+//	while (it.hasNext()){
+//		Edge e = * it.getNext();
+//		dd += e.value ;
+//		dd += e.other_node ;
+//		dd += e.id ;
+//		EdgeData ed = g.getEdgeData(e.id);
+//		dd += ed.out_index ;
+//		dd += ed.in_index ;
+//		dd += ed.distance ;
+//		dd += ed.type ;
+//		dd += ed.load ;
+//	}
+//	it = g.getInEdgesIt(i);
+//	while (it.hasNext()){
+//		Edge e = * it.getNext();
+//		dd += e.value ;
+//		dd += e.other_node ;
+//		dd += e.id ;
+//		EdgeData ed = g.getEdgeData(e.id);
+//		dd += ed.out_index ;
+//		dd += ed.in_index ;
+//		dd += ed.distance ;
+//		dd += ed.type ;
+//		dd += ed.load ;
+//	}
+//}
 for(unsigned int i = 0; i <= node; i++){
 	
 	NodeData nd = g.getNodeData(i);
@@ -62,15 +140,19 @@ for(unsigned int i = 0; i <= node; i++){
 	cout << "Lon: " << nd.lon << endl;
 	cout << "El: " << nd.elevation << endl << endl;
 	
-	Graph::OutEdgesIterator it = g.getOutEdgesIt(i);
+	EdgesIterator it = g.getOutEdgesIt(i);
 	while(it.hasNext()){
 		Edge* e = it.getNext();
 		cout << "other_node: " << e->other_node << endl;
-				Graph::InEdgesIterator ieit = g.getInEdgesIt(e->other_node);
+				EdgesIterator ieit = g.getInEdgesIt(e->other_node);
 		cout << "value: " << e->value << endl;
 		cout << "type: " << g.getEdgeData(e->id).type << endl;
 		cout << "id: " << e->id << endl << endl;
-				cout << "   alle einkommenden Kanten von " << e->other_node << endl;
+
+		EdgeData ed;
+		ed = g.getEdgeData(e->id);
+
+				dd+= e->other_node;
 				while(ieit.hasNext()){
 					Edge* ee = ieit.getNext();
 					cout << "   v: " << ee->value << endl;
@@ -81,9 +163,7 @@ for(unsigned int i = 0; i <= node; i++){
 	cout << " === === " << endl;
 }
 
-
 cout << "Dijkstra angefangen." << endl;
-
 for(int i=0; i<1; i++){
 	start = clock();
 	Dijkstra(&g, i);
@@ -121,39 +201,6 @@ for(int i=0; i<1; i++){
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 	}
-
-
-
-cout << "Taste drücken zum Erstellen von Shortcuts. " << endl;
-cin.get();
-start = clock();
-	unsigned int scc = g.getEdgeCount()*2;
-		for(unsigned int i = 0; i < scc; i++){
-		Shortcut s;
-		s.value = ((int)( i*i*3.141592)) % 100;
-		s.source = i%g.getNodeCount();
-		s.target = i*(i+1)%(g.getNodeCount());
-		s.id = g.getEdgeCount() + i;
-      s.papa_edge = i*i % g.getEdgeCount();
-      s.mama_edge = i*(i+1) % g.getEdgeCount();
-		g.addShortcut(s);
-	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Shortcuts angelegt. Nun initialisieren. Benötigte Zeit:" << time << endl;
-	cout << "Taste drücken zum Fortfahren! " << endl;
-	cin.get();
-
-	start = clock();
-	g.setShortcutOffsets();
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit, 2m Shortcuts zu initialisieren: " << time << endl;
-	cout << "Taste drücken zum Fortfahren. " << endl;
-	cin.get(); 
-
-	g.clearShortcutlist();
-
 
 cout << "Taste drücken zum Beenden..."<< endl;
 cin.get();

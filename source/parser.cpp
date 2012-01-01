@@ -8,11 +8,11 @@
 #include "parser.h"
 using namespace std;
 
-parser::parser(void)
+parser::parser()
 {
 }
 
-parser::~parser(void)
+parser::~parser()
 {
 }
 
@@ -189,10 +189,3 @@ ParserEdge* parser::getEdges()
 	return graphEdges;
 }
 
-bool parser::writeGraphFile(string filename){
-	return false;
-}
-
-bool parser::readGraphFile(string filename){
-	return false;
-}
