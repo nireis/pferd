@@ -11,7 +11,18 @@ typedef NodeData ND;
 typedef Edge E;
 typedef EdgeData ED;
 
-class Graph {
+typedef Andrenator_P<Edge> EdgesIterator;
+
+class Dijkstra_Interface {
+	public:
+		virtual unsigned int getNodeCount() = 0;
+		virtual unsigned int getEdgeCount() = 0;
+
+		virtual EdgesIterator getOutEdgesIt(unsigned int id) = 0;
+		virtual EdgesIterator getInEdgesIt(unsigned int id) = 0;
+};
+
+class Graph : public Dijkstra_Interface {
 
 	/*
 	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
@@ -70,8 +81,8 @@ class Graph {
 		/*
 		 * Daten zu Strukturen abfragen
 		 */
-		unsigned int getNodeCount();
-		unsigned int getEdgeCount();
+		virtual unsigned int getNodeCount();
+		virtual unsigned int getEdgeCount();
 
 		/*
 		 * get*Data - jeweils mit indexprüfung,
@@ -100,12 +111,12 @@ class Graph {
 		 *		* für nur einen Knoten
 		 *		* für genau alle Kanten der angeforderten Richtung 
 		 */
-		EdgesIterator getOutEdgesIt(unsigned int node){
+		virtual EdgesIterator getOutEdgesIt(unsigned int node){
 			return EdgesIterator
 					(&(out_edges[nodes_out_offs[node] ])
 					,nodes_out_offs[node+1] - nodes_out_offs[node] );
 		}
-		EdgesIterator getInEdgesIt(unsigned int node){
+		virtual EdgesIterator getInEdgesIt(unsigned int node){
 			return EdgesIterator
 				( &(in_edges[nodes_in_offs[node] ]) 
 				 ,nodes_in_offs[node+1] - nodes_in_offs[node] );

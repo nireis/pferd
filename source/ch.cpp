@@ -156,6 +156,13 @@ unsigned int CH::getShortcutCount(){
 	return shortcut_count;
 }
 
+unsigned int CH::getNodeCount(){
+	return node_count;
+}
+unsigned int CH::getEdgeCount(){
+	return edge_count;
+}
+
 unsigned int CH::calcIndepSet(){
 	for(unsigned int i = 0; i < node_count; i++){
 		node_order[i] = 0;

@@ -7,7 +7,7 @@
 typedef Shortcut S;
 typedef ShortcutData SD;
 
-class CH {
+class CH : public Dijkstra_Interface {
 	private:
 		/*
 		 * Die CH ist eine erweiterte Graphstruktur,
@@ -81,12 +81,15 @@ class CH {
 		SD getShortcutData(unsigned int id);
 		unsigned int getShortcutCount();
 
-		EdgesIterator getOutEdgesIt(unsigned int node){
+		virtual unsigned int getNodeCount();
+		virtual unsigned int getEdgeCount();
+
+		virtual EdgesIterator getOutEdgesIt(unsigned int node){
 			return EdgesIterator
 				( &(out_edges[nodes_out_offs[node]]) 
 				 ,nodes_out_offs[node+1]-nodes_out_offs[node]);
 		}
-		EdgesIterator getInEdgesIt(unsigned int node){
+		virtual EdgesIterator getInEdgesIt(unsigned int node){
 			return EdgesIterator
 				( &(in_edges[nodes_in_offs[node]]) 
 				 ,nodes_in_offs[node+1]-nodes_in_offs[node]);

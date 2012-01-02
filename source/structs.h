@@ -260,7 +260,6 @@ class Andrenator_P {
 			return start++;
 		}
 };
-typedef Andrenator_P<Edge> EdgesIterator;
 
 
 #endif
