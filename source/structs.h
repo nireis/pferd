@@ -55,11 +55,23 @@ struct EdgeData {
 	unsigned int type;
 	unsigned int load;
 };
+struct EdgeData2 {
+	EdgeData2() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
+	EdgeData2(Edge* o, Edge* i, unsigned int d, unsigned int t, unsigned int l) : 
+		out_index(o), in_index(i), distance(d), type(t), load(l) {}
+	
+	Edge* out_index;
+	Edge* in_index;
+	unsigned int distance;
+	unsigned int type;
+	unsigned int load;
+};
 
 struct Node {
-	Node() : v(0) {} //edge_offset(0), shortcut_offset(0) {}
+	Node() : count(0), edges(0) {} //edge_offset(0), shortcut_offset(0) {}
 	
-	unsigned int v;
+	unsigned int count;
+	Edge* edges;
 	//unsigned int edge_offset; 
 	//unsigned int shortcut_offset;
 };
@@ -81,7 +93,6 @@ struct NodeData {
  * damit später Shortcuts und Edges unterschieden werden können
  */
 struct Shortcut {
-	unsigned int id;
 	unsigned int value;
 	unsigned int source;
 	unsigned int target;
@@ -106,7 +117,7 @@ struct ShortcutData {
  * eine LIFO mit Iterator
  */
 template <typename T>
-class SList {
+class SList_Base {
 	protected:
 		struct SListData;
 		SListData* root;
@@ -116,9 +127,9 @@ class SList {
 			SListData* next;
 		};
 	public:
-		SList() : root(0) {
+		SList_Base() : root(0) {
 		}
-		~SList(){
+		~SList_Base(){
 			//clear();
 			root = 0;
 		}
@@ -188,14 +199,14 @@ template <typename T>
  * um Mitzählen der Größe
  * und "peek()"
  */
-class SListExt {
+class SList_Inner {
 	protected:
 		unsigned int siz;
-		SList<T> list;
+		SList_Base<T> list;
 	public:
-		SListExt() : siz(0), list() {
+		SList_Inner() : siz(0), list() {
 		}
-		~SListExt() {
+		~SList_Inner() {
 			//list.clear();
 		}
 
@@ -226,12 +237,56 @@ class SListExt {
 			return list.empty();
 		}
 
-		typedef typename SList<T>::Iterator Iterator;
+		typedef typename SList_Base<T>::Iterator Iterator;
 
 		Iterator getIterator(){
 			return list.getIterator();
 		}
 };
+
+template <typename T>
+class SList {
+	protected:
+		SList_Inner<T> list;
+	public:
+		SList() : list() {
+		}
+		~SList() {
+			list.clear();
+		}
+
+		void push(T d){
+			list.push(d);
+		}
+		T pop(){
+			return list.pop();
+		}
+		void clear(){
+			list.clear();
+		}
+
+		T peek(){
+			return list.peek();
+		}
+		unsigned int size() const {
+			return list.size();
+		}
+
+		bool empty() const {
+			return list.empty();
+		}
+
+		typedef typename SList_Inner<T>::Iterator Iterator;
+
+		Iterator getIterator(){
+			return list.getIterator();
+		}
+
+		SList_Inner<T> getInnerList(){
+			return list;
+		}
+};
+
 
 /*
  * Ein Iterator für gewisse Strukturen
@@ -255,9 +310,9 @@ class Andrenator_P {
 			return max != 0;
 		}
 
-		T* getNext() {
+		T getNext() {
 			--max;
-			return start++;
+			return * start++;
 		}
 };
 

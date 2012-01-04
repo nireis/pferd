@@ -45,16 +45,135 @@ Graph g = Graph();
 
 start = clock();
 
-g.setGraph(file);
+g.setGraph(file, true);
+//g.computeIterators();
 
 finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
-cout << "Taste drücken zum Erstellen einer CH mit m Shortcuts. " << endl;
+cout << "Dijkstra angefangen." << endl;
+for(int i=0; i<10; i++){
+	start = clock();
+	DirectDijkstra(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Dijkstra direkt auf dem Graphen von " << i << " aus: "<< time << endl;
+}
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+}
+
+//Graph2 g2 = Graph2();
+//start = clock();
+//
+//g2.setGraph(file);
+//
+//finish = clock();
+//time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+//cout << "Zeit zum initialisieren des Graphen2: " << time << endl;
+//
+//cout << "Dijkstra angefangen." << endl;
+//for(int i=0; i<10; i++){
+//	start = clock();
+//	DirectDijkstra(&g, i);
+//	finish = clock();
+//	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+//	cout << "Zeit für Dijkstra direkt auf dem Graphen von " << i << " aus: "<< time << endl;
+//}
+//for(int i=0; i<10; i++){
+//	start = clock();
+//	Dijkstra2(&g2, i);
+//	finish = clock();
+//	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+//	cout << "Zeit für normalen Dijkstra2 von " << i << " aus: "<< time << endl;
+//}
+//
+//cout << "Vergleiche Graph und Graph2 " << endl;
+//if(g.getNodeCount() != g2.getNodeCount())
+//	cout << "NodeCounts undlgeich, g: " << g.getNodeCount() <<", g2: " <<  g2.getNodeCount() << endl;
+//if(g.getEdgeCount() != g2.getEdgeCount())
+//	cout << "EdgeCounts undlgeich, g: " << g.getEdgeCount() <<", g2: " <<  g2.getEdgeCount() << endl;
+//
+//	cout << "=== OutEdges Differenzen zwischen g und g2 ===" << endl;
+//for(unsigned int n = 0; n < g.getNodeCount(); n++){
+//	Graph::EdgesIterator it = g.getOutEdgesIt(n);
+//	Graph2::EdgesIterator it2 = g2.getOutEdgesIt(n);
+//	while( it.hasNext() && it2.hasNext() ){
+//		Edge e = it.getNext();
+//		Edge e2 = it2.getNext();
+//		if( e.id != e2.id)
+//			cout << "IDs ungleich: g: " << e.id << ", g2: " << e2.id << endl;
+//		if( e.value != e2.value)
+//			cout << "VALUEs ungleich: g: " << e.value << ", g2: " << e2.value << endl;
+//		if( e.other_node != e2.other_node)
+//			cout << "OTHER_NODEs ungleich: g: " << e.other_node << ", g2: " << e2.other_node << endl;
+//	}
+//	if( it.hasNext() || it2.hasNext() )
+//		cout << "Knoten " << n << "hat unterschiedlich viele OutEdges: g: " << it.hasNext() << ", g2: " << it2.hasNext() << endl;
+//}
+//	cout << "=== InEdges Differenzen zwischen g und g2 ===" << endl;
+//for(unsigned int n = 0; n < g.getNodeCount(); n++){
+//	Graph::EdgesIterator it = g.getInEdgesIt(n);
+//	Graph2::EdgesIterator it2 = g2.getInEdgesIt(n);
+//	while( it.hasNext() && it2.hasNext() ){
+//		Edge e = it.getNext();
+//		Edge e2 = it2.getNext();
+//		if( e.id != e2.id)
+//			cout << "IDs ungleich: g: " << e.id << ", g2: " << e2.id << endl;
+//		if( e.value != e2.value)
+//			cout << "VALUEs ungleich: g: " << e.value << ", g2: " << e2.value << endl;
+//		if( e.other_node != e2.other_node)
+//			cout << "OTHER_NODEs ungleich: g: " << e.other_node << ", g2: " << e2.other_node << endl;
+//	}
+//	if( it.hasNext() || it2.hasNext() )
+//		cout << "Knoten " << n << "hat unterschiedlich viele InEdges: g: " << it.hasNext() << ", g2: " << it2.hasNext() << endl;
+//}
+
+cout << "Taste drücken zum Erstellen zweier CHs (statisch und dynamisch). " << endl;
 cin.get();
 
 CH h = CH(&g);
+h.setShortcuts();
+DynCH dch = DynCH(&g);
+
+
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+}
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra_4I(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Interface-Dijkstra mit Graph von " << i << " aus: "<< time << endl;
+}
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra_4I(&h, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Interface-Dijkstra mit statischer CH von " << i << " aus: "<< time << endl;
+}
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra_4I(&dch, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Interface-Dijkstra mit dynamischer CH von " << i << " aus: "<< time << endl;
+}
+
+cout << "Taste drücken zum Erstellen von m Shortcuts. " << endl;
+cin.get();
+
 start = clock();
 	unsigned int scc = g.getEdgeCount();//*2;
 		for(unsigned int i = 0; i < scc; i++){
@@ -62,7 +181,6 @@ start = clock();
 		s.value = ((int)( i*i*3.141592)) % 100;
 		s.source = i%g.getNodeCount();
 		s.target = i*(i+1)%(g.getNodeCount());
-		s.id = g.getEdgeCount() + i;
       s.papa_edge = i*i % g.getEdgeCount();
       s.mama_edge = i*(i+1) % g.getEdgeCount();
 		h.addShortcut(s);
@@ -94,7 +212,7 @@ start = clock();
 cout << "Es folgt weiteres Testzeug. Taste drücken." << endl;
 cin.get();
 
-long double dd = 0;
+//long double dd = 0;
 unsigned int node = 0;//g.getNodeCount() - 1;
 //for(unsigned int i = 0; i <= node; i++){
 //	NodeData nd = g.getNodeData(i);
@@ -129,6 +247,8 @@ unsigned int node = 0;//g.getNodeCount() - 1;
 //		dd += ed.load ;
 //	}
 //}
+Graph::EdgesIterator it;
+Graph::EdgesIterator ieit;
 for(unsigned int i = 0; i <= node; i++){
 	
 	NodeData nd = g.getNodeData(i);
@@ -140,44 +260,28 @@ for(unsigned int i = 0; i <= node; i++){
 	cout << "Lon: " << nd.lon << endl;
 	cout << "El: " << nd.elevation << endl << endl;
 	
-	EdgesIterator it = g.getOutEdgesIt(i);
+	it = g.getOutEdgesIt(i);
 	while(it.hasNext()){
-		Edge* e = it.getNext();
-		cout << "other_node: " << e->other_node << endl;
-				EdgesIterator ieit = g.getInEdgesIt(e->other_node);
-		cout << "value: " << e->value << endl;
-		cout << "type: " << g.getEdgeData(e->id).type << endl;
-		cout << "id: " << e->id << endl << endl;
+		Edge e = it.getNext();
+		cout << "other_node: " << e.other_node << endl;
+		
+		ieit = g.getInEdgesIt(e.other_node);
+		
+		cout << "value: " << e.value << endl;
+		cout << "type: " << g.getEdgeData(e.id).type << endl;
+		cout << "id: " << e.id << endl << endl;
 
 		EdgeData ed;
-		ed = g.getEdgeData(e->id);
+		ed = g.getEdgeData(e.id);
 
-				dd+= e->other_node;
 				while(ieit.hasNext()){
-					Edge* ee = ieit.getNext();
-					cout << "   v: " << ee->value << endl;
-					cout << "   other: " << ee->other_node << endl;
-					cout << "   id: " << ee->id << endl;
+					Edge ee = ieit.getNext();
+					cout << "   v: " << ee.value << endl;
+					cout << "   other: " << ee.other_node << endl;
+					cout << "   id: " << ee.id << endl;
 				}
 	}
 	cout << " === === " << endl;
-}
-
-cout << "Dijkstra angefangen." << endl;
-for(int i=0; i<1; i++){
-	start = clock();
-	Dijkstra(&g, i);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
-}
-
-for(int i=0; i<1; i++){
-	start = clock();
-	DirectDijkstra(&g, i);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit für Dijkstra direkt auf dem Graphen von " << i << " aus: "<< time << endl;
 }
 
 	for(unsigned int i=5010; i<5011; i++){

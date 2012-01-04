@@ -13,8 +13,6 @@ CH::CH(Graph* gr) :
 	shortcut_data( new SD[ gr->getEdgeCount() ] ),
 	shortcutlist(),
 	uintlist() {}
-//		shortcutlist = SListExt<S>();
-//}
 
 CH::~CH(){
 	g = 0;
@@ -41,7 +39,7 @@ bool CH::setShortcuts(){
 	shortcut_count = shortcutlist.size();
 	S* shortcuts = new S[shortcut_count];
 
-	SListExt<S>::Iterator it = shortcutlist.getIterator();
+	SList<S>::Iterator it = shortcutlist.getIterator();
 	for(unsigned int i=0; i < shortcut_count; i++){
 		if(it.hasNext())
 			shortcuts[i] = it.getNext();
@@ -91,16 +89,16 @@ bool CH::setShortcuts(){
 		while( in_edges[ i ].id != 0 ){
 			i++;
 		}
-		out_edges[ o ] = E(s.id, s.value, s.target);
-		in_edges[ i ] = E(s.id, s.value, s.source);
-		shortcut_data[s.id - edge_count] = SD(s.papa_edge, s.mama_edge);
+		out_edges[ o ] = E(edge_count + c, s.value, s.target);
+		in_edges[ i ] = E(edge_count + c, s.value, s.source);
+		shortcut_data[c] = SD(s.papa_edge, s.mama_edge);
 	}
 	EdgesIterator eit;
 	for(unsigned int c = 0; c < node_count; c++){
 		eit = g->getOutEdgesIt(c);
 		o = nodes_out_offs[c + 1] - 1;
 		while( eit.hasNext() ){
-			out_edges[ o ] = * eit.getNext();
+			out_edges[ o ] = eit.getNext();
 			o--;
 		}
 	}
@@ -108,11 +106,10 @@ bool CH::setShortcuts(){
 		eit = g->getInEdgesIt(c);
 		i = nodes_in_offs[c + 1] - 1;
 		while( eit.hasNext() ){
-			in_edges[ i ] = * eit.getNext();
+			in_edges[ i ] = eit.getNext();
 			i--;
 		}
 	}
-
 	delete[] shortcuts;
 
 	return true;
@@ -173,7 +170,7 @@ unsigned int CH::calcIndepSet(){
 			node_order[i] = 2;
 			EdgesIterator it = g->getOutEdgesIt(i);
 			while( it.hasNext() ){
-				node_order[ it.getNext() -> other_node ] = 1;
+				node_order[ it.getNext() . other_node ] = 1;
 			}
 		} 
 	}
@@ -183,4 +180,51 @@ unsigned int CH::calcIndepSet(){
 	}
 
 	return uintlist.size();
+}
+
+
+DynCH::DynCH(Graph* gr) : 
+	out_edges(new std::vector<E>[gr->getNodeCount()]),
+	in_edges(new std::vector<E>[gr->getNodeCount()]),
+	g(gr),
+	node_order(new unsigned int[gr->getNodeCount()]),
+	node_count(gr->getNodeCount()),
+	edge_count(gr->getEdgeCount()),
+	shortcut_count(0),
+	shortcut_data(),
+	uintlist() {
+		for(unsigned int i = 0; i < node_count; i++){
+			EdgesIterator it = gr->getOutEdgesIt(i);
+			while( it.hasNext() ){
+				out_edges[i].push_back( it.getNext() );
+			}
+		}
+		for(unsigned int i = 0; i < node_count; i++){
+			EdgesIterator it = gr->getInEdgesIt(i);
+			while( it.hasNext() ){
+				in_edges[i].push_back( it.getNext() );
+			}
+		}
+	}
+DynCH::~DynCH(){
+	delete[] out_edges; out_edges = 0;
+	delete[] in_edges; in_edges = 0;
+	delete[] node_order; node_order = 0;
+}
+
+unsigned int DynCH::getNodeCount(){
+	return node_count;
+}
+unsigned int DynCH::getEdgeCount(){
+	return edge_count;
+}
+unsigned int DynCH::getShortcutCount(){
+	return shortcut_count;
+}
+
+void DynCH::addShortcut(S sc){
+	shortcut_data.push( sc_id( SD(sc.papa_edge, sc.mama_edge) , shortcut_count ) );
+	out_edges[ sc.source ].push_back( E(edge_count + shortcut_count, sc.value, sc.target ) );
+	in_edges[ sc.target ].push_back( E(edge_count + shortcut_count, sc.value, sc.source ) );
+	shortcut_count ++;
 }

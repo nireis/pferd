@@ -3,6 +3,7 @@
 
 #include "graph.h"
 #include "structs.h"
+#include <vector>
 
 typedef Shortcut S;
 typedef ShortcutData SD;
@@ -33,9 +34,9 @@ class CH : public Dijkstra_Interface {
 
 		SD* shortcut_data;
 	
-		SListExt<S> shortcutlist;
+		SList<S> shortcutlist;
 
-		SListExt<unsigned int> uintlist;
+		SList<unsigned int> uintlist;
 
 	public:
 		CH(Graph* gr);
@@ -95,6 +96,48 @@ class CH : public Dijkstra_Interface {
 				 ,nodes_in_offs[node+1]-nodes_in_offs[node]);
 		}
 
+};
+
+class DynCH : public Dijkstra_Interface {
+	private:
+		std::vector<E>* out_edges;
+		std::vector<E>* in_edges;
+
+		Graph* g;
+
+		unsigned int* node_order;
+		
+		unsigned int node_count;
+		unsigned int edge_count;
+		unsigned int shortcut_count;
+		
+		struct sc_id {
+			sc_id(SD s, unsigned int i) : sd(s), id(i) {}
+			sc_id() : sd(), id(0) {}
+			SD sd;
+			unsigned int id;
+		};
+		SList<sc_id> shortcut_data;
+
+		SList<unsigned int> uintlist;
+
+	public:
+		DynCH(Graph* gr);
+		~DynCH();
+
+		void addShortcut(S sc);
+
+		unsigned int getShortcutCount();
+
+		virtual unsigned int getNodeCount();
+		virtual unsigned int getEdgeCount();
+
+		virtual EdgesIterator getOutEdgesIt(unsigned int id){
+			return EdgesIterator( & out_edges[id][0] , out_edges[id].size() );
+		}
+		virtual EdgesIterator getInEdgesIt(unsigned int id){
+			return EdgesIterator( & in_edges[id][0] , in_edges[id].size() );
+		}
 };
 
 #endif

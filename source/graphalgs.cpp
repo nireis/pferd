@@ -48,7 +48,7 @@ class Compare_U_element_bi{
 			return u1.distance > u2.distance;
 		}   
 };
-
+/*
 void Dijkstra(Graph* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id);
@@ -128,15 +128,258 @@ void Dijkstra(Graph* g, unsigned int node_id){
 //			}
 //		}
 //	}
+}*/
+void Dijkstra_4I(Dijkstra_Interface* g, unsigned int node_id){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	Dijkstra_Interface::EdgesIterator it = g->getOutEdgesIt(node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	dist[node_id] = 0;
+	found[node_id] = true;
+	while(it.hasNext()){
+		currentEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(currentEdge.value,currentEdge.other_node,currentEdge.id));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	//U_element ue;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		//ue = U.top();
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			dist[tmpid] = U.top().distance;
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge.other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
+				}
+			}
+		}
+		U.pop();
+	}
+//	// TEST: Ergebnisse ausgeben
+//	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//	//		cout << dist[i] << endl;
+//	//	}
+//	// Test: Dijkstra verifizieren
+//	// Schauen ob die Distanzen stimmen und auch minimal sind
+//	EdgesIterator iit;
+//	Edge* inEdge;
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		iit = g->getInEdgesIt(i);
+//		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+//		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
+//			Edge* tmpedge = g->getInEdge(in_edge_id[i]);
+//			// Wenn die Distanz nicht stimmt...
+//			if(tmpedge->value + dist[tmpedge->other_node] != dist[i]){
+//				// DISTANZ in Dijkstra nicht konsistent!!
+//				cout << "Distanz stimmt nicht für: " << i << endl;
+//			}
+//		}
+//		while(iit.hasNext()){
+//			inEdge = iit.getNext();		
+//			if(dist[i] > inEdge->value + dist[inEdge->other_node] && dist[inEdge->other_node] != numeric_limits<unsigned int>::max()){
+//				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+//				cout << "Minimal stimmt nicht für: ";
+//				cout << "Edge ID: " << in_edge_id[i];
+//				cout << " Other Node: " << inEdge->other_node;
+//				//cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+//				cout << " Dijkstra Dist: " << dist[i];
+//				cout << " Scheinbar min Dist: " << inEdge->value + dist[inEdge->other_node] << endl;
+//			}
+//		}
+//	}
+}
+void Dijkstra2(Graph2* g, unsigned int node_id){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	Graph2::EdgesIterator it = g->getOutEdgesIt(node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	dist[node_id] = 0;
+	found[node_id] = true;
+	while(it.hasNext()){
+		currentEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(currentEdge.value,currentEdge.other_node,currentEdge.id));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	//U_element ue;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		//ue = U.top();
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			dist[tmpid] = U.top().distance;
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge.other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
+				}
+			}
+		}
+		U.pop();
+	}
+//	// TEST: Ergebnisse ausgeben
+//	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//	//		cout << dist[i] << endl;
+//	//	}
+//	// Test: Dijkstra verifizieren
+//	// Schauen ob die Distanzen stimmen und auch minimal sind
+//	EdgesIterator iit;
+//	Edge* inEdge;
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		iit = g->getInEdgesIt(i);
+//		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+//		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
+//			Edge* tmpedge = g->getInEdge(in_edge_id[i]);
+//			// Wenn die Distanz nicht stimmt...
+//			if(tmpedge->value + dist[tmpedge->other_node] != dist[i]){
+//				// DISTANZ in Dijkstra nicht konsistent!!
+//				cout << "Distanz stimmt nicht für: " << i << endl;
+//			}
+//		}
+//		while(iit.hasNext()){
+//			inEdge = iit.getNext();		
+//			if(dist[i] > inEdge->value + dist[inEdge->other_node] && dist[inEdge->other_node] != numeric_limits<unsigned int>::max()){
+//				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+//				cout << "Minimal stimmt nicht für: ";
+//				cout << "Edge ID: " << in_edge_id[i];
+//				cout << " Other Node: " << inEdge->other_node;
+//				//cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+//				cout << " Dijkstra Dist: " << dist[i];
+//				cout << " Scheinbar min Dist: " << inEdge->value + dist[inEdge->other_node] << endl;
+//			}
+//		}
+//	}
+}
+void Dijkstra(Graph* g, unsigned int node_id){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	Graph::EdgesIterator it = g->getOutEdgesIt(node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	dist[node_id] = 0;
+	found[node_id] = true;
+	while(it.hasNext()){
+		currentEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(currentEdge.value,currentEdge.other_node,currentEdge.id));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	//U_element ue;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		//ue = U.top();
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			dist[tmpid] = U.top().distance;
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge.other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
+				}
+			}
+		}
+		U.pop();
+	}
+//	// TEST: Ergebnisse ausgeben
+//	//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//	//		cout << dist[i] << endl;
+//	//	}
+//	// Test: Dijkstra verifizieren
+//	// Schauen ob die Distanzen stimmen und auch minimal sind
+//	EdgesIterator iit;
+//	Edge* inEdge;
+//	for(unsigned int i=0; i < g->getNodeCount(); i++){
+//		iit = g->getInEdgesIt(i);
+//		// Wenn es kein Startknoten bzw. unerreichbarer Knoten ist
+//		if(dist[i] != numeric_limits<unsigned int>::max() && dist[i] != 0){
+//			Edge* tmpedge = g->getInEdge(in_edge_id[i]);
+//			// Wenn die Distanz nicht stimmt...
+//			if(tmpedge->value + dist[tmpedge->other_node] != dist[i]){
+//				// DISTANZ in Dijkstra nicht konsistent!!
+//				cout << "Distanz stimmt nicht für: " << i << endl;
+//			}
+//		}
+//		while(iit.hasNext()){
+//			inEdge = iit.getNext();		
+//			if(dist[i] > inEdge->value + dist[inEdge->other_node] && dist[inEdge->other_node] != numeric_limits<unsigned int>::max()){
+//				// Die MINIMALE DISTANZ im Dijkstra ist nicht konsistent!!
+//				cout << "Minimal stimmt nicht für: ";
+//				cout << "Edge ID: " << in_edge_id[i];
+//				cout << " Other Node: " << inEdge->other_node;
+//				//cout << " Target Node: " << inEdge->target << " (" << i << ")" << endl;
+//				cout << " Dijkstra Dist: " << dist[i];
+//				cout << " Scheinbar min Dist: " << inEdge->value + dist[inEdge->other_node] << endl;
+//			}
+//		}
+//	}
 }
 
 unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	EdgesIterator it = g->getOutEdgesIt(node_id0);
+	Graph::EdgesIterator it = g->getOutEdgesIt(node_id0);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
-	Edge* currentEdge;
+	Edge currentEdge;
 
 	unsigned int nr_of_nodes = g->getNodeCount();
 	vector<bool> found(nr_of_nodes,false);
@@ -165,10 +408,10 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 			while(it.hasNext()){
 				currentEdge = it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge->other_node]){
+				if(!found[currentEdge.other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id));
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
 				}
 			}
 		}
@@ -304,8 +547,8 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
 
 unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
-	EdgesIterator itout = g->getOutEdgesIt(node_id0);
-	EdgesIterator itin = g->getInEdgesIt(node_id1);
+	Graph::EdgesIterator itout = g->getOutEdgesIt(node_id0);
+	Graph::EdgesIterator itin = g->getInEdgesIt(node_id1);
 
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
@@ -322,7 +565,7 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	vector<bool> found1(nr_of_nodes,false);
 	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
 
-	Edge* currentEdge;
+	Edge currentEdge;
 
 	// Die ersten Knoten abarbeiten
 	if(node_id0 == node_id1){
@@ -345,21 +588,21 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				while(itout.hasNext()){
 					currentEdge = itout.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found[0][currentEdge->other_node]){
-						tmptgtsrc = currentEdge->other_node;
+					if(!found[0][currentEdge.other_node]){
+						tmptgtsrc = currentEdge.other_node;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
 						if(found[1][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
-							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge.value;
 							if(prob_min_val < current_min_path){
 								current_min_path = prob_min_val;
-								min_edge_id = currentEdge->id;
+								min_edge_id = currentEdge.id;
 							}
 						}
 						else{
 							// ...tu sie in U
 							U.push(U_element_bi(
-										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,0));
+										currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id,0));
 						}
 					}
 				}
@@ -370,21 +613,21 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				while(itin.hasNext()){
 					currentEdge = itin.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!found[1][currentEdge->other_node]){
-						tmptgtsrc = currentEdge->other_node;
+					if(!found[1][currentEdge.other_node]){
+						tmptgtsrc = currentEdge.other_node;
 						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
 						if(found[0][tmptgtsrc]){
 							// ...neues Minimum zuweisen wenn nötig, sonst...
-							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge.value;
 							if(prob_min_val < current_min_path){
 								current_min_path = prob_min_val;
-								min_edge_id = currentEdge->id;
+								min_edge_id = currentEdge.id;
 							}
 						}
 						else{
 							// ...tu sie in U
 							U.push(U_element_bi(
-										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,1));
+										currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id,1));
 						}
 					}
 				}
