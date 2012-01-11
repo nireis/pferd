@@ -210,6 +210,66 @@ void Dijkstra_4I(Dijkstra_Interface* g, unsigned int node_id){
 //		}
 //	}
 }
+
+unsigned int Dijkstra_4I(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
+		unsigned int over_node_id){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	Graph::EdgesIterator it = g->getOutEdgesIt(start_node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	U.push(U_element(0,start_node_id,0));
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	while(!U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			dist[tmpid] = U.top().distance;
+			found[tmpid] = true;
+			// Testen ob das unser Zielknoten ist
+			if(tmpid == end_node_id){
+				break;
+			}
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge.other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
+				}
+			}
+		}
+		U.pop();
+	}
+	
+	// Backtracing des kürzesten Pfades und prüfen, ob er über over_node_id geht.
+	if(found[end_node_id]){
+		tmpid = end_node_id;
+		while(tmpid != start_node_id){
+			if(tmpid == over_node_id){
+				return true;
+			}
+			tmpid = g->getOutEdge(in_edge_id[tmpid])->other_node;
+		}
+	}
+	return false;
+}
+
 void Dijkstra2(Graph2* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
 	Graph2::EdgesIterator it = g->getOutEdgesIt(node_id);
