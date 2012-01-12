@@ -41,7 +41,8 @@ cout << " " << endl;
 	clock_t start,finish;
 	double time;
 
-Graph g = Graph();
+cout << "Erstelle Graph mit Datei " << file << endl;
+Graph2 g = Graph2();
 
 start = clock();
 
@@ -52,20 +53,21 @@ finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
-cout << "Dijkstra angefangen." << endl;
+cout << "Dijkstra angefangen." << endl; /*
 for(int i=0; i<10; i++){
 	start = clock();
 	DirectDijkstra(&g, i);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit für Dijkstra direkt auf dem Graphen von " << i << " aus: "<< time << endl;
-}
+}*/
 for(int i=0; i<10; i++){
 	start = clock();
-	Dijkstra(&g, i);
+	Dijkstra2(&g, i);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+	//cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+	cout << "Zeit für normalen Dijkstra mit Pointern auf Kanten und lokalen U_elements von " << i << " aus: "<< time << endl;
 }
 
 //Graph2 g2 = Graph2();
@@ -133,6 +135,8 @@ for(int i=0; i<10; i++){
 //	if( it.hasNext() || it2.hasNext() )
 //		cout << "Knoten " << n << "hat unterschiedlich viele InEdges: g: " << it.hasNext() << ", g2: " << it2.hasNext() << endl;
 //}
+
+/*
 
 cout << "Taste drücken zum Erstellen zweier CHs (statisch und dynamisch). " << endl;
 cin.get();
@@ -305,7 +309,7 @@ for(unsigned int i = 0; i <= node; i++){
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << (double(finish)-double(start))/CLOCKS_PER_SEC << endl;
 	}
-
+*/
 cout << "Taste drücken zum Beenden..."<< endl;
 cin.get();
 

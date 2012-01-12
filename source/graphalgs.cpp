@@ -276,7 +276,7 @@ void Dijkstra2(Graph2* g, unsigned int node_id){
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
-	Edge currentEdge;
+	Edge* currentEdge;
 
 	unsigned int nr_of_nodes = g->getNodeCount();
 	vector<bool> found(nr_of_nodes,false);
@@ -288,9 +288,9 @@ void Dijkstra2(Graph2* g, unsigned int node_id){
 	dist[node_id] = 0;
 	found[node_id] = true;
 	while(it.hasNext()){
-		currentEdge = it.getNext();
+		currentEdge =  it.getNext();
 		// Die Knoten mit ihrer Distanz in U stecken
-		U.push(U_element(currentEdge.value,currentEdge.other_node,currentEdge.id));
+		U.push(U_element(currentEdge->value,currentEdge->other_node,currentEdge->id));
 	}
 
 	// Die restlichen Knoten abarbeiten
@@ -298,21 +298,21 @@ void Dijkstra2(Graph2* g, unsigned int node_id){
 	//U_element ue;
 	while(!U.empty()){
 		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
-		//ue = U.top();
-		tmpid = U.top().id;
+		U_element ue = U.top();
+		tmpid = ue.id;
 		if(!found[tmpid]){
-			dist[tmpid] = U.top().distance;
+			dist[tmpid] = ue.distance;
 			found[tmpid] = true;
-			in_edge_id[tmpid] = U.top().eid;
+			in_edge_id[tmpid] = ue.eid;
 			// Die ausgehenden Kanten durchgehen und in U werfen
 			it = g->getOutEdgesIt(tmpid);
 			while(it.hasNext()){
-				currentEdge = it.getNext();
+				currentEdge =  it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
-				if(!found[currentEdge.other_node]){
+				if(!found[currentEdge->other_node]){
 					// ...tu sie in U
 					U.push(U_element(
-								currentEdge.value+dist[tmpid],currentEdge.other_node,currentEdge.id));
+								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id));
 				}
 			}
 		}
