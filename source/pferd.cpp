@@ -69,6 +69,14 @@ for(int i=0; i<10; i++){
 	//cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
 	cout << "Zeit für normalen Dijkstra mit Pointern auf Kanten und lokalen U_elements von " << i << " aus: "<< time << endl;
 }
+for(int i=0; i<10; i++){
+	start = clock();
+	Dijkstra2A(&g, i);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	//cout << "Zeit für normalen Dijkstra von " << i << " aus: "<< time << endl;
+	cout << "Zeit für 'optimierten' Dijkstra von " << i << " aus: "<< time << endl;
+}
 
 //Graph2 g2 = Graph2();
 //start = clock();

@@ -8,6 +8,7 @@
  */
 void Dijkstra(Graph* g, unsigned int node_id);
 void Dijkstra2(Graph2* g, unsigned int node_id);
+void Dijkstra2A(Graph2* g, unsigned int node_id);
 void Dijkstra_4I(Dijkstra_Interface* g, unsigned int node_id);
 bool Dijkstra_4I(Dijkstra_Interface* g, unsigned int start_node_id,
 		unsigned int end_node_id, unsigned int over_node_id);

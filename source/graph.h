@@ -228,9 +228,7 @@ class Graph2 {
 		EdgesIterator getOutEdgesIt(unsigned int node){
 			unsigned int nofs = nodes_out_offs[node] ;
 			unsigned int c = nodes_out_offs[node+1] - nofs ;
-			return EdgesIterator
-					((out_edges + nofs )
-					, c ); 
+			return EdgesIterator(out_edges + nofs , c ); 
 		}
 		EdgesIterator getInEdgesIt(unsigned int node){
 			return EdgesIterator
