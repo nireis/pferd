@@ -91,14 +91,14 @@ bool CH::setShortcuts(){
 		}
 		out_edges[ o ] = E(edge_count + c, s.value, s.target);
 		in_edges[ i ] = E(edge_count + c, s.value, s.source);
-		shortcut_data[c] = SD(s.papa_edge, s.mama_edge);
+		shortcut_data[c] = SD(o, i, s.papa_edge, s.mama_edge);
 	}
-	EdgesIterator eit;
+	Graph::EdgesIterator eit;
 	for(unsigned int c = 0; c < node_count; c++){
 		eit = g->getOutEdgesIt(c);
 		o = nodes_out_offs[c + 1] - 1;
 		while( eit.hasNext() ){
-			out_edges[ o ] = eit.getNext();
+			out_edges[ o ] = * eit.getNext();
 			o--;
 		}
 	}
@@ -106,7 +106,7 @@ bool CH::setShortcuts(){
 		eit = g->getInEdgesIt(c);
 		i = nodes_in_offs[c + 1] - 1;
 		while( eit.hasNext() ){
-			in_edges[ i ] = eit.getNext();
+			in_edges[ i ] = * eit.getNext();
 			i--;
 		}
 	}
@@ -168,9 +168,9 @@ unsigned int CH::calcIndepSet(){
 		if(node_order[i] == 0){
 			uintlist.push(i);
 			node_order[i] = 2;
-			EdgesIterator it = g->getOutEdgesIt(i);
+			Graph::EdgesIterator it = g->getOutEdgesIt(i);
 			while( it.hasNext() ){
-				node_order[ it.getNext() . other_node ] = 1;
+				node_order[ it.getNext() -> other_node ] = 1;
 			}
 		} 
 	}
@@ -194,15 +194,15 @@ DynCH::DynCH(Graph* gr) :
 	shortcut_data(),
 	uintlist() {
 		for(unsigned int i = 0; i < node_count; i++){
-			EdgesIterator it = gr->getOutEdgesIt(i);
+			Graph::EdgesIterator it = gr->getOutEdgesIt(i);
 			while( it.hasNext() ){
-				out_edges[i].push_back( it.getNext() );
+				out_edges[i].push_back( * it.getNext() );
 			}
 		}
 		for(unsigned int i = 0; i < node_count; i++){
-			EdgesIterator it = gr->getInEdgesIt(i);
+			Graph::EdgesIterator it = gr->getInEdgesIt(i);
 			while( it.hasNext() ){
-				in_edges[i].push_back( it.getNext() );
+				in_edges[i].push_back( * it.getNext() );
 			}
 		}
 	}
@@ -223,7 +223,7 @@ unsigned int DynCH::getShortcutCount(){
 }
 
 void DynCH::addShortcut(S sc){
-	shortcut_data.push( sc_id( SD(sc.papa_edge, sc.mama_edge) , shortcut_count ) );
+	shortcut_data.push( SD(shortcut_count, shortcut_count, sc.papa_edge, sc.mama_edge) );
 	out_edges[ sc.source ].push_back( E(edge_count + shortcut_count, sc.value, sc.target ) );
 	in_edges[ sc.target ].push_back( E(edge_count + shortcut_count, sc.value, sc.source ) );
 	shortcut_count ++;

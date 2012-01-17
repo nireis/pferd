@@ -6,18 +6,12 @@
 #include "parser.h"
 
 typedef unsigned int N;
-typedef Node N2;
+//typedef Node N2;
 typedef NodeData ND;
 
 typedef Edge E;
 typedef EdgeData ED;
-typedef EdgeData2 ED2;
-
-class EdgesIterator_Interface {
-	public:
-		virtual bool hasNext() const  = 0;
-		virtual E getNext() = 0;
-};
+//typedef EdgeData2 ED2;
 
 class Dijkstra_Interface {
 	public:
@@ -28,12 +22,14 @@ class Dijkstra_Interface {
 
 		virtual EdgesIterator getOutEdgesIt(unsigned int id) = 0;
 		virtual EdgesIterator getInEdgesIt(unsigned int id) = 0;
+
+		virtual Edge* getOutEdge(unsigned int id) = 0;
+		virtual Edge* getInEdge(unsigned int id) = 0;
 };
 
-class Graph : public Dijkstra_Interface {
+class Graph {
 	public:
-		//typedef Andrenator_P<E> EdgesIterator;
-
+		typedef Andrenator_P<E> EdgesIterator;
 	/*
 	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
 	 *		*_data
@@ -103,8 +99,8 @@ class Graph : public Dijkstra_Interface {
 		/*
 		 * Daten zu Strukturen abfragen
 		 */
-		virtual unsigned int getNodeCount();
-		virtual unsigned int getEdgeCount();
+		unsigned int getNodeCount();
+		unsigned int getEdgeCount();
 
 		/*
 		 * get*Data - jeweils mit indexprüfung,
@@ -122,6 +118,7 @@ class Graph : public Dijkstra_Interface {
 		unsigned int getUpperOutEdgeBound(unsigned int id); 
 		unsigned int getLowerInEdgeBound(unsigned int id);
 		unsigned int getUpperInEdgeBound(unsigned int id); 
+		
 		E* getOutEdge(unsigned int id);
 		E* getInEdge(unsigned int id);
 
@@ -133,107 +130,21 @@ class Graph : public Dijkstra_Interface {
 		 *		* für nur einen Knoten
 		 *		* für genau alle Kanten der angeforderten Richtung 
 		 */
-		virtual EdgesIterator getOutEdgesIt(unsigned int node){
-			unsigned int nofs = nodes_out_offs[node] ;
-			unsigned int c = nodes_out_offs[node+1] - nofs ;
-			return EdgesIterator
-					((out_edges + nofs )
-					, c ); 
-		}
-		virtual EdgesIterator getInEdgesIt(unsigned int node){
-			return EdgesIterator
-				( &(in_edges[nodes_in_offs[node] ]) 
-				 ,nodes_in_offs[node+1] - nodes_in_offs[node] ); 
-		}
-		
-		/*
-		 * stuff
-		 */
-		void print(unsigned int i){
-			for(unsigned int j = 0; j <= i; j++){
-			E e = in_edges[j];
-				std::cout << " id: " << e.id << std::endl;
-				std::cout << " other_node: " << e.other_node << std::endl ;
-				std::cout << " value: " << e.value << std::endl;
-				std::cout << " type: " << edge_data[ e.id ].type << std::endl;
-			}
-		}
-
-};
-
-
-class Graph2 {
-	public:
-		class EdgesIterator {
-			private:
-				unsigned int max;
-				E* start;
-			public:
-				EdgesIterator() : max(0), start(0) {}
-		
-				EdgesIterator(E* strt, unsigned int mx) : 
-					max(mx), start(strt) {}
-		
-				~EdgesIterator(){
-					start = 0;
-				}
-				
-				bool hasNext() const {
-					return max != 0;
-				}
-		
-				E* getNext() {
-					--max;
-					return start++;
-				}
-		};
-	private:
-		bool is_set;
-		static const int BinID;
-		static const std::string dateiendung;
-
-		unsigned int node_count;
-		unsigned int edge_count;
-
-		N* nodes_in_offs;
-		E* in_edges; 
-		N* nodes_out_offs;
-		E* out_edges;
-		ND* node_data;
-		ED* edge_data;
-
-		int checkDataFile(std::string graphdata);
-		void writeBinaryGraphFile(std::string graphdata);
-		bool readBinaryGraphFile(std::string graphdata);
-		bool parseTextGraphFile(std::string graphdata);
-
-	public:
-		Graph2();
-		~Graph2();
-
-		bool isSet(){ return is_set; }
-		bool setGraph(std::string graphdata, bool write_binary);
-		unsigned int getNodeCount();
-		unsigned int getEdgeCount();
-		ND getNodeData(unsigned int id);
-		ED getEdgeData(unsigned int id);
-
-		unsigned int getLowerOutEdgeBound(unsigned int id);
-		unsigned int getUpperOutEdgeBound(unsigned int id); 
-		unsigned int getLowerInEdgeBound(unsigned int id);
-		unsigned int getUpperInEdgeBound(unsigned int id); 
-		E* getOutEdge(unsigned int id);
-		E* getInEdge(unsigned int id);
-
 		EdgesIterator getOutEdgesIt(unsigned int node){
 			unsigned int nofs = nodes_out_offs[node] ;
 			unsigned int c = nodes_out_offs[node+1] - nofs ;
 			return EdgesIterator(out_edges + nofs , c ); 
 		}
 		EdgesIterator getInEdgesIt(unsigned int node){
-			return EdgesIterator
-				( &(in_edges[nodes_in_offs[node] ]) 
-				 ,nodes_in_offs[node+1] - nodes_in_offs[node] ); 
+			unsigned int nifs = nodes_in_offs[node] ;
+			unsigned int c = nodes_in_offs[node+1] - nifs ;
+			return EdgesIterator(in_edges + nifs , c ); 
+
+			//return EdgesIterator
+			//	( &(in_edges[nodes_in_offs[node] ]) 
+			//	 ,nodes_in_offs[node+1] - nodes_in_offs[node] ); 
 		}
+
 };
+
 #endif

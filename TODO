@@ -1,8 +1,10 @@
 === allgemein ===
 
-* Visualisierung des Graphen
+* CH berechnung ausprobieren + entsprechend angepasste/optimierte Dijkstras
 
-* CH + entsprechende Dijkstras
+* wann lohnt sich eine Dijkstra-Klasse ? unter welchen Umständen ist diese schneller als ein normaler DIjkstra?
+
+* Visualisierung des Graphen
 
 * wie werden straßenlasten berechnet ? welche informationen brauchen wir dafür in kanten?
 
@@ -10,7 +12,7 @@
 
 * genaue zeitmessung für die simulation / initialisierung der objekte => in log?
 
-* interne log/error struktur einführen
+* interne log/error struktur einführen ?
 
 
 

@@ -96,6 +96,9 @@ class CH : public Dijkstra_Interface {
 				 ,nodes_in_offs[node+1]-nodes_in_offs[node]);
 		}
 
+		virtual E* getOutEdge(unsigned int id){ return 0; }
+		virtual E* getInEdge(unsigned int id){ return 0; }
+
 };
 
 class DynCH : public Dijkstra_Interface {
@@ -111,13 +114,13 @@ class DynCH : public Dijkstra_Interface {
 		unsigned int edge_count;
 		unsigned int shortcut_count;
 		
-		struct sc_id {
+		/*struct sc_id {
 			sc_id(SD s, unsigned int i) : sd(s), id(i) {}
 			sc_id() : sd(), id(0) {}
 			SD sd;
 			unsigned int id;
-		};
-		SList<sc_id> shortcut_data;
+		};*/
+		SList<SD> shortcut_data;
 
 		SList<unsigned int> uintlist;
 
@@ -138,6 +141,9 @@ class DynCH : public Dijkstra_Interface {
 		virtual EdgesIterator getInEdgesIt(unsigned int id){
 			return EdgesIterator( & in_edges[id][0] , in_edges[id].size() );
 		}
+
+		virtual E* getOutEdge(unsigned int id){ return 0; }
+		virtual E* getInEdge(unsigned int id){ return 0; }
 };
 
 #endif

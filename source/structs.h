@@ -55,7 +55,7 @@ struct EdgeData {
 	unsigned int type;
 	unsigned int load;
 };
-struct EdgeData2 {
+/*struct EdgeData2 {
 	EdgeData2() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
 	EdgeData2(Edge* o, Edge* i, unsigned int d, unsigned int t, unsigned int l) : 
 		out_index(o), in_index(i), distance(d), type(t), load(l) {}
@@ -65,16 +65,17 @@ struct EdgeData2 {
 	unsigned int distance;
 	unsigned int type;
 	unsigned int load;
-};
+};*/
 
-struct Node {
+/*struct Node {
 	Node() : count(0), edges(0) {} //edge_offset(0), shortcut_offset(0) {}
 	
 	unsigned int count;
 	Edge* edges;
 	//unsigned int edge_offset; 
 	//unsigned int shortcut_offset;
-};
+};*/
+
 struct NodeData {
 	NodeData() : id(0), elevation(0), lat(0), lon(0) {}
 	NodeData(unsigned int i, int e, double la, double lo) : 
@@ -105,10 +106,12 @@ struct Shortcut {
  * die ausgelagert werden sollten.
  */
 struct ShortcutData {
-	ShortcutData() : papa_edge(0), mama_edge(0) {}
-	ShortcutData(unsigned int p, unsigned int m) :
-		papa_edge(p), mama_edge(m) {}
+	ShortcutData() : out_index(0), in_index(0), papa_edge(0), mama_edge(0) {}
+	ShortcutData(unsigned int o, unsigned int i, unsigned int p, unsigned int m) :
+		out_index(o), in_index(i), papa_edge(p), mama_edge(m) {}
 
+	unsigned int out_index;
+	unsigned int in_index;
 	unsigned int papa_edge;
 	unsigned int mama_edge;
 };
@@ -310,11 +313,93 @@ class Andrenator_P {
 			return max != 0;
 		}
 
-		T getNext() {
+		T* getNext() {
 			--max;
-			return * start++;
+			return start++;
 		}
 };
 
+class bitvec {
+	private:
+		typedef unsigned int classtype;
+		classtype* vector;
+		unsigned int bit_size;
+		unsigned int int_size;
+		//static const classtype zero = 0;
+		//static const classtype one = 1;
+		static const int mult = (8*sizeof(classtype));
+	public:
+		bitvec() : vector(0) , bit_size(0), int_size(0) {}
+		bitvec(unsigned int s){
+			vector = 0;
+			init(s);
+		}
+		~bitvec(){ delete[] vector; vector=0; }
 
+		void init(unsigned int s){
+			delete[] vector; vector = 0;
+
+			bit_size = s;
+			if( s % (8*sizeof(classtype)) == 0 ){
+				int_size = (s / mult);
+			} else {
+				int_size = (s / mult) + 1;
+			}
+			vector = new classtype[int_size];
+		}
+
+		bool get(unsigned int index){
+			unsigned int rest = index % mult;
+			unsigned int div = index / mult;
+
+			return vector[div] & ( 1 << rest);
+		}
+
+		void set(unsigned int index){
+			unsigned int rest = index % mult;
+			unsigned int div = index / mult;
+
+			vector[div] |= ( 1 << rest );
+		}
+
+		void reset(){
+			for(unsigned int i = 0; i < int_size; i++){
+				vector[i] = 0;
+			}
+		}
+};
+
+class uintvec {
+	private:
+		unsigned int* vector;
+		unsigned int size;
+	public:
+		uintvec() : vector(0), size(0) {}
+		uintvec(unsigned int s){
+			vector = 0;
+			init(s);
+		}
+		~uintvec(){ delete[] vector; vector = 0; }
+
+		void init(unsigned int s){
+			vector = new unsigned int[s];
+			size = s;
+		}
+
+		unsigned int& operator[](unsigned int const& index){
+			return vector[index];
+		}
+
+		void reset(){
+			for(unsigned int i = 0; i < size; i++){
+				vector[i] = 0;
+			}
+		}
+		void reset(unsigned int r){
+			for(unsigned int i = 0; i < size; i++){
+				vector[i] = r;
+			}
+		}
+
+};
 #endif

@@ -3,6 +3,8 @@ CXXFLAGS = -Wall -g -O3
 LDFLAGS = 
 BIN =pferd
 
+OBJDIR=obj
+
 # zu jeder X.cpp datei, die kompiliert wird, hier in
 # OBJ eine entsprechende X.o file anlegen lassen
 CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp
@@ -15,8 +17,6 @@ $(BIN): $(OBJ)
 
 # es werden all .cpp dateien kompiliert
 $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
-
-
 
 clean:
 	rm -f $(BIN) $(OBJ)
