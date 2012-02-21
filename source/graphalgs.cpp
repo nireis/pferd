@@ -30,7 +30,7 @@ class Compare_U_element_bi{
 
 void Dijkstra(Graph* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::EdgesIterator it = g->getOutEdgesIt(node_id);
+	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -114,7 +114,7 @@ void Dijkstra(Graph* g, unsigned int node_id){
 bool Dijkstra(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 		unsigned int over_node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::EdgesIterator it = g->getOutEdgesIt(start_node_id);
+	EdgesIterator it = g->getOutEdgesIt(start_node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -174,7 +174,7 @@ bool Dijkstra(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 
 unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::EdgesIterator it = g->getOutEdgesIt(node_id0);
+	EdgesIterator it = g->getOutEdgesIt(node_id0);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
@@ -344,10 +344,10 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
 	return dist[node_id1];
 }
 
-unsigned int BiDijkstra(Dijkstra_Interface* g, unsigned int node_id0, unsigned int node_id1){
+unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
-	Dijkstra_Interface::EdgesIterator itout = g->getOutEdgesIt(node_id0);
-	Dijkstra_Interface::EdgesIterator itin = g->getInEdgesIt(node_id1);
+	EdgesIterator itout = g->getOutEdgesIt(node_id0);
+	EdgesIterator itin = g->getInEdgesIt(node_id1);
 
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
@@ -465,7 +465,7 @@ class Compare_U_elementA{
 };
 void Dijkstra_plus(Graph* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	Graph::EdgesIterator it = g->getOutEdgesIt(node_id);
+	EdgesIterator it = g->getOutEdgesIt(node_id);
 
 	Edge* currentEdge;
 	unsigned int nr_of_nodes = g->getNodeCount();

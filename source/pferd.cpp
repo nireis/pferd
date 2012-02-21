@@ -7,25 +7,12 @@
 
 using namespace std;
 
-void CallDynCH(Graph* g){
-	clock_t start,finish;
-	double time;
-	DynCH dch = DynCH(g);
-	for(int i=0; i<10; i++){
-		start = clock();
-		TDijkstra<DynCH>(&dch, i);
-		finish = clock();
-		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Zeit für Template-Dijkstra mit dynamischer CH von " << i << " aus: "<< time << endl;
-	}
-}
-
-void CallCH(Graph* g){
+void CallSCGraph(Graph* g){
 	clock_t start,finish;
 	double time;
 	
-	CH h = CH(g);
-	h.setShortcuts();
+	SCGraph scg = SCGraph(g);
+	scg.setShortcuts();
 	
 	for(int i=0; i<10; i++){
 		start = clock();
@@ -36,7 +23,7 @@ void CallCH(Graph* g){
 	}
 	for(int i=0; i<10; i++){
 		start = clock();
-		TDijkstra<CH>(&h, i);
+		TDijkstra<SCGraph>(&scg, i);
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit für Template-Dijkstra mit statischer CH von " << i << " aus: "<< time << endl;
@@ -54,7 +41,7 @@ void CallCH(Graph* g){
 			s.target = i*(i+1)%(g->getNodeCount());
 	      s.papa_edge = i*i % g->getEdgeCount();
 	      s.mama_edge = i*(i+1) % g->getEdgeCount();
-			h.addShortcut(s);
+			scg.addShortcut(s);
 		}
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -63,18 +50,18 @@ void CallCH(Graph* g){
 		cin.get();
 	
 		start = clock();
-		h.setShortcuts();
+		scg.setShortcuts();
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit, m Shortcuts und m vorhandene Kanten zu initialisieren: " << time << endl;
 		cout << "Nun löschen der Shortcuts. Taste drücken. " << endl;
 		cin.get(); 
 	
-		h.clearShortcutlist();
-		h.clearShortcuts();
+		scg.clearShortcutlist();
+		scg.clearShortcuts();
 	
 		start = clock();
-		unsigned int is = h.calcIndepSet();
+		unsigned int is = scg.calcIndepSet();
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	
@@ -167,14 +154,10 @@ for(int i=0; i<10; i++){
 	cout << "Zeit für Dijkstra-Klasse normal von " << i << " aus: "<< time << endl;
 }
 
-/* CH TESTS => !! DIJKSTRA NEEDED !!
- */
 cout << " -- ab hier frisst das ganze >3GB Speicher --" << endl;
 cout << "Taste drücken zum Erstellen zweier CHs (statisch und dynamisch). " << endl;
 cin.get();
-CallCH(&g);
-CallDynCH(&g);
-
+CallSCGraph(&g);
 
 /* GRAPH TRAVERSIERUNG
  *

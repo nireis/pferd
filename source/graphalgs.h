@@ -120,7 +120,7 @@ class DijkstraC {
 		~DijkstraC(){}
 
 		void run(unsigned int node_id){
-			typename G::EdgesIterator it = g->getOutEdgesIt(node_id);
+			EdgesIterator it = g->getOutEdgesIt(node_id);
 		
 			U = std::priority_queue<U_elementA, std::vector<U_elementA>, Compare_U_elementA>();
 			
@@ -175,7 +175,7 @@ class DijkstraC {
 template <typename G>
 void TDijkstra(G* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
-	typename G::EdgesIterator it = g->getOutEdgesIt(node_id);
+	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 
