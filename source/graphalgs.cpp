@@ -607,6 +607,6 @@ list<unsigned int> independent_set(Graph* g){
 			}
 		}
 	}
-	independent_set_test(g, solution); //TEST
+	// independent_set_test(g, solution); //TEST
 	return solution;
 }
