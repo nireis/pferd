@@ -535,21 +535,29 @@ void independent_set_test(Graph* g, list<unsigned int> solution){
 	while(!solution.empty()){
 		tmpnode = solution.front();
 		solution.pop_front();
+		// Wurde der Knoten schon von einem anderen erreicht?
 		if(found[tmpnode]){
 			cout << "Independent Set NICHT korrekt!" << endl;
 			return;
 		}
 		else{
+			// Alle erreichten markieren
 			found[tmpnode] = true;
 			it = g->getOutEdgesIt(tmpnode);
 			while(it.hasNext()){
 				found[it.getNext()->other_node] = true;
 			}
+			it = g->getInEdgesIt(tmpnode);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
 		}
 	}
+	// Schauen dass alle markiert sind
 	for(unsigned int i=0; i<nr_of_nodes; i++){
 		if(!found[i]){
 			cout << "Maximal Independent Set NICHT korrekt!" << endl;
+			return;
 		}
 	}
 	cout << "Maximal Independent Set Korrekt!" << endl;
@@ -562,15 +570,21 @@ list<unsigned int> independent_set(Graph* g){
 	EdgesIterator it;
 
 	for(unsigned int i=0; i<nr_of_nodes; i++){
+		// Prüfen ob der Knoten aufgenommen werden kann
 		if(!found[i]){
-			found[i] = true;
 			solution.push_front(i);
+			// Alle ausgehenden Kanten verfolgen
 			it = g->getOutEdgesIt(i);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
+			// Alle eingehenden Kanten verfolgen
+			it = g->getInEdgesIt(i);
 			while(it.hasNext()){
 				found[it.getNext()->other_node] = true;
 			}
 		}
 	}
-	independent_set_test(g, solution); //TEST
+	// independent_set_test(g, solution); //TEST
 	return solution;
 }
