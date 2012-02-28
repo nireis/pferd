@@ -1,6 +1,7 @@
 #include "graphalgs.h"
 #include <queue>
 #include <ctime>
+#include <cstdlib>
 #include <limits>
 #include <iostream>
 #include "structs.h"
@@ -568,8 +569,12 @@ list<unsigned int> independent_set(Graph* g){
 	list<unsigned int> solution;
 	vector<bool> found(nr_of_nodes,false);
 	EdgesIterator it;
+	// Random Nummer für den Startknoten
+	srand((unsigned)time(0));
+	unsigned int r = rand() % nr_of_nodes;
 
-	for(unsigned int i=0; i<nr_of_nodes; i++){
+	// Erster Part der Knoten (wegen der Randomisierung)
+	for(unsigned int i=r; i<nr_of_nodes; i++){
 		// Prüfen ob der Knoten aufgenommen werden kann
 		if(!found[i]){
 			solution.push_front(i);
@@ -585,6 +590,23 @@ list<unsigned int> independent_set(Graph* g){
 			}
 		}
 	}
-	// independent_set_test(g, solution); //TEST
+	// Zweiter Part der Knoten
+	for(unsigned int i=0; i<r; i++){
+		// Prüfen ob der Knoten aufgenommen werden kann
+		if(!found[i]){
+			solution.push_front(i);
+			// Alle ausgehenden Kanten verfolgen
+			it = g->getOutEdgesIt(i);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
+			// Alle eingehenden Kanten verfolgen
+			it = g->getInEdgesIt(i);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
+		}
+	}
+	independent_set_test(g, solution); //TEST
 	return solution;
 }

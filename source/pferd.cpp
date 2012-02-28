@@ -119,12 +119,14 @@ finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
-cout << "Testen des Maximal Independent Set Algs!" << endl;
-start = clock();
-independent_set(&g);
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit für das Maximal Independent Set + Test: " << time << endl;
+for(int i=0; i<20; i++){
+	cout << "Testen des Maximal Independent Set Algs!" << endl;
+	start = clock();
+	independent_set(&g);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für das Maximal Independent Set + Test: " << time << endl;
+}
 
 cout << "Dijkstra angefangen." << endl;
 for(int i=0; i<10; i++){
