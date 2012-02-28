@@ -524,3 +524,53 @@ void Dijkstra_plus(Graph* g, unsigned int node_id){
  *	!!
  *		ENDE
  */
+void independent_set_test(Graph* g, list<unsigned int> solution){
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+	EdgesIterator it;
+	unsigned int tmpnode;
+
+	cout << "Anzahl Knoten der Independent Set Lösung: " << solution.size() << endl;
+
+	while(!solution.empty()){
+		tmpnode = solution.front();
+		solution.pop_front();
+		if(found[tmpnode]){
+			cout << "Independent Set NICHT korrekt!" << endl;
+			return;
+		}
+		else{
+			found[tmpnode] = true;
+			it = g->getOutEdgesIt(tmpnode);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
+		}
+	}
+	for(unsigned int i=0; i<nr_of_nodes; i++){
+		if(!found[i]){
+			cout << "Maximal Independent Set NICHT korrekt!" << endl;
+		}
+	}
+	cout << "Maximal Independent Set Korrekt!" << endl;
+}
+
+list<unsigned int> independent_set(Graph* g){
+	unsigned int nr_of_nodes = g->getNodeCount();
+	list<unsigned int> solution;
+	vector<bool> found(nr_of_nodes,false);
+	EdgesIterator it;
+
+	for(unsigned int i=0; i<nr_of_nodes; i++){
+		if(!found[i]){
+			found[i] = true;
+			solution.push_front(i);
+			it = g->getOutEdgesIt(i);
+			while(it.hasNext()){
+				found[it.getNext()->other_node] = true;
+			}
+		}
+	}
+	independent_set_test(g, solution); //TEST
+	return solution;
+}

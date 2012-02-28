@@ -4,6 +4,8 @@
 #include "graph.h"
 #include <queue>
 #include <limits>
+#include <list>
+using namespace std;
 
 // struct für die Elemente aus U incl. Vergleich
 struct U_element{
@@ -57,6 +59,11 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
  */
 unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
 
+/*
+ * Maximal Independent Set Funktionen
+ */
+void independent_set_test(Graph* g, list<unsigned int> solution);
+list<unsigned int> independent_set(Graph* g);
 
 
 /*

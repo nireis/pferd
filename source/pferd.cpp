@@ -119,6 +119,9 @@ finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit zum initialisieren des Graphen: " << time << endl;
 
+cout << "Testen des Maximal Independent Set Algs!" << endl;
+independent_set(&g);
+
 cout << "Dijkstra angefangen." << endl;
 for(int i=0; i<10; i++){
 	start = clock();
