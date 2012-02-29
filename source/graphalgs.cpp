@@ -525,6 +525,12 @@ void Dijkstra_plus(Graph* g, unsigned int node_id){
  *	!!
  *		ENDE
  */
+
+/*
+ * Testet das Max Ind Set auf seine Korrektheit.
+ *
+ * @solution Ist das angebliche Max Ind Set.
+ */
 void independent_set_test(Graph* g, list<unsigned int> solution){
 	unsigned int nr_of_nodes = g->getNodeCount();
 	vector<bool> found(nr_of_nodes,false);
@@ -564,6 +570,11 @@ void independent_set_test(Graph* g, list<unsigned int> solution){
 	cout << "Maximal Independent Set Korrekt!" << endl;
 }
 
+/*
+ * Berechnet ein Maximales Independent Set.
+ *
+ * @return Liste der Knoten des Max Ind Sets.
+ */
 list<unsigned int> independent_set(Graph* g){
 	unsigned int nr_of_nodes = g->getNodeCount();
 	list<unsigned int> solution;
