@@ -146,7 +146,6 @@ void dijkstra_tests(Graph* g){
 
 
 
-
 int main(int argc, char *argv[]){
 
 cout << "            _|\\__/|, " << endl;
