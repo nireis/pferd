@@ -43,6 +43,9 @@ class graphalgs2{
 		// Reset Liste, um zu wissen welche Felder zurück
 		// gesetzt werden müssen. Sollte Laufzeit verbessern.
 		list<unsigned int> resetlist;
+		// Listen um den Graphen nachher umzubauen
+		list<Shortcut> allsclist;
+		list<unsigned int> conodelist;
 
 	public:
 		graphalgs2(G* g);
@@ -51,8 +54,13 @@ class graphalgs2{
 		 * Berechnet ein Maximales Independent Set und kontrahiert
 		 * alle Knoten von diesem, welche eine negative Edge
 		 * Difference haben.
+		 *
+		 * @sclist Zu übergebender Pointer, in welchen nachher ein Pointer
+		 * auf die zu legenden Shortcuts geschrieben werden.
+		 * @nodelist Zu übergebender Pointer, in den ein Pointer auf die zu 
+		 * löschenden Knoten geschrieben werden.
 		 */
-		void doOneRound();
+		void doOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist);
 		// TODO: Nachfolgendes soll nach den Tests alles private werden.
 		/*
 		 * Berechnet ein Maximal Independent Set (randomisiert).
@@ -110,8 +118,10 @@ graphalgs2<G>::graphalgs2(G* g):
 }
 
 template <typename G>
-void graphalgs2<G>::doOneRound(){
+void graphalgs2<G>::doOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist){
 	contract_nodes(independent_set());
+	*sclist = &(this->allsclist);
+	*nodelist = &(this->conodelist);
 }
 
 template <typename G>
@@ -178,7 +188,8 @@ void graphalgs2<G>::contract_node(unsigned int conode){
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	if(sclist.size()-(g->getEdgeCount(conode)) < 0){
-		// TODO: Den Knoten aus Graph entfernen und Shortcuts einfügen.
+		conodelist.push_front(conode);
+		allsclist.splice(allsclist.begin(), sclist);
 	}
 }
 
@@ -245,6 +256,7 @@ void graphalgs2<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
 			resetlist.push_front(tmpid);
 			if(U.top().sourceid == conode){
 				// TODO Shortcut zur Liste hinzufügen.
+				// sclist.push_front(...);
 			}
 			it = g->getOutEdgesIt(tmpid);
 			while(it.hasNext()){
@@ -265,6 +277,7 @@ void graphalgs2<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
 	resetlist.push_front(targetnode);
 	if(U.top().sourceid == conode){
 		// TODO Shortcut zur Liste hinzufügen.
+		// sclist.push_front(...);
 	}
 }
 
