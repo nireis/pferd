@@ -111,6 +111,7 @@ class Graph {
 		 */
 		unsigned int getNodeCount();
 		unsigned int getEdgeCount();
+		unsigned int getEdgeCount(unsigned int node_id);
 
 		/*
 		 * get*Data - jeweils mit indexprüfung,

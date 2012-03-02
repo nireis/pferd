@@ -224,6 +224,12 @@ unsigned int Graph::getEdgeCount(){
 	return edge_count;
 }
 
+unsigned int Graph::getEdgeCount(unsigned int node_id){
+        unsigned int in = nodes_in_offs[node_id+1] - nodes_in_offs[node_id];
+        unsigned int out = nodes_out_offs[node_id+1] - nodes_out_offs[node_id];
+        return in+out;
+}
+
 ND Graph::getNodeData(unsigned int id){
 	if(id < node_count)
 		return node_data[id];

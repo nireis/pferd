@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "graphalgs.h"
+#include "graphalgs2.h"
 #include "parser.h"
 #include <ctime>
 #include "structs.h"
