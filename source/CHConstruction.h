@@ -12,15 +12,17 @@ class CHConstruction{
 	private:
 		// struct für die Elemente aus U des Dijkstra.
 		struct U_element{
-			unsigned int distance;
-			unsigned int targetid;
 			unsigned int sourceid;
+			unsigned int targetid;
+			unsigned int targeteid;
+			unsigned int targetedist;
+			unsigned int distance;
 
-			U_element(unsigned int d, unsigned int t, unsigned int s)
-				:distance(d),targetid(t),sourceid(s){}
+			U_element(unsigned int sid, unsigned int tid, unsigned int teid, unsigned int td, unsigned int d)
+				:sourceid(sid),targetid(tid),targeteid(teid),targetedist(td),distance(d){}
 
 			U_element()
-				:distance(0),targetid(0),sourceid(0){}
+				:sourceid(0),targetid(0),targeteid(0),targetedist(0),distance(0){}
 		};
 
 		// Vergleich für structs um der kleinsten Distanz die höchste Priorität zu geben.
@@ -29,6 +31,19 @@ class CHConstruction{
 			bool operator()(U_element& u1, U_element& u2){
 				return u1.distance > u2.distance;
 			}
+		};
+
+		// struct um immer die aktuelle erste Kante des Shortcuts mitführen zu können.
+		struct firstSCEdge{
+			unsigned int sourceid;
+			unsigned int eid;
+			unsigned int dist;
+
+			firstSCEdge(unsigned int s, unsigned int e, unsigned int d)
+				:sourceid(s),eid(e),dist(d){}
+
+			firstSCEdge()
+				:sourceid(0),eid(0),dist(0){}
 		};
 		
 		G* g;
@@ -93,7 +108,7 @@ class CHConstruction{
 		 * @sclist Liste der Shortcuts.
 		 * @conode Der Knoten, welcher kontrahiert wird.
 		 */
-		void addShortcuts(unsigned int scnode, list<Shortcut>* sclist, unsigned int conode);
+		void addShortcuts(list<Shortcut>* sclist, unsigned int conode, firstSCEdge fsce);
 		/*
 		 * Macht einen kurzen Dijkstra zu targetnode und fügt auch sonst alle 
 		 * anfallende Shortcuts ein.
@@ -101,7 +116,7 @@ class CHConstruction{
 		 * @targetnode Der zu erreichende Knoten.
 		 * @sclist Liste der Shortcuts.
 		 */
-		void shortDijkstra(unsigned int targetnode, unsigned int conode, list<Shortcut>* sclist);
+		void shortDijkstra(unsigned int targetnode, unsigned int conode, list<Shortcut>* sclist, firstSCEdge fsce);
 		/*
 		 * Setzt die benutzten Felder des found und dist Arrays zurück
 		 * um ihn für weitere Dijkstras brauchbar zu machen. U wird auch zurückgesetzt.
@@ -187,9 +202,11 @@ template <typename G>
 void CHConstruction<G>::contract_node(unsigned int conode){
 	list<Shortcut> sclist;
 	EdgesIterator it = g->getInEdgesIt(conode);
+	Edge* c_edge;
 	// Die möglichen Shortcuts berechnen und speichern.
 	while(it.hasNext()){
-		addShortcuts(it.getNext()->other_node, &sclist, conode);
+		c_edge = it.getNext();
+		addShortcuts(&sclist, conode, firstSCEdge(c_edge->other_node,c_edge->id,c_edge->value));
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	if(sclist.size()-(g->getEdgeCount(conode)) < 0){
@@ -200,9 +217,10 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 }
 
 template <typename G>
-void CHConstruction<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist,
-		unsigned int conode){
+void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
+		unsigned int conode, firstSCEdge fsce){
 	unsigned int tmpnode;
+	unsigned int scnode = fsce.sourceid;
 	EdgesIterator it = g->getOutEdgesIt(conode);
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
@@ -212,7 +230,7 @@ void CHConstruction<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist
 	resetlist.push_front(scnode);
 	while(it.hasNext()){
 		currentEdge = it.getNext();
-		U.push(U_element(currentEdge->value,currentEdge->other_node,scnode));
+		U.push(U_element(scnode,currentEdge->other_node,currentEdge->id,currentEdge->value,currentEdge->value));
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
 	// in shortDijkstra.
@@ -222,7 +240,7 @@ void CHConstruction<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
 		if(!found[tmpnode]){
-			shortDijkstra(tmpnode, conode, sclist);
+			shortDijkstra(tmpnode, conode, sclist, fsce);
 		}
 	}
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
@@ -231,7 +249,7 @@ void CHConstruction<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist
 
 template <typename G>
 void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
-		list<Shortcut>* sclist){
+		list<Shortcut>* sclist, firstSCEdge fsce){
 	unsigned int tmpid;
 	EdgesIterator it;
 	Edge* currentEdge;
@@ -250,7 +268,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 		if(!found[currentEdge->other_node]){
 			// ...tu sie in U
 			U.push(U_element(
-						currentEdge->value+dist[tmpid],currentEdge->other_node,tmpid));
+						tmpid,currentEdge->other_node,currentEdge->id,currentEdge->value,currentEdge->value+dist[tmpid]));
 		}   
 	}
 	U.pop();
@@ -261,8 +279,9 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 			found[tmpid] = true;
 			resetlist.push_front(tmpid);
 			if(U.top().sourceid == conode){
-				// TODO Shortcut zur Liste hinzufügen.
-				// sclist.push_front(...);
+				sclist->push_front(
+						Shortcut(U.top().targetdist+fsce.dist, fsce.sourceid, tmpid,
+							fsce.eid, U.top().targeteid));
 			}
 			it = g->getOutEdgesIt(tmpid);
 			while(it.hasNext()){
@@ -271,7 +290,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
             if(!found[currentEdge->other_node]){
                // ...tu sie in U
                U.push(U_element(
-                        currentEdge->value+dist[tmpid],currentEdge->other_node,tmpid));
+							tmpid,currentEdge->other_node,currentEdge->id,currentEdge->value,currentEdge->value+dist[tmpid]));
             }   
 			}
 		}
@@ -282,8 +301,9 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 	// Runde.
 	resetlist.push_front(targetnode);
 	if(U.top().sourceid == conode){
-		// TODO Shortcut zur Liste hinzufügen.
-		// sclist.push_front(...);
+		sclist->push_front(
+				Shortcut(U.top().targetdist+fsce.dist, fsce.sourceid, targetnode,
+					fsce.eid, U.top().targeteid));
 	}
 }
 

@@ -99,6 +99,12 @@ struct Shortcut {
 	unsigned int target;
 	unsigned int papa_edge;
 	unsigned int mama_edge;
+
+	Shortcut()
+		:value(0),source(0),target(0),papa_edge(0),mama_edge(0){}
+
+	Shortcut(unsigned int v, unsigned int s, unsigned int t, unsigned int p, unsigned int m)
+		:value(v),source(s),target(t),papa_edge(p),mama_edge(m){}
 };
 
 /*
