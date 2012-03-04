@@ -1,5 +1,5 @@
-#ifndef graphalgs2_h
-#define graphalgs2_h
+#ifndef CHConstruction_h
+#define CHConstruction_h
 
 #include "graph.h"
 #include <queue>
@@ -8,7 +8,7 @@
 using namespace std;
 
 template <typename G>
-class graphalgs2{
+class CHConstruction{
 	private:
 		// struct für die Elemente aus U des Dijkstra.
 		struct U_element{
@@ -38,6 +38,7 @@ class graphalgs2{
 		 * da wir die Daten global haben wollen.
 		 */
 		vector<bool> found;
+		vector<bool> is_node_black;
 		vector<unsigned int> dist;
 		priority_queue<U_element, vector<U_element>, Compare_U_element> U;
 		// Reset Liste, um zu wissen welche Felder zurück
@@ -48,8 +49,8 @@ class graphalgs2{
 		list<unsigned int> conodelist;
 
 	public:
-		graphalgs2(G* g);
-		~graphalgs2(){};
+		CHConstruction(G* g);
+		~CHConstruction(){};
 		/*
 		 * Berechnet ein Maximales Independent Set und kontrahiert
 		 * alle Knoten von diesem, welche eine negative Edge
@@ -60,7 +61,7 @@ class graphalgs2{
 		 * @nodelist Zu übergebender Pointer, in den ein Pointer auf die zu 
 		 * löschenden Knoten geschrieben werden.
 		 */
-		void doOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist);
+		void calcOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist);
 		// TODO: Nachfolgendes soll nach den Tests alles private werden.
 		/*
 		 * Berechnet ein Maximal Independent Set (randomisiert).
@@ -103,29 +104,33 @@ class graphalgs2{
 		void shortDijkstra(unsigned int targetnode, unsigned int conode, list<Shortcut>* sclist);
 		/*
 		 * Setzt die benutzten Felder des found und dist Arrays zurück
-		 * um ihn für weitere Dijkstras brauchbar zu machen. Sollte die
-		 * Laufzeit verbessern.
+		 * um ihn für weitere Dijkstras brauchbar zu machen. U wird auch zurückgesetzt.
+		 * Sollte die Laufzeit verbessern.
 		 */
-		void reset();
+		void resetDij();
 };
 
 template <typename G>
-graphalgs2<G>::graphalgs2(G* g):
+CHConstruction<G>::CHConstruction(G* g):
 	nr_of_nodes(g->getNodeCount()),
 	found(nr_of_nodes,false),
+	is_node_black(nr_of_nodes,false),
 	dist(nr_of_nodes,numeric_limits<unsigned int>::max()){
 	this->g = g;
 }
 
 template <typename G>
-void graphalgs2<G>::doOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist){
+void CHConstruction<G>::calcOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist){
 	contract_nodes(independent_set());
 	*sclist = &(this->allsclist);
 	*nodelist = &(this->conodelist);
+	// Für die nächste Runde zurücksetzen.
+	&allsclist = new list<Shortcut>();
+	&conodelist = new list<unsigned int>();
 }
 
 template <typename G>
-list<unsigned int> graphalgs2<G>::independent_set(){
+list<unsigned int> CHConstruction<G>::independent_set(){
    list<unsigned int> solution;
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
@@ -136,7 +141,7 @@ list<unsigned int> graphalgs2<G>::independent_set(){
    // Erster Part der Knoten (wegen der Randomisierung)
    for(unsigned int i=r; i<nr_of_nodes; i++){
       // Prüfen ob der Knoten aufgenommen werden kann
-      if(!marked[i]){
+      if(!is_node_black[i] && !marked[i]){
          solution.push_front(i);
          // Alle ausgehenden Kanten verfolgen
          it = g->getOutEdgesIt(i);
@@ -153,7 +158,7 @@ list<unsigned int> graphalgs2<G>::independent_set(){
    // Zweiter Part der Knoten
    for(unsigned int i=0; i<r; i++){
       // Prüfen ob der Knoten aufgenommen werden kann
-      if(!marked[i]){
+      if(!is_node_black[i] && !marked[i]){
          solution.push_front(i);
          // Alle ausgehenden Kanten verfolgen
          it = g->getOutEdgesIt(i);
@@ -171,7 +176,7 @@ list<unsigned int> graphalgs2<G>::independent_set(){
 }
 
 template <typename G>
-void graphalgs2<G>::contract_nodes(list<unsigned int>* nodes){
+void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
 	while(!nodes->empty()){
 		contract_node(nodes->front());
 		nodes->pop_front();
@@ -179,7 +184,7 @@ void graphalgs2<G>::contract_nodes(list<unsigned int>* nodes){
 }
 
 template <typename G>
-void graphalgs2<G>::contract_node(unsigned int conode){
+void CHConstruction<G>::contract_node(unsigned int conode){
 	list<Shortcut> sclist;
 	EdgesIterator it = g->getInEdgesIt(conode);
 	// Die möglichen Shortcuts berechnen und speichern.
@@ -189,12 +194,13 @@ void graphalgs2<G>::contract_node(unsigned int conode){
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	if(sclist.size()-(g->getEdgeCount(conode)) < 0){
 		conodelist.push_front(conode);
+		is_node_black[conode] = true;
 		allsclist.splice(allsclist.begin(), sclist);
 	}
 }
 
 template <typename G>
-void graphalgs2<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist,
+void CHConstruction<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist,
 		unsigned int conode){
 	unsigned int tmpnode;
 	EdgesIterator it = g->getOutEdgesIt(conode);
@@ -220,11 +226,11 @@ void graphalgs2<G>::addShortcuts(unsigned int scnode, list<Shortcut>* sclist,
 		}
 	}
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
-	reset();
+	resetDij();
 }
 
 template <typename G>
-void graphalgs2<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
+void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
 		list<Shortcut>* sclist){
 	unsigned int tmpid;
 	EdgesIterator it;
@@ -282,7 +288,7 @@ void graphalgs2<G>::shortDijkstra(unsigned int targetnode, unsigned int conode,
 }
 
 template <typename G>
-void graphalgs2<G>::reset(){
+void CHConstruction<G>::resetDij(){
 	unsigned int current;
 	while(!resetlist.empty()){
 		current = resetlist.front();
@@ -290,6 +296,7 @@ void graphalgs2<G>::reset(){
 		dist[current] = numeric_limits<unsigned int>::max();
 		resetlist.pop_front();
 	}
+	U = priority_queue<U_element, vector<U_element>, Compare_U_element>();
 }
 
 #endif

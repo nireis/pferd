@@ -1,5 +1,6 @@
 CC = g++
-CXXFLAGS = -Wall -g -O3 -std=c++0x
+CXXFLAGS = -Wall -g -std=c++0x#-O3
+CFLAGS = -Wall -g #-O3
 LDFLAGS = 
 BIN =pferd
 
@@ -7,8 +8,8 @@ OBJDIR=obj
 
 # zu jeder X.cpp datei, die kompiliert wird, hier in
 # OBJ eine entsprechende X.o file anlegen lassen
-CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp
-OBJ =pferd.o graphalgs.o parser.o graph.o ch.o
+CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp rlparser.c CHConstruction.h
+OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o
 
 all: $(BIN)
 

@@ -20,10 +20,8 @@ class RlParser{
 		double tmpdouble;
 		double tmpexp;
 	public:
-		RlParser(std::string filename);
-		unsigned int getNodeCount();
-		unsigned int getEdgeCount();
-		void getNodesAndEdges(ParserNode* n, ParserEdge* e);
-}
+		RlParser(const char* filename);
+		void run(ParserNode** n, ParserEdge** e);
+};
 
 #endif

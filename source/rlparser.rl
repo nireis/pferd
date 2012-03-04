@@ -26,7 +26,7 @@
 	uint = '+'? [0-9]+ >StartInt $ReadInt;
 
 	action NegSint{
-		tmpsint = -tmpsint
+		tmpsint = -tmpsint;
 	}
 
 	action StartSint{
@@ -40,7 +40,7 @@
 	sint = ('-' [0-9]+ $ReadSint %NegSint | '+'? [0-9]+ $ReadSint) >StartSint;
 
 	action NegDouble{
-		tmpdouble = -tmpdouble
+		tmpdouble = -tmpdouble;
 	}
 
 	action StartDouble{
@@ -60,11 +60,15 @@
 	double = ('-' [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)? %NegDouble | '+'? [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)?) >StartDouble;
 
 	action NodeCount{
+		std::cout << "Vor node_count" << std::endl;
 		node_count = tmpint;
+		nodes = new ParserNode[node_count];
 	}
 
 	action EdgeCount{
+		std::cout << "Vor edge_count" << std::endl;
 		edge_count = tmpint;
+		edges = new ParserEdge[edge_count];
 	}
 
 	action NodeID{
@@ -91,11 +95,11 @@
 	}
 
 	action EdgeSrc{
-		edges[current_edge].in_index = tmpint;
+		edges[current_edge].source = tmpint;
 	}
 
 	action EdgeTgt{
-		edges[current_edge].out_index = tmpint;
+		edges[current_edge].target = tmpint;
 	}
 
 	action EdgeDist{
@@ -107,7 +111,6 @@
 	}
 
 	action EdgesCheckEnd{
-		edges[current_edge].id = current_edge;
 		current_edge++;
 		if(current_edge == edge_count){
 			fgoto fileend;
@@ -128,47 +131,21 @@
 	main := uint %NodeCount NL uint %EdgeCount NL data;
 }%%
 
-RlParser::RlParser(std::string filename){
+%%write data;
+
+RlParser::RlParser(const char* filename){
 	cs = 0;
 	current_node = 0;
 	current_edge = 0;
 	fd = open(filename, O_RDONLY);
-
-	%%write data;
+	std::cout << "Vor write init." << std::endl;
 	%%write init;
+	std::cout << "Nach write init." << std::endl;
 }
 
-unsigned int RlParser::getNodeCount(){
-	std::string buf;
-	int r;
-
-	r = getline(fd, buf, '\n');
-	const char *p = buf;
-	const char *pe = buf + r;
-	const char *eof = 0;
-	%% write exec;
-
-	return node_count;
-}
-
-unsigned int RlParser::getEdgeCount(){
-	std::string buf;
-	int r;
-
-	r = getline(fd, buf, '\n');
-	const char *p = buf;
-	const char *pe = buf + r;
-	const char *eof = 0;
-	%% write exec;
-
-	return edge_count;
-}
-
-void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
-	nodes = n;
-	edges = e;
-
-	char buf[1024*1024];
+void RlParser::run(ParserNode** n, ParserEdge** e){
+	std::cout << "Anfang run()" << std::endl;
+	char buf[4*1024*1024];
 	int r;
 
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
@@ -178,5 +155,9 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 	
 		%% write exec;
 	}
+
+	n = &nodes;
+	e = &edges;
+
 	close(fd);
 }

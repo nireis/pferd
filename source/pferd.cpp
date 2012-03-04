@@ -1,10 +1,11 @@
 #include "graph.h"
 #include "graphalgs.h"
-#include "graphalgs2.h"
+#include "CHConstruction.h"
 #include "parser.h"
 #include <ctime>
 #include "structs.h"
 #include "ch.h"
+#include "rlparser.h"
 
 using namespace std;
 
@@ -199,6 +200,27 @@ cout << " " << endl;
 
 cout << "Erstelle Graph mit Datei " << file << endl;
 Graph g = Graph();
+
+// Geht noch nicht!
+/*const char* rlfile = argv[1];
+cout << "Ragel start" << endl;
+start = clock();
+ParserNode** rlnode = new ParserNode*;
+ParserEdge** rledge = new ParserEdge*;
+
+RlParser rl(rlfile);
+cout << "zwischen constr. und run" << endl;
+rl.run(rlnode, rledge);
+finish = clock();
+time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit zum parsen: " << time << endl;
+cout << "Ragel end" << endl;
+
+// Nur mal um meinen Speicher nicht überzustrapazieren.
+delete[] *rlnode;
+delete[] *rledge;
+delete rlnode;
+delete rledge;*/
 
 start = clock();
 
