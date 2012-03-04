@@ -106,14 +106,15 @@ struct Shortcut {
  * die ausgelagert werden sollten.
  */
 struct ShortcutData {
-	ShortcutData() : out_index(0), in_index(0), papa_edge(0), mama_edge(0) {}
-	ShortcutData(unsigned int o, unsigned int i, unsigned int p, unsigned int m) :
-		out_index(o), in_index(i), papa_edge(p), mama_edge(m) {}
+	ShortcutData() : out_index(0), in_index(0), papa_edge(0), mama_edge(0), load(0) {}
+	ShortcutData(unsigned int o, unsigned int i, unsigned int p, unsigned int m, unsigned int l) :
+		out_index(o), in_index(i), papa_edge(p), mama_edge(m), load(l) {}
 
 	unsigned int out_index;
 	unsigned int in_index;
 	unsigned int papa_edge;
 	unsigned int mama_edge;
+	unsigned int load;
 };
 
 /*
@@ -334,7 +335,7 @@ class bitvec {
 			vector = 0;
 			init(s);
 		}
-		~bitvec(){ delete[] vector; vector=0; }
+		~bitvec(){ del(); }
 
 		void init(unsigned int s){
 			delete[] vector; vector = 0;
@@ -366,6 +367,10 @@ class bitvec {
 			for(unsigned int i = 0; i < int_size; i++){
 				vector[i] = 0;
 			}
+		}
+
+		void del(){
+			delete[] vector; vector = 0; 
 		}
 };
 
