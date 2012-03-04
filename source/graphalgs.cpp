@@ -435,7 +435,9 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 		}
 		U.pop();
 	}
-	return current_min_path;
+	// damit compilerwarnung weg geht
+	min_edge_id = 0;
+	return current_min_path + min_edge_id;
 }
 
 
