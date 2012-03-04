@@ -5,6 +5,7 @@
 #include <ctime>
 #include "structs.h"
 #include "ch.h"
+#include "rlparser.h"
 
 using namespace std;
 
@@ -170,6 +171,7 @@ cout << " " << endl;
 	} 
 
 	string file = argv[1];
+	const char* rlfile = argv[1];
 
 	ifstream checkfile(file.c_str());
 	if(!checkfile){
@@ -182,6 +184,25 @@ cout << " " << endl;
 
 cout << "Erstelle Graph mit Datei " << file << endl;
 Graph g = Graph();
+
+cout << "Ragel start" << endl;
+start = clock();
+ParserNode** rlnode = new ParserNode*;
+ParserEdge** rledge = new ParserEdge*;
+
+RlParser rl(rlfile);
+cout << "zwischen constr. und run" << endl;
+rl.run(rlnode, rledge);
+finish = clock();
+time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+cout << "Zeit zum parsen: " << time << endl;
+cout << "Ragel end" << endl;
+
+// Nur mal um meinen Speicher nicht überzustrapazieren.
+delete[] *rlnode;
+delete[] *rledge;
+delete rlnode;
+delete rledge;
 
 start = clock();
 

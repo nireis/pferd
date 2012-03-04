@@ -14,17 +14,11 @@
 #include "rlparser.h"
 
 
-#line 129 "rlparser.rl"
+#line 132 "rlparser.rl"
 
 
-RlParser::RlParser(std::string filename){
-	cs = 0;
-	current_node = 0;
-	current_edge = 0;
-	fd = open(filename, O_RDONLY);
 
-	
-#line 28 "rlparser.c"
+#line 22 "rlparser.c"
 static const char _graphparser_actions[] = {
 	0, 1, 1, 1, 3, 1, 4, 1, 
 	6, 1, 7, 1, 8, 1, 9, 1, 
@@ -181,493 +175,27 @@ static const int graphparser_en_edges = 56;
 static const int graphparser_en_main = 1;
 
 
-#line 138 "rlparser.rl"
+#line 135 "rlparser.rl"
+
+RlParser::RlParser(const char* filename){
+	cs = 0;
+	current_node = 0;
+	current_edge = 0;
+	fd = open(filename, O_RDONLY);
+	std::cout << "Vor write init." << std::endl;
 	
-#line 187 "rlparser.c"
+#line 188 "rlparser.c"
 	{
 	( cs) = graphparser_start;
 	}
 
-#line 139 "rlparser.rl"
+#line 143 "rlparser.rl"
+	std::cout << "Nach write init." << std::endl;
 }
 
-unsigned int RlParser::getNodeCount(){
-	std::string buf;
-	int r;
-
-	r = getline(fd, buf, '\n');
-	const char *p = buf;
-	const char *pe = buf + r;
-	const char *eof = 0;
-	
-#line 204 "rlparser.c"
-	{
-	int _klen;
-	unsigned int _trans;
-	const char *_acts;
-	unsigned int _nacts;
-	const char *_keys;
-
-	if ( p == pe )
-		goto _test_eof;
-	if ( ( cs) == 0 )
-		goto _out;
-_resume:
-	_keys = _graphparser_trans_keys + _graphparser_key_offsets[( cs)];
-	_trans = _graphparser_index_offsets[( cs)];
-
-	_klen = _graphparser_single_lengths[( cs)];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + _klen - 1;
-		while (1) {
-			if ( _upper < _lower )
-				break;
-
-			_mid = _lower + ((_upper-_lower) >> 1);
-			if ( (*p) < *_mid )
-				_upper = _mid - 1;
-			else if ( (*p) > *_mid )
-				_lower = _mid + 1;
-			else {
-				_trans += (unsigned int)(_mid - _keys);
-				goto _match;
-			}
-		}
-		_keys += _klen;
-		_trans += _klen;
-	}
-
-	_klen = _graphparser_range_lengths[( cs)];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + (_klen<<1) - 2;
-		while (1) {
-			if ( _upper < _lower )
-				break;
-
-			_mid = _lower + (((_upper-_lower) >> 1) & ~1);
-			if ( (*p) < _mid[0] )
-				_upper = _mid - 2;
-			else if ( (*p) > _mid[1] )
-				_lower = _mid + 2;
-			else {
-				_trans += (unsigned int)((_mid - _keys)>>1);
-				goto _match;
-			}
-		}
-		_trans += _klen;
-	}
-
-_match:
-	_trans = _graphparser_indicies[_trans];
-	( cs) = _graphparser_trans_targs[_trans];
-
-	if ( _graphparser_trans_actions[_trans] == 0 )
-		goto _again;
-
-	_acts = _graphparser_actions + _graphparser_trans_actions[_trans];
-	_nacts = (unsigned int) *_acts++;
-	while ( _nacts-- > 0 )
-	{
-		switch ( *_acts++ )
-		{
-	case 0:
-#line 18 "rlparser.rl"
-	{
-		tmpint = 0;
-	}
-	break;
-	case 1:
-#line 22 "rlparser.rl"
-	{
-		tmpint = tmpint*10 + ((*p) - '0');
-	}
-	break;
-	case 2:
-#line 28 "rlparser.rl"
-	{
-		tmpsint = -tmpsint
-	}
-	break;
-	case 3:
-#line 32 "rlparser.rl"
-	{
-		tmpsint = 0;
-	}
-	break;
-	case 4:
-#line 36 "rlparser.rl"
-	{
-		tmpsint = tmpsint*10 + ((*p) - '0');
-	}
-	break;
-	case 5:
-#line 42 "rlparser.rl"
-	{
-		tmpdouble = -tmpdouble
-	}
-	break;
-	case 6:
-#line 46 "rlparser.rl"
-	{
-		tmpdouble = 0;
-		tmpexp = 0.1;
-	}
-	break;
-	case 7:
-#line 51 "rlparser.rl"
-	{
-		tmpdouble = tmpdouble*10 + ((*p) - '0');
-	}
-	break;
-	case 8:
-#line 55 "rlparser.rl"
-	{
-		tmpdouble += tmpexp * ((*p) - '0');
-		tmpexp /= 10.0;
-	}
-	break;
-	case 9:
-#line 62 "rlparser.rl"
-	{
-		node_count = tmpint;
-	}
-	break;
-	case 10:
-#line 66 "rlparser.rl"
-	{
-		edge_count = tmpint;
-	}
-	break;
-	case 11:
-#line 70 "rlparser.rl"
-	{
-		nodes[current_node].id = tmpint;
-	}
-	break;
-	case 12:
-#line 74 "rlparser.rl"
-	{
-		nodes[current_node].lat = tmpdouble;
-	}
-	break;
-	case 13:
-#line 78 "rlparser.rl"
-	{
-		nodes[current_node].lon = tmpdouble;
-	}
-	break;
-	case 14:
-#line 82 "rlparser.rl"
-	{
-		nodes[current_node].elevation = tmpsint;
-	}
-	break;
-	case 15:
-#line 86 "rlparser.rl"
-	{
-		current_node++;
-		if(current_node == node_count){
-			{( cs) = 56; goto _again;}
-		}
-	}
-	break;
-	case 16:
-#line 93 "rlparser.rl"
-	{
-		edges[current_edge].in_index = tmpint;
-	}
-	break;
-	case 17:
-#line 97 "rlparser.rl"
-	{
-		edges[current_edge].out_index = tmpint;
-	}
-	break;
-	case 18:
-#line 101 "rlparser.rl"
-	{
-		edges[current_edge].distance = tmpint;
-	}
-	break;
-	case 19:
-#line 105 "rlparser.rl"
-	{
-		edges[current_edge].type = tmpint;
-	}
-	break;
-	case 20:
-#line 109 "rlparser.rl"
-	{
-		edges[current_edge].id = current_edge;
-		current_edge++;
-		if(current_edge == edge_count){
-			{( cs) = 55; goto _again;}
-		} 
-	}
-	break;
-#line 413 "rlparser.c"
-		}
-	}
-
-_again:
-	if ( ( cs) == 0 )
-		goto _out;
-	if ( ++p != pe )
-		goto _resume;
-	_test_eof: {}
-	_out: {}
-	}
-
-#line 150 "rlparser.rl"
-
-	return node_count;
-}
-
-unsigned int RlParser::getEdgeCount(){
-	std::string buf;
-	int r;
-
-	r = getline(fd, buf, '\n');
-	const char *p = buf;
-	const char *pe = buf + r;
-	const char *eof = 0;
-	
-#line 440 "rlparser.c"
-	{
-	int _klen;
-	unsigned int _trans;
-	const char *_acts;
-	unsigned int _nacts;
-	const char *_keys;
-
-	if ( p == pe )
-		goto _test_eof;
-	if ( ( cs) == 0 )
-		goto _out;
-_resume:
-	_keys = _graphparser_trans_keys + _graphparser_key_offsets[( cs)];
-	_trans = _graphparser_index_offsets[( cs)];
-
-	_klen = _graphparser_single_lengths[( cs)];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + _klen - 1;
-		while (1) {
-			if ( _upper < _lower )
-				break;
-
-			_mid = _lower + ((_upper-_lower) >> 1);
-			if ( (*p) < *_mid )
-				_upper = _mid - 1;
-			else if ( (*p) > *_mid )
-				_lower = _mid + 1;
-			else {
-				_trans += (unsigned int)(_mid - _keys);
-				goto _match;
-			}
-		}
-		_keys += _klen;
-		_trans += _klen;
-	}
-
-	_klen = _graphparser_range_lengths[( cs)];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + (_klen<<1) - 2;
-		while (1) {
-			if ( _upper < _lower )
-				break;
-
-			_mid = _lower + (((_upper-_lower) >> 1) & ~1);
-			if ( (*p) < _mid[0] )
-				_upper = _mid - 2;
-			else if ( (*p) > _mid[1] )
-				_lower = _mid + 2;
-			else {
-				_trans += (unsigned int)((_mid - _keys)>>1);
-				goto _match;
-			}
-		}
-		_trans += _klen;
-	}
-
-_match:
-	_trans = _graphparser_indicies[_trans];
-	( cs) = _graphparser_trans_targs[_trans];
-
-	if ( _graphparser_trans_actions[_trans] == 0 )
-		goto _again;
-
-	_acts = _graphparser_actions + _graphparser_trans_actions[_trans];
-	_nacts = (unsigned int) *_acts++;
-	while ( _nacts-- > 0 )
-	{
-		switch ( *_acts++ )
-		{
-	case 0:
-#line 18 "rlparser.rl"
-	{
-		tmpint = 0;
-	}
-	break;
-	case 1:
-#line 22 "rlparser.rl"
-	{
-		tmpint = tmpint*10 + ((*p) - '0');
-	}
-	break;
-	case 2:
-#line 28 "rlparser.rl"
-	{
-		tmpsint = -tmpsint
-	}
-	break;
-	case 3:
-#line 32 "rlparser.rl"
-	{
-		tmpsint = 0;
-	}
-	break;
-	case 4:
-#line 36 "rlparser.rl"
-	{
-		tmpsint = tmpsint*10 + ((*p) - '0');
-	}
-	break;
-	case 5:
-#line 42 "rlparser.rl"
-	{
-		tmpdouble = -tmpdouble
-	}
-	break;
-	case 6:
-#line 46 "rlparser.rl"
-	{
-		tmpdouble = 0;
-		tmpexp = 0.1;
-	}
-	break;
-	case 7:
-#line 51 "rlparser.rl"
-	{
-		tmpdouble = tmpdouble*10 + ((*p) - '0');
-	}
-	break;
-	case 8:
-#line 55 "rlparser.rl"
-	{
-		tmpdouble += tmpexp * ((*p) - '0');
-		tmpexp /= 10.0;
-	}
-	break;
-	case 9:
-#line 62 "rlparser.rl"
-	{
-		node_count = tmpint;
-	}
-	break;
-	case 10:
-#line 66 "rlparser.rl"
-	{
-		edge_count = tmpint;
-	}
-	break;
-	case 11:
-#line 70 "rlparser.rl"
-	{
-		nodes[current_node].id = tmpint;
-	}
-	break;
-	case 12:
-#line 74 "rlparser.rl"
-	{
-		nodes[current_node].lat = tmpdouble;
-	}
-	break;
-	case 13:
-#line 78 "rlparser.rl"
-	{
-		nodes[current_node].lon = tmpdouble;
-	}
-	break;
-	case 14:
-#line 82 "rlparser.rl"
-	{
-		nodes[current_node].elevation = tmpsint;
-	}
-	break;
-	case 15:
-#line 86 "rlparser.rl"
-	{
-		current_node++;
-		if(current_node == node_count){
-			{( cs) = 56; goto _again;}
-		}
-	}
-	break;
-	case 16:
-#line 93 "rlparser.rl"
-	{
-		edges[current_edge].in_index = tmpint;
-	}
-	break;
-	case 17:
-#line 97 "rlparser.rl"
-	{
-		edges[current_edge].out_index = tmpint;
-	}
-	break;
-	case 18:
-#line 101 "rlparser.rl"
-	{
-		edges[current_edge].distance = tmpint;
-	}
-	break;
-	case 19:
-#line 105 "rlparser.rl"
-	{
-		edges[current_edge].type = tmpint;
-	}
-	break;
-	case 20:
-#line 109 "rlparser.rl"
-	{
-		edges[current_edge].id = current_edge;
-		current_edge++;
-		if(current_edge == edge_count){
-			{( cs) = 55; goto _again;}
-		} 
-	}
-	break;
-#line 649 "rlparser.c"
-		}
-	}
-
-_again:
-	if ( ( cs) == 0 )
-		goto _out;
-	if ( ++p != pe )
-		goto _resume;
-	_test_eof: {}
-	_out: {}
-	}
-
-#line 163 "rlparser.rl"
-
-	return edge_count;
-}
-
-void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
-	nodes = n;
-	edges = e;
-
-	char buf[1024*1024];
+void RlParser::run(ParserNode** n, ParserEdge** e){
+	std::cout << "Anfang run()" << std::endl;
+	char buf[4*1024*1024];
 	int r;
 
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
@@ -676,7 +204,7 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 		const char *eof = 0;
 	
 		
-#line 680 "rlparser.c"
+#line 208 "rlparser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -765,7 +293,7 @@ _match:
 	case 2:
 #line 28 "rlparser.rl"
 	{
-		tmpsint = -tmpsint
+		tmpsint = -tmpsint;
 	}
 	break;
 	case 3:
@@ -783,7 +311,7 @@ _match:
 	case 5:
 #line 42 "rlparser.rl"
 	{
-		tmpdouble = -tmpdouble
+		tmpdouble = -tmpdouble;
 	}
 	break;
 	case 6:
@@ -809,41 +337,45 @@ _match:
 	case 9:
 #line 62 "rlparser.rl"
 	{
+		std::cout << "Vor node_count" << std::endl;
 		node_count = tmpint;
+		nodes = new ParserNode[node_count];
 	}
 	break;
 	case 10:
-#line 66 "rlparser.rl"
+#line 68 "rlparser.rl"
 	{
+		std::cout << "Vor edge_count" << std::endl;
 		edge_count = tmpint;
+		edges = new ParserEdge[edge_count];
 	}
 	break;
 	case 11:
-#line 70 "rlparser.rl"
+#line 74 "rlparser.rl"
 	{
 		nodes[current_node].id = tmpint;
 	}
 	break;
 	case 12:
-#line 74 "rlparser.rl"
+#line 78 "rlparser.rl"
 	{
 		nodes[current_node].lat = tmpdouble;
 	}
 	break;
 	case 13:
-#line 78 "rlparser.rl"
+#line 82 "rlparser.rl"
 	{
 		nodes[current_node].lon = tmpdouble;
 	}
 	break;
 	case 14:
-#line 82 "rlparser.rl"
+#line 86 "rlparser.rl"
 	{
 		nodes[current_node].elevation = tmpsint;
 	}
 	break;
 	case 15:
-#line 86 "rlparser.rl"
+#line 90 "rlparser.rl"
 	{
 		current_node++;
 		if(current_node == node_count){
@@ -852,40 +384,39 @@ _match:
 	}
 	break;
 	case 16:
-#line 93 "rlparser.rl"
+#line 97 "rlparser.rl"
 	{
-		edges[current_edge].in_index = tmpint;
+		edges[current_edge].source = tmpint;
 	}
 	break;
 	case 17:
-#line 97 "rlparser.rl"
+#line 101 "rlparser.rl"
 	{
-		edges[current_edge].out_index = tmpint;
+		edges[current_edge].target = tmpint;
 	}
 	break;
 	case 18:
-#line 101 "rlparser.rl"
+#line 105 "rlparser.rl"
 	{
 		edges[current_edge].distance = tmpint;
 	}
 	break;
 	case 19:
-#line 105 "rlparser.rl"
+#line 109 "rlparser.rl"
 	{
 		edges[current_edge].type = tmpint;
 	}
 	break;
 	case 20:
-#line 109 "rlparser.rl"
+#line 113 "rlparser.rl"
 	{
-		edges[current_edge].id = current_edge;
 		current_edge++;
 		if(current_edge == edge_count){
 			{( cs) = 55; goto _again;}
 		} 
 	}
 	break;
-#line 889 "rlparser.c"
+#line 420 "rlparser.c"
 		}
 	}
 
@@ -898,7 +429,11 @@ _again:
 	_out: {}
 	}
 
-#line 180 "rlparser.rl"
+#line 157 "rlparser.rl"
 	}
+
+	n = &nodes;
+	e = &edges;
+
 	close(fd);
 }
