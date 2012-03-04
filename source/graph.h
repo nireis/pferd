@@ -163,6 +163,17 @@ class Graph {
 /*
  * statischer Graph mit Daten eines normalen Graphen
  * und Shortcuts, inklusive deren Daten
+ *
+ * kann über mehrere Runden Shortcuts
+ * einfügen (wenn zuvor mindestens so viele Kanten
+ * entfernt wurden) und Knoten aus dem Graph schneiden
+ *
+ * während der Runden sind Shortcuts als solche
+ * nicht erkennbar
+ *
+ * merkt sich über alle Runden übergebene Shortcuts
+ * und kann diese dann mit Graph* g
+ * zu einem Graph zusammenfügen
  */
 class SCGraph {
 	private:
@@ -188,7 +199,7 @@ class SCGraph {
 		SList<S> round_shortcutlist;
 		SList<unsigned int> round_node_blacklist;
 
-		SList<unsigned int> free_edge_ids; // TODO
+		SList<unsigned int> free_edge_ids;
 
 		bitvec blacklist;
 
@@ -219,6 +230,8 @@ class SCGraph {
 
 		unsigned int getNodeCount();
 		unsigned int getEdgeCount();
+		unsigned int getEdgeCount(unsigned int node_id);
+		unsigned int getEdgeCount_Round(unsigned int node_id);
 		unsigned int getShortcutCount();
 
 		ND getNodeData(unsigned int node_id);
@@ -249,61 +262,5 @@ class SCGraph {
 
 };
 
-
-
-
-/*
- * Dynamischer Graph, in den Shortcuts eingefügt werden können 
- * (löschen sollte überflüssig sein)
- *
- * TODO da das Einfügen von Shortcuts in Runden passiert, 
- * daher pro Runde mehrere Shortcuts, geht dies evtl besser
- * als mit Listen
- */
-//	class DSCGraph {
-//		private:
-//			std::vector<E>* out_edges;
-//			std::vector<E>* in_edges;
-//	
-//			Graph* g;
-//	
-//			unsigned int* node_order;
-//			
-//			unsigned int node_count;
-//			unsigned int edge_count;
-//			unsigned int shortcut_count;
-//			
-//			/*struct sc_id {
-//				sc_id(SD s, unsigned int i) : sd(s), id(i) {}
-//				sc_id() : sd(), id(0) {}
-//				SD sd;
-//				unsigned int id;
-//			};*/
-//			std::vector<SD> shortcut_data;
-//	
-//			SList<unsigned int> uintlist;
-//	
-//		public:
-//			DSCGraph(Graph* gr);
-//			~DSCGraph();
-//	
-//			void addShortcut(S sc);
-//	
-//			unsigned int getShortcutCount();
-//	
-//			unsigned int getNodeCount();
-//			unsigned int getEdgeCount();
-//	
-//			EdgesIterator getOutEdgesIt(unsigned int id){
-//				return EdgesIterator( & out_edges[id][0] , out_edges[id].size() );
-//			}
-//			EdgesIterator getInEdgesIt(unsigned int id){
-//				return EdgesIterator( & in_edges[id][0] , in_edges[id].size() );
-//			}
-//	
-//			E* getOutEdge(unsigned int id){ return 0; }
-//			E* getInEdge(unsigned int id){ return 0; }
-//	
-//	};
 
 #endif

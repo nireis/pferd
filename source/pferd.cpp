@@ -144,6 +144,23 @@ using namespace std;
 
 
 
+void testSCGraph(Graph* g){
+	clock_t start,finish;
+	double time;
+	
+	SCGraph scg = SCGraph(g);
+	
+	cout << scg.mergeRound(1) << endl;
+	start = clock();
+	cout << scg.mergeShortcutsAndGraph() << endl;
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit um Graph zu kopieren: " << time << endl;
+	
+	cout << scg.isShortcut(0) << " " << scg.isShortcut( scg.getEdgeCount() ) << endl;
+	
+}
+
 
 
 
@@ -199,17 +216,7 @@ time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 cout << "Zeit für das Maximal Independent Set + Test: " << time << endl;
 
 // dijkstra_tests(&g);
-
-SCGraph scg = SCGraph(&g);
-
-cout << scg.mergeRound(1) << endl;
-start = clock();
-cout << scg.mergeShortcutsAndGraph() << endl;
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit um Graph zu kopieren: " << time << endl;
-
-cout << scg.isShortcut(0) << " " << scg.isShortcut( scg.getEdgeCount() ) << endl;
+testSCGraph(&g);
 
 cout << "Taste drücken zum Beenden..."<< endl;
 cin.get();
