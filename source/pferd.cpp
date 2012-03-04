@@ -1,6 +1,6 @@
 #include "graph.h"
 #include "graphalgs.h"
-#include "graphalgs2.h"
+#include "CHConstruction.h"
 #include "parser.h"
 #include <ctime>
 #include "structs.h"
@@ -171,7 +171,6 @@ cout << " " << endl;
 	} 
 
 	string file = argv[1];
-	const char* rlfile = argv[1];
 
 	ifstream checkfile(file.c_str());
 	if(!checkfile){
@@ -185,6 +184,8 @@ cout << " " << endl;
 cout << "Erstelle Graph mit Datei " << file << endl;
 Graph g = Graph();
 
+// Geht noch nicht!
+/*const char* rlfile = argv[1];
 cout << "Ragel start" << endl;
 start = clock();
 ParserNode** rlnode = new ParserNode*;
@@ -202,7 +203,7 @@ cout << "Ragel end" << endl;
 delete[] *rlnode;
 delete[] *rledge;
 delete rlnode;
-delete rledge;
+delete rledge;*/
 
 start = clock();
 
