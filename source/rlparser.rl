@@ -60,13 +60,11 @@
 	double = ('-' [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)? %NegDouble | '+'? [0-9]* $ReadPreDouble ('.' [0-9]* $ReadPostDouble)?) >StartDouble;
 
 	action NodeCount{
-		std::cout << "Vor node_count" << std::endl;
 		node_count = tmpint;
 		nodes = new ParserNode[node_count];
 	}
 
 	action EdgeCount{
-		std::cout << "Vor edge_count" << std::endl;
 		edge_count = tmpint;
 		edges = new ParserEdge[edge_count];
 	}
@@ -138,14 +136,11 @@ RlParser::RlParser(const char* filename){
 	current_node = 0;
 	current_edge = 0;
 	fd = open(filename, O_RDONLY);
-	std::cout << "Vor write init." << std::endl;
 	%%write init;
-	std::cout << "Nach write init." << std::endl;
 }
 
 void RlParser::run(ParserNode** n, ParserEdge** e){
-	std::cout << "Anfang run()" << std::endl;
-	char buf[4*1024*1024];
+	char buf[128*1024];
 	int r;
 
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
@@ -156,8 +151,8 @@ void RlParser::run(ParserNode** n, ParserEdge** e){
 		%% write exec;
 	}
 
-	n = &nodes;
-	e = &edges;
+	*n = nodes;
+	*e = edges;
 
 	close(fd);
 }

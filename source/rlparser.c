@@ -14,7 +14,7 @@
 #include "rlparser.h"
 
 
-#line 132 "rlparser.rl"
+#line 130 "rlparser.rl"
 
 
 
@@ -175,27 +175,24 @@ static const int graphparser_en_edges = 56;
 static const int graphparser_en_main = 1;
 
 
-#line 135 "rlparser.rl"
+#line 133 "rlparser.rl"
 
 RlParser::RlParser(const char* filename){
 	cs = 0;
 	current_node = 0;
 	current_edge = 0;
 	fd = open(filename, O_RDONLY);
-	std::cout << "Vor write init." << std::endl;
 	
-#line 188 "rlparser.c"
+#line 187 "rlparser.c"
 	{
 	( cs) = graphparser_start;
 	}
 
-#line 143 "rlparser.rl"
-	std::cout << "Nach write init." << std::endl;
+#line 140 "rlparser.rl"
 }
 
 void RlParser::run(ParserNode** n, ParserEdge** e){
-	std::cout << "Anfang run()" << std::endl;
-	char buf[4*1024*1024];
+	char buf[128*1024];
 	int r;
 
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
@@ -204,7 +201,7 @@ void RlParser::run(ParserNode** n, ParserEdge** e){
 		const char *eof = 0;
 	
 		
-#line 208 "rlparser.c"
+#line 205 "rlparser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -337,45 +334,43 @@ _match:
 	case 9:
 #line 62 "rlparser.rl"
 	{
-		std::cout << "Vor node_count" << std::endl;
 		node_count = tmpint;
 		nodes = new ParserNode[node_count];
 	}
 	break;
 	case 10:
-#line 68 "rlparser.rl"
+#line 67 "rlparser.rl"
 	{
-		std::cout << "Vor edge_count" << std::endl;
 		edge_count = tmpint;
 		edges = new ParserEdge[edge_count];
 	}
 	break;
 	case 11:
-#line 74 "rlparser.rl"
+#line 72 "rlparser.rl"
 	{
 		nodes[current_node].id = tmpint;
 	}
 	break;
 	case 12:
-#line 78 "rlparser.rl"
+#line 76 "rlparser.rl"
 	{
 		nodes[current_node].lat = tmpdouble;
 	}
 	break;
 	case 13:
-#line 82 "rlparser.rl"
+#line 80 "rlparser.rl"
 	{
 		nodes[current_node].lon = tmpdouble;
 	}
 	break;
 	case 14:
-#line 86 "rlparser.rl"
+#line 84 "rlparser.rl"
 	{
 		nodes[current_node].elevation = tmpsint;
 	}
 	break;
 	case 15:
-#line 90 "rlparser.rl"
+#line 88 "rlparser.rl"
 	{
 		current_node++;
 		if(current_node == node_count){
@@ -384,31 +379,31 @@ _match:
 	}
 	break;
 	case 16:
-#line 97 "rlparser.rl"
+#line 95 "rlparser.rl"
 	{
 		edges[current_edge].source = tmpint;
 	}
 	break;
 	case 17:
-#line 101 "rlparser.rl"
+#line 99 "rlparser.rl"
 	{
 		edges[current_edge].target = tmpint;
 	}
 	break;
 	case 18:
-#line 105 "rlparser.rl"
+#line 103 "rlparser.rl"
 	{
 		edges[current_edge].distance = tmpint;
 	}
 	break;
 	case 19:
-#line 109 "rlparser.rl"
+#line 107 "rlparser.rl"
 	{
 		edges[current_edge].type = tmpint;
 	}
 	break;
 	case 20:
-#line 113 "rlparser.rl"
+#line 111 "rlparser.rl"
 	{
 		current_edge++;
 		if(current_edge == edge_count){
@@ -416,7 +411,7 @@ _match:
 		} 
 	}
 	break;
-#line 420 "rlparser.c"
+#line 415 "rlparser.c"
 		}
 	}
 
@@ -429,11 +424,11 @@ _again:
 	_out: {}
 	}
 
-#line 157 "rlparser.rl"
+#line 152 "rlparser.rl"
 	}
 
-	n = &nodes;
-	e = &edges;
+	*n = nodes;
+	*e = edges;
 
 	close(fd);
 }

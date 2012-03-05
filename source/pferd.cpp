@@ -202,14 +202,13 @@ cout << "Erstelle Graph mit Datei " << file << endl;
 Graph g = Graph();
 
 // Geht noch nicht!
-/*const char* rlfile = argv[1];
+const char* rlfile = argv[1];
 cout << "Ragel start" << endl;
 start = clock();
 ParserNode** rlnode = new ParserNode*;
 ParserEdge** rledge = new ParserEdge*;
 
 RlParser rl(rlfile);
-cout << "zwischen constr. und run" << endl;
 rl.run(rlnode, rledge);
 finish = clock();
 time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -220,7 +219,7 @@ cout << "Ragel end" << endl;
 delete[] *rlnode;
 delete[] *rledge;
 delete rlnode;
-delete rledge;*/
+delete rledge;
 
 start = clock();
 
