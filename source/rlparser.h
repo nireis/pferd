@@ -21,7 +21,9 @@ class RlParser{
 		double tmpexp;
 	public:
 		RlParser(const char* filename);
-		void run(ParserNode** n, ParserEdge** e);
+		unsigned int getNodeCount();
+		unsigned int getEdgeCount();
+		void getNodesAndEdges(ParserNode* n, ParserEdge* e);
 };
 
 #endif

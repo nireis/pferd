@@ -61,12 +61,10 @@
 
 	action NodeCount{
 		node_count = tmpint;
-		nodes = new ParserNode[node_count];
 	}
 
 	action EdgeCount{
 		edge_count = tmpint;
-		edges = new ParserEdge[edge_count];
 	}
 
 	action NodeID{
@@ -139,7 +137,35 @@ RlParser::RlParser(const char* filename){
 	%%write init;
 }
 
-void RlParser::run(ParserNode** n, ParserEdge** e){
+unsigned int RlParser::getNodeCount(){
+	char buf[1];
+	int r;
+	do{
+		r = read(fd, buf, sizeof(buf));
+		const char *p = buf;
+		const char *pe = buf + 1;
+		const char *eof = 0;
+		%% write exec;
+	}while(buf[0] != '\n' && r > 0);
+	return node_count;
+}
+
+unsigned int RlParser::getEdgeCount(){
+	char buf[1];
+	int r;
+	do{
+		r = read(fd, buf, sizeof(buf));
+		const char *p = buf;
+		const char *pe = buf + 1;
+		const char *eof = 0;
+		%% write exec;
+	}while(buf[0] != '\n' && r > 0);
+	return edge_count;
+}
+
+void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
+	nodes = n;
+	edges = e;
 	char buf[128*1024];
 	int r;
 
@@ -147,12 +173,8 @@ void RlParser::run(ParserNode** n, ParserEdge** e){
 		const char *p = buf;
 		const char *pe = buf + r;
 		const char *eof = 0;
-	
 		%% write exec;
 	}
-
-	*n = nodes;
-	*e = edges;
 
 	close(fd);
 }
