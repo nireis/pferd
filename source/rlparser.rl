@@ -144,7 +144,6 @@ unsigned int RlParser::getNodeCount(){
 		r = read(fd, buf, sizeof(buf));
 		const char *p = buf;
 		const char *pe = buf + 1;
-		const char *eof = 0;
 		%% write exec;
 	}while(buf[0] != '\n' && r > 0);
 	return node_count;
@@ -157,7 +156,6 @@ unsigned int RlParser::getEdgeCount(){
 		r = read(fd, buf, sizeof(buf));
 		const char *p = buf;
 		const char *pe = buf + 1;
-		const char *eof = 0;
 		%% write exec;
 	}while(buf[0] != '\n' && r > 0);
 	return edge_count;
@@ -172,7 +170,6 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
 		const char *p = buf;
 		const char *pe = buf + r;
-		const char *eof = 0;
 		%% write exec;
 	}
 

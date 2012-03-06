@@ -198,9 +198,8 @@ unsigned int RlParser::getNodeCount(){
 		r = read(fd, buf, sizeof(buf));
 		const char *p = buf;
 		const char *pe = buf + 1;
-		const char *eof = 0;
 		
-#line 204 "rlparser.c"
+#line 203 "rlparser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -408,7 +407,7 @@ _match:
 		} 
 	}
 	break;
-#line 412 "rlparser.c"
+#line 411 "rlparser.c"
 		}
 	}
 
@@ -421,7 +420,7 @@ _again:
 	_out: {}
 	}
 
-#line 149 "rlparser.rl"
+#line 148 "rlparser.rl"
 	}while(buf[0] != '\n' && r > 0);
 	return node_count;
 }
@@ -433,9 +432,8 @@ unsigned int RlParser::getEdgeCount(){
 		r = read(fd, buf, sizeof(buf));
 		const char *p = buf;
 		const char *pe = buf + 1;
-		const char *eof = 0;
 		
-#line 439 "rlparser.c"
+#line 437 "rlparser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -643,7 +641,7 @@ _match:
 		} 
 	}
 	break;
-#line 647 "rlparser.c"
+#line 645 "rlparser.c"
 		}
 	}
 
@@ -656,7 +654,7 @@ _again:
 	_out: {}
 	}
 
-#line 162 "rlparser.rl"
+#line 160 "rlparser.rl"
 	}while(buf[0] != '\n' && r > 0);
 	return edge_count;
 }
@@ -670,9 +668,8 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 	while(0 < (r = read(fd, buf, sizeof(buf)))) {
 		const char *p = buf;
 		const char *pe = buf + r;
-		const char *eof = 0;
 		
-#line 676 "rlparser.c"
+#line 673 "rlparser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -880,7 +877,7 @@ _match:
 		} 
 	}
 	break;
-#line 884 "rlparser.c"
+#line 881 "rlparser.c"
 		}
 	}
 
@@ -893,7 +890,7 @@ _again:
 	_out: {}
 	}
 
-#line 177 "rlparser.rl"
+#line 174 "rlparser.rl"
 	}
 
 	close(fd);
