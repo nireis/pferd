@@ -179,69 +179,18 @@ cout << "hjw          /        `-`'" << endl;
 cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 cout << " " << endl;
 cout << " " << endl;
-
-	if(argc != 2){
-		cout << "---" << endl 
-				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Graphendatei " << endl
-				<< "-- Graphdatei: Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
-				<< "---" << endl;
-		return 0;
-	} 
-
-	string file = argv[1];
-
-	ifstream checkfile(file.c_str());
-	if(!checkfile){
-		cout << "-> angegebene Datei existiert nicht." << endl;
-		return 0;
-	}
-
-	clock_t start,finish;
-	double time;
+string file = "../data/150K.txt";
 
 cout << "Erstelle Graph mit Datei " << file << endl;
 Graph g = Graph();
 
-// Ragel Test
-const char* rlfile = argv[1];
-cout << "Ragel start" << endl;
-start = clock();
-
-RlParser rl(rlfile);
-ParserNode* rlnode = new ParserNode[rl.getNodeCount()];
-ParserEdge* rledge = new ParserEdge[rl.getEdgeCount()];
-rl.getNodesAndEdges(rlnode, rledge);
-
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit zum parsen: " << time << endl;
-cout << "Ragel end" << endl;
-delete[] rlnode;
-delete[] rledge;
-// Ragel Test Ende
-
-start = clock();
-
 g.setGraph(file, true);
-
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit zum initialisieren des Graphen: " << time << endl;
-
-cout << "Testen des Maximal Independent Set Algs!" << endl;
-start = clock();
-independent_set(&g);
-finish = clock();
-time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-cout << "Zeit für das Maximal Independent Set + Test: " << time << endl;
-
-// dijkstra_tests(&g);
-testSCGraph(&g);
 
 // vis test
 QApplication app(argc,argv);
 vis *mapWidget = new vis(&g);
 mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+mapWidget->setProjection(Mercator);
 mapWidget->show();
 return app.exec();
 
