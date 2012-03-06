@@ -1,15 +1,15 @@
 CC = g++
-CXXFLAGS = -Wall -g -std=c++0x -O3
+CXXFLAGS = -Wall -g -std=c++0x -O3 -lmarblewidget -lQtGui
 CFLAGS = -Wall -g -O3
-LDFLAGS = 
+LDFLAGS = -Il /usr/lib/libQtCore.so.4
 BIN =pferd
 
 OBJDIR=obj
 
 # zu jeder X.cpp datei, die kompiliert wird, hier in
 # OBJ eine entsprechende X.o file anlegen lassen
-CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp rlparser.c
-OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o
+CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp rlparser.c vis.cpp
+OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o vis.o
 
 all: $(BIN)
 
@@ -22,15 +22,5 @@ $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
 clean:
 	rm -f $(BIN) $(OBJ)
 
+#fucking...
 .PHONY: all clean
-
-#all: pferd
-#
-#pferd: pferd.o
-#	$(CC) -o $@ $^
-#
-#clean:
-#	rm -f pferd *.o
-#
-#.PHONY: all clean
-#

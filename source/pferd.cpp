@@ -6,6 +6,7 @@
 #include "structs.h"
 #include "ch.h"
 #include "rlparser.h"
+#include "vis.h"
 
 using namespace std;
 
@@ -236,6 +237,13 @@ cout << "Zeit für das Maximal Independent Set + Test: " << time << endl;
 
 // dijkstra_tests(&g);
 testSCGraph(&g);
+
+// vis test
+QApplication app(argc,argv);
+vis *mapWidget = new vis(&g);
+mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+mapWidget->show();
+return app.exec();
 
 cout << "Taste drücken zum Beenden..."<< endl;
 cin.get();
