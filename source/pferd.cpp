@@ -212,6 +212,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, Graph* g){
 	list<Shortcut>** sclist = new list<Shortcut>*;
 	list<unsigned int>** nodelist = new list<unsigned int>*;
 	CHConstruction<Graph>(g).calcOneRound(sclist, nodelist);
+	cout << "Fertig" << endl;
 	double lon;
 	double lat;
 	const char* val;
@@ -226,6 +227,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, Graph* g){
 		sstr << sc.value;
 		val = sstr.str().c_str();
 		txtsc->push_back(vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
+		(*sclist)->pop_front();
 	}
 }
 

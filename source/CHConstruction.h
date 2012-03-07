@@ -180,8 +180,10 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 
 template <typename G>
 void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
+	int i=1;
 	while(!nodes->empty()){
-		// cout << "nodes ist nicht leer" << endl;
+		i++;
+		cout << i << ", " << nodes->front() << endl;
 		contract_node(nodes->front());
 		nodes->pop_front();
 	}
@@ -194,27 +196,15 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 	Edge* c_edge;
 	// Die möglichen Shortcuts berechnen und speichern.
 	while(it.hasNext()){
+		cout << "HA" << endl;
 		c_edge = it.getNext();
 		addShortcuts(&sclist, conode, c_edge);
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	// cout << "sclist größe: " << sclist.size() << endl;
 	if(sclist.size() < (g->getEdgeCount(conode))){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
-		/*if(sclist.empty()){
-			cout << "sclist ist leer" << endl;
-		}
-		else{
-			cout << "sclist ist nicht leer" << endl;
-		}*/
 		allsclist->splice(allsclist->begin(), sclist);
-		/*if(allsclist->empty()){
-			cout << "allsclist ist leer" << endl;
-		}
-		else{
-			cout << "allsclist ist nicht leer" << endl;
-		}*/
 	}
 }
 
@@ -247,6 +237,7 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
 		if(!found[tmpnode]){
+			cout << "ha" << endl;
 			shortDijkstra(tmpnode, conode, sclist, firstSCE);
 		}
 	}
@@ -301,12 +292,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
             }   
 			}
 		}
-		/*if(!U.empty()){
-			cout << "U ist nicht leer" << endl;
-		}
-		else{
-			cout << "U ist leer" << endl;
-		}*/
+		cout << "Hallo" << endl;
 		U.pop();
 	}
 	// Von targetnode noch die Shortcuts legen und in die Reset Liste einfügen,
