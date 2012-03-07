@@ -163,13 +163,14 @@ void testSCGraph(Graph* g){
 	
 }
 
-void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortcut>** sclist, Graph* g){
+void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortcut>** sclist,
+		vector<vis::linesc>* lnsc, Graph* g){
 	vector<unsigned int> edgePainted(g->getEdgeCount(),false);
 	vector<unsigned int> nodeSeen(g->getNodeCount(),false);
 	list<unsigned int> seenNodes;
 	EdgesIterator it;
 	for(unsigned int i=0; i<g->getNodeCount(); i++){
-		// Die normalen Kanten einzeichnen
+		// Die normalen Kanten einfügen
 		Edge* tmpedge;
 		double lon;
 		double lat;
@@ -178,7 +179,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 		while(it.hasNext()){
 			tmpedge = it.getNext();
 			if(!edgePainted[tmpedge->id]){
-				// Die Kante einzeichnen
+				// Die Kante einfügen
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
 				stringstream sstr;
@@ -193,12 +194,12 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 		it = g->getInEdgesIt(i);
 		while(it.hasNext()){
 			tmpedge = it.getNext();
-			// Die Kante wurde schon eingezeichnet
+			// Die Kante wurde schon eingefügt
 			if(nodeSeen[tmpedge->other_node]){
 				edgePainted[tmpedge->id] = true;
 			}
 			else{
-				// Die Kante einzeichnen
+				// Die Kante einfügen
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
 				stringstream sstr;
@@ -210,14 +211,21 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 	}
 	double lon;
 	double lat;
+	ND nds;
+	ND ndt;
 	const char* val;
 	Shortcut sc;
 	// Shortcuts einzeichnen
 	for(list<Shortcut>::iterator i=(*sclist)->begin(); i!=(*sclist)->end(); i++){
 		sc = *i;
-		// Die Kante einzeichnen
-		lon = (g->getNodeData(sc.source).lon+g->getNodeData(sc.target).lon)/2;
-		lat = (g->getNodeData(sc.source).lat+g->getNodeData(sc.target).lat)/2;
+		// Die Kante einfügen
+		nds = g->getNodeData(sc.source);
+		ndt = g->getNodeData(sc.target);
+		lnsc->push_back(vis::linesc(GeoDataCoordinates(nds.lon,nds.lat,0.0,GeoDataCoordinates::Degree),
+					GeoDataCoordinates(ndt.lon,ndt.lat,0.0,GeoDataCoordinates::Degree)));
+		// Die Werte einfügen
+		lon = (nds.lon+ndt.lon)/2;
+		lat = (nds.lat+ndt.lat)/2;
 		stringstream sstr;
 		sstr << sc.value;
 		val = sstr.str().c_str();
@@ -252,9 +260,10 @@ int main(int argc, char *argv[]){
 	// vis test
 	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
-	berechneVis(txt, txtsc, sclist, &g);
+	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
+	berechneVis(txt, txtsc, sclist, lnsc, &g);
 	QApplication app(argc,argv);
-	vis *mapWidget = new vis(&g, txt, txtsc, nodelist);
+	vis *mapWidget = new vis(&g, txt, txtsc, nodelist, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));

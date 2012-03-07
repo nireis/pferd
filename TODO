@@ -2,10 +2,6 @@
 
 * CH soll einen Graph bekommen, diesen um Shortcuts erweitern und einen SCGraph ausgeben. Intern erfolgt die Shortcutverteilung wie besprochen in Runden mit unabhängigen Mengen von Knoten
 
-* SHGraph / DSCGraph sind dynamische/statische Graphen mit entsprechender Shortcutverwaltung. Diese müssen noch ausgearbeitet werden, und evtl. gemeinsame/äquivalente Schnittstellen nach Aussen bereitstellen. (Knoten / Kantenbeschriftung für das LVL, in dem ein Knoten kotrahiert wrude)
-
-* eine Dijkstra-Klasse einführen für kürzeste Wege finden zwischen vielen nahe gelegenen Knoten untereinander. die bestehenden Dijkstra-Klassen in graphalgs.h sind ansätze und tests dafür
-
 * Visualisierung des Graphen
 
 * wie werden straßenlasten berechnet ? welche informationen brauchen wir dafür in kanten?
