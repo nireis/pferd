@@ -105,6 +105,15 @@ struct Shortcut {
 
 	Shortcut(unsigned int v, unsigned int s, unsigned int t, unsigned int p, unsigned int m)
 		:value(v),source(s),target(t),papa_edge(p),mama_edge(m){}
+
+	Shortcut& operator=(Shortcut const& sc){
+		value = sc.value;
+		source = sc.source;
+		target = sc.target;
+		papa_edge = sc.papa_edge;
+		mama_edge = sc.mama_edge;
+		return *this;
+	}
 };
 
 /*

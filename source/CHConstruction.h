@@ -45,8 +45,8 @@ class CHConstruction{
 		// gesetzt werden müssen. Sollte Laufzeit verbessern.
 		list<unsigned int> resetlist;
 		// Listen um den Graphen nachher umzubauen
-		list<Shortcut> allsclist;
-		list<unsigned int> conodelist;
+		list<Shortcut>* allsclist;
+		list<unsigned int>* conodelist;
 
 	public:
 		CHConstruction(G* g);
@@ -67,9 +67,9 @@ class CHConstruction{
 		 * Berechnet ein Maximal Independent Set (randomisiert).
 		 * Wir benutzen dabei einen naiven Markierungsalgorithmus.
 		 *
-		 * @return Liste der Knoten des Max Ind Sets.
+		 * @return Pointer auf Liste der Knoten des Max Ind Sets.
 		 */
-		list<unsigned int> independent_set();
+		list<unsigned int>* independent_set();
 		/*
 		 * Kontrahiert die Knoten aus der Liste und fügt die 
 		 * entstandenen Shortcuts in die Struktur ein.
@@ -118,21 +118,23 @@ CHConstruction<G>::CHConstruction(G* g):
 	is_node_black(nr_of_nodes,false),
 	dist(nr_of_nodes,numeric_limits<unsigned int>::max()){
 	this->g = g;
+	allsclist = new list<Shortcut>();
+	conodelist = new list<unsigned int>();
 }
 
 template <typename G>
 void CHConstruction<G>::calcOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist){
 	contract_nodes(independent_set());
-	*sclist = &(this->allsclist);
-	*nodelist = &(this->conodelist);
+	*sclist = this->allsclist;
+	*nodelist = this->conodelist;
 	// Für die nächste Runde zurücksetzen.
-	&allsclist = new list<Shortcut>();
-	&conodelist = new list<unsigned int>();
+	allsclist = new list<Shortcut>();
+	conodelist = new list<unsigned int>();
 }
 
 template <typename G>
-list<unsigned int> CHConstruction<G>::independent_set(){
-   list<unsigned int> solution;
+list<unsigned int>* CHConstruction<G>::independent_set(){
+   list<unsigned int>* solution = new list<unsigned int>;
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
    // Random Nummer für den Startknoten
@@ -143,7 +145,7 @@ list<unsigned int> CHConstruction<G>::independent_set(){
    for(unsigned int i=r; i<nr_of_nodes; i++){
       // Prüfen ob der Knoten aufgenommen werden kann
       if(!is_node_black[i] && !marked[i]){
-         solution.push_front(i);
+         solution->push_front(i);
          // Alle ausgehenden Kanten verfolgen
          it = g->getOutEdgesIt(i);
          while(it.hasNext()){
@@ -160,7 +162,7 @@ list<unsigned int> CHConstruction<G>::independent_set(){
    for(unsigned int i=0; i<r; i++){
       // Prüfen ob der Knoten aufgenommen werden kann
       if(!is_node_black[i] && !marked[i]){
-         solution.push_front(i);
+         solution->push_front(i);
          // Alle ausgehenden Kanten verfolgen
          it = g->getOutEdgesIt(i);
          while(it.hasNext()){
@@ -196,9 +198,9 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	if(sclist.size()-(g->getEdgeCount(conode)) < 0){
-		conodelist.push_front(conode);
+		conodelist->push_front(conode);
 		is_node_black[conode] = true;
-		allsclist.splice(allsclist.begin(), sclist);
+		allsclist->splice(allsclist->begin(), sclist);
 	}
 }
 

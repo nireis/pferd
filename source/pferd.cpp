@@ -167,35 +167,30 @@ void testSCGraph(Graph* g){
 
 
 int main(int argc, char *argv[]){
+	cout << "            _|\\__/|, " << endl;
+	cout << "          ,((\\````\\\\_" << endl;
+	cout << "        ,(())     `))\\ "<< endl;
+	cout << "      ,(()))       ,_ \\ "<< endl;
+	cout << "     ((())'   |        \\ "<< endl;
+	cout << "     )))))     >.__     \\ "<< endl;
+	cout << "     ((('     /    `-. .c|" << endl;
+	cout << "hjw          /        `-`'" << endl;
+	cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
+	cout << " " << endl;
+	cout << " " << endl;
+	string file = "../data/15K.txt";
 
-cout << "            _|\\__/|, " << endl;
-cout << "          ,((\\````\\\\_" << endl;
-cout << "        ,(())     `))\\ "<< endl;
-cout << "      ,(()))       ,_ \\ "<< endl;
-cout << "     ((())'   |        \\ "<< endl;
-cout << "     )))))     >.__     \\ "<< endl;
-cout << "     ((('     /    `-. .c|" << endl;
-cout << "hjw          /        `-`'" << endl;
-cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
-cout << " " << endl;
-cout << " " << endl;
-string file = "../data/150K.txt";
+	cout << "Erstelle Graph mit Datei " << file << endl;
+	Graph g = Graph();
 
-cout << "Erstelle Graph mit Datei " << file << endl;
-Graph g = Graph();
+	g.setGraph(file, true);
 
-g.setGraph(file, true);
-
-// vis test
-QApplication app(argc,argv);
-vis *mapWidget = new vis(&g);
-mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
-mapWidget->setProjection(Mercator);
-mapWidget->show();
-return app.exec();
-
-cout << "Taste drücken zum Beenden..."<< endl;
-cin.get();
-
-	return 0;
+	// vis test
+	QApplication app(argc,argv);
+	vis *mapWidget = new vis(&g);
+	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+	mapWidget->setProjection(Mercator);
+	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
+	mapWidget->show();
+	return app.exec();
 }
