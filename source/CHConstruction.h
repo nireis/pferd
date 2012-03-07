@@ -181,6 +181,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 template <typename G>
 void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
 	while(!nodes->empty()){
+		// cout << "nodes ist nicht leer" << endl;
 		contract_node(nodes->front());
 		nodes->pop_front();
 	}
@@ -197,10 +198,23 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 		addShortcuts(&sclist, conode, c_edge);
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	if(sclist.size()-(g->getEdgeCount(conode)) < 0){
+	// cout << "sclist größe: " << sclist.size() << endl;
+	if(sclist.size() < (g->getEdgeCount(conode))){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
+		/*if(sclist.empty()){
+			cout << "sclist ist leer" << endl;
+		}
+		else{
+			cout << "sclist ist nicht leer" << endl;
+		}*/
 		allsclist->splice(allsclist->begin(), sclist);
+		/*if(allsclist->empty()){
+			cout << "allsclist ist leer" << endl;
+		}
+		else{
+			cout << "allsclist ist nicht leer" << endl;
+		}*/
 	}
 }
 
@@ -216,13 +230,18 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 	dist[scnode] = 0;
 	found[scnode] = true;
 	resetlist.push_front(scnode);
-	while(it.hasNext()){
-		currentEdge = it.getNext();
+	while(itfirst.hasNext()){
+		currentEdge = itfirst.getNext();
 		U.push(U_element(scnode,currentEdge,currentEdge->value));
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
 	// in shortDijkstra.
-	resetlist.push_front(U.top().targetedge->id);
+	if(!U.empty()){
+		resetlist.push_front(U.top().targetedge->other_node);
+	}
+	else{
+		cout << "Warnung: U ist leer" << endl;
+	}
 	// Alle zu erreichenden Knoten durchgehen.
 	while(it.hasNext()){
 		tmpnode = it.getNext()->other_node;
@@ -246,7 +265,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 	// oder einer der ersten Knoten. Außerdem muss er nicht in die Resetliste einge-
 	// fügt werden, das dies auch schon gemacht wurde, für den Fall, dass er nichtmehr
 	// abgearbeitet werden muss.
-	tmpid = U.top().targetedge->id;
+	tmpid = U.top().targetedge->other_node;
 	dist[tmpid] = U.top().distance;
 	found[tmpid] = true;
 	it = g->getOutEdgesIt(tmpid);
@@ -261,7 +280,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 	}
 	U.pop();
 	// Die restlichen Knoten abarbeiten.
-	while((tmpid = U.top().targetedge->other_node) != targetnode){
+	while(!U.empty() && (tmpid = U.top().targetedge->other_node) != targetnode){
 		if(!found[tmpid]){
 			dist[tmpid] = U.top().distance;
 			found[tmpid] = true;
@@ -282,6 +301,12 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
             }   
 			}
 		}
+		/*if(!U.empty()){
+			cout << "U ist nicht leer" << endl;
+		}
+		else{
+			cout << "U ist leer" << endl;
+		}*/
 		U.pop();
 	}
 	// Von targetnode noch die Shortcuts legen und in die Reset Liste einfügen,
