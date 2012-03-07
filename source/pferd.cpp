@@ -163,7 +163,7 @@ void testSCGraph(Graph* g){
 	
 }
 
-void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, Graph* g){
+void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortcut>** sclist, Graph* g){
 	vector<unsigned int> edgePainted(g->getEdgeCount(),false);
 	vector<unsigned int> nodeSeen(g->getNodeCount(),false);
 	list<unsigned int> seenNodes;
@@ -208,18 +208,13 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, Graph* g){
 			}
 		}
 	}
-	// Shortcuts berechnen und die Liste zurückgeben
-	list<Shortcut>** sclist = new list<Shortcut>*;
-	list<unsigned int>** nodelist = new list<unsigned int>*;
-	CHConstruction<Graph>(g).calcOneRound(sclist, nodelist);
-	cout << "Fertig" << endl;
 	double lon;
 	double lat;
 	const char* val;
 	Shortcut sc;
 	// Shortcuts einzeichnen
-	while(!(*sclist)->empty()){
-		sc = ((*sclist)->front());
+	for(list<Shortcut>::iterator i=(*sclist)->begin(); i!=(*sclist)->end(); i++){
+		sc = *i;
 		// Die Kante einzeichnen
 		lon = (g->getNodeData(sc.source).lon+g->getNodeData(sc.target).lon)/2;
 		lat = (g->getNodeData(sc.source).lat+g->getNodeData(sc.target).lat)/2;
@@ -227,7 +222,6 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, Graph* g){
 		sstr << sc.value;
 		val = sstr.str().c_str();
 		txtsc->push_back(vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
-		(*sclist)->pop_front();
 	}
 }
 
@@ -250,12 +244,17 @@ int main(int argc, char *argv[]){
 
 	g.setGraph(file, true);
 
+	// Shortcuts berechnen und die Liste zurückgeben
+	list<Shortcut>** sclist = new list<Shortcut>*;
+	list<unsigned int>** nodelist = new list<unsigned int>*;
+	CHConstruction<Graph>(&g).calcOneRound(sclist, nodelist);
+
 	// vis test
 	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
-	berechneVis(txt, txtsc, &g);
+	berechneVis(txt, txtsc, sclist, &g);
 	QApplication app(argc,argv);
-	vis *mapWidget = new vis(&g, txt, txtsc);
+	vis *mapWidget = new vis(&g, txt, txtsc, nodelist);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));

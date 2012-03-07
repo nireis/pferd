@@ -31,8 +31,9 @@ class vis: public MarbleWidget
 		Graph* g;
 		vector<text>* txt;
 		vector<textsc>* txtsc;
+		list<unsigned int>** blackn;
 	public:
-		vis(Graph* g, vector<text>* txt, vector<textsc>* txtsc);
+		vis(Graph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>** blackn);
 		virtual void customPaint(GeoPainter* painter);
 };
 
