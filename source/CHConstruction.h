@@ -295,11 +295,11 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 			}
 			U.pop();
 		}
+		resetlist.push_front(targetnode);
 	}
 	// Von targetnode noch die Shortcuts legen und in die Reset Liste einfügen,
 	// falls es der letzte Knoten war, der zu bearbeiten war in dieser Dijkstra
 	// Runde.
-	resetlist.push_front(targetnode);
 	if(U.top().sourceid == conode){
 		sclist->push_front(
 				Shortcut(U.top().targetedge->value+firstSCE->value, firstSCE->other_node, targetnode,

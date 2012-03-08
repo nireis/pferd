@@ -245,7 +245,7 @@ int main(int argc, char *argv[]){
 	cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 	cout << " " << endl;
 	cout << " " << endl;
-	string file = "/home/chaot/Studium/Projekt-INF/pferd/data/15K.txt";
+	string file = "../data/15K.txt";
 
 	cout << "Erstelle Graph mit Datei " << file << endl;
 	Graph g = Graph();
