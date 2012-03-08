@@ -257,43 +257,44 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 	// oder einer der ersten Knoten. Außerdem muss er nicht in die Resetliste einge-
 	// fügt werden, das dies auch schon gemacht wurde, für den Fall, dass er nichtmehr
 	// abgearbeitet werden muss.
-	tmpid = U.top().targetedge->other_node;
-	dist[tmpid] = U.top().distance;
-	found[tmpid] = true;
-	it = g->getOutEdgesIt(tmpid);
-	while(it.hasNext()){
-		currentEdge = it.getNext();
-		// Wenn sie noch nicht gefunden wurde...
-		if(!found[currentEdge->other_node]){
-			// ...tu sie in U
-			U.push(U_element(
-						tmpid,currentEdge,currentEdge->value+dist[tmpid]));
-		}   
-	}
-	U.pop();
-	// Die restlichen Knoten abarbeiten.
-	while(!U.empty() && (tmpid = U.top().targetedge->other_node) != targetnode){
-		if(!found[tmpid]){
-			dist[tmpid] = U.top().distance;
-			found[tmpid] = true;
-			resetlist.push_front(tmpid);
-			if(U.top().sourceid == conode){
-				sclist->push_front(
-						Shortcut(U.top().targetedge->value+firstSCE->value, firstSCE->other_node, tmpid,
-							firstSCE->id, U.top().targetedge->id));
-			}
-			it = g->getOutEdgesIt(tmpid);
-			while(it.hasNext()){
-				currentEdge = it.getNext();
-            // Wenn sie noch nicht gefunden wurde...
-            if(!found[currentEdge->other_node]){
-               // ...tu sie in U
-               U.push(U_element(
+	if((tmpid = U.top().targetedge->other_node) != targetnode){
+		dist[tmpid] = U.top().distance;
+		found[tmpid] = true;
+		it = g->getOutEdgesIt(tmpid);
+		while(it.hasNext()){
+			currentEdge = it.getNext();
+			// Wenn sie noch nicht gefunden wurde...
+			if(!found[currentEdge->other_node]){
+				// ...tu sie in U
+				U.push(U_element(
 							tmpid,currentEdge,currentEdge->value+dist[tmpid]));
-            }   
-			}
+			}   
 		}
 		U.pop();
+		// Die restlichen Knoten abarbeiten.
+		while((tmpid = U.top().targetedge->other_node) != targetnode){
+			if(!found[tmpid]){
+				dist[tmpid] = U.top().distance;
+				found[tmpid] = true;
+				resetlist.push_front(tmpid);
+				if(U.top().sourceid == conode){
+					sclist->push_front(
+							Shortcut(U.top().targetedge->value+firstSCE->value, firstSCE->other_node, tmpid,
+								firstSCE->id, U.top().targetedge->id));
+				}
+				it = g->getOutEdgesIt(tmpid);
+				while(it.hasNext()){
+					currentEdge = it.getNext();
+					// Wenn sie noch nicht gefunden wurde...
+					if(!found[currentEdge->other_node]){
+						// ...tu sie in U
+						U.push(U_element(
+								tmpid,currentEdge,currentEdge->value+dist[tmpid]));
+					}   
+				}
+			}
+			U.pop();
+		}
 	}
 	// Von targetnode noch die Shortcuts legen und in die Reset Liste einfügen,
 	// falls es der letzte Knoten war, der zu bearbeiten war in dieser Dijkstra
