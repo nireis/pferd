@@ -190,6 +190,7 @@ void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
 		contract_node(nodes->front());
 		nodes->pop_front();
 	}
+	delete nodes;
 }
 
 template <typename G>

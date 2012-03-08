@@ -213,7 +213,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 	double lat;
 	ND nds;
 	ND ndt;
-	const char* val;
+	string val;
 	Shortcut sc;
 	// Shortcuts einzeichnen
 	for(list<Shortcut>::iterator i=(*sclist)->begin(); i!=(*sclist)->end(); i++){
@@ -228,7 +228,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 		lat = (nds.lat+ndt.lat)/2;
 		stringstream sstr;
 		sstr << sc.value;
-		val = sstr.str().c_str();
+		val = sstr.str();
 		txtsc->push_back(vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
 	}
 }
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]){
 	cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 	cout << " " << endl;
 	cout << " " << endl;
-	string file = "../data/15000.txt";
+	string file = "../data/15K.txt";
 
 	cout << "Erstelle Graph mit Datei " << file << endl;
 	Graph g = Graph();
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]){
 	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
 
 	// vis test
-	/*vector<vis::text>* txt = new vector<vis::text>;
+	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
 	berechneVis(txt, txtsc, sclist, lnsc, &g);
@@ -276,5 +276,11 @@ int main(int argc, char *argv[]){
 	mapWidget->setProjection(Mercator);
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
 	mapWidget->show();
-	return app.exec();*/
+	app.exec();
+	delete mapWidget;
+	delete *sclist;
+	delete sclist;
+	delete *nodelist;
+	delete nodelist;
+	return 0;
 }
