@@ -48,21 +48,6 @@ class CHConstruction{
 		list<Shortcut>* allsclist;
 		list<unsigned int>* conodelist;
 
-	public:
-		CHConstruction(G* g);
-		~CHConstruction(){};
-		/*
-		 * Berechnet ein Maximales Independent Set und kontrahiert
-		 * alle Knoten von diesem, welche eine negative Edge
-		 * Difference haben.
-		 *
-		 * @sclist Zu übergebender Pointer, in welchen nachher ein Pointer
-		 * auf die zu legenden Shortcuts geschrieben werden.
-		 * @nodelist Zu übergebender Pointer, in den ein Pointer auf die zu 
-		 * löschenden Knoten geschrieben werden.
-		 */
-		void calcOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist);
-		// TODO: Nachfolgendes soll nach den Tests alles private werden.
 		/*
 		 * Berechnet ein Maximal Independent Set (randomisiert).
 		 * Wir benutzen dabei einen naiven Markierungsalgorithmus.
@@ -109,6 +94,21 @@ class CHConstruction{
 		 * Sollte die Laufzeit verbessern.
 		 */
 		void resetDij();
+
+	public:
+		CHConstruction(G* g);
+		~CHConstruction();
+		/*
+		 * Berechnet ein Maximales Independent Set und kontrahiert
+		 * alle Knoten von diesem, welche eine negative Edge
+		 * Difference haben.
+		 *
+		 * @sclist Zu übergebender Pointer, in welchen nachher ein Pointer
+		 * auf die zu legenden Shortcuts geschrieben werden.
+		 * @nodelist Zu übergebender Pointer, in den ein Pointer auf die zu 
+		 * löschenden Knoten geschrieben werden.
+		 */
+		void calcOneRound(list<Shortcut>** sclist, list<unsigned int>** nodelist);
 };
 
 template <typename G>
@@ -120,6 +120,12 @@ CHConstruction<G>::CHConstruction(G* g):
 	this->g = g;
 	allsclist = new list<Shortcut>();
 	conodelist = new list<unsigned int>();
+}
+
+template <typename G>
+CHConstruction<G>::~CHConstruction(){
+	delete allsclist;
+	delete conodelist;
 }
 
 template <typename G>
@@ -209,15 +215,14 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 		unsigned int conode, Edge* firstSCE){
 	unsigned int tmpnode;
 	unsigned int scnode = firstSCE->other_node;
-	EdgesIterator it = g->getOutEdgesIt(conode);
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
-	EdgesIterator itfirst = g->getOutEdgesIt(scnode);
+	EdgesIterator it = g->getOutEdgesIt(scnode);
 	dist[scnode] = 0;
 	found[scnode] = true;
 	resetlist.push_front(scnode);
-	while(itfirst.hasNext()){
-		currentEdge = itfirst.getNext();
+	while(it.hasNext()){
+		currentEdge = it.getNext();
 		U.push(U_element(scnode,currentEdge,currentEdge->value));
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
@@ -229,6 +234,7 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 		cout << "Warnung: U ist leer" << endl;
 	}
 	// Alle zu erreichenden Knoten durchgehen.
+	it = g->getOutEdgesIt(conode);
 	while(it.hasNext()){
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
