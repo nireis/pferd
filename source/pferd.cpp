@@ -245,20 +245,28 @@ int main(int argc, char *argv[]){
 	cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 	cout << " " << endl;
 	cout << " " << endl;
-	string file = "../data/15K.txt";
+	string file = "../data/15000.txt";
 
 	cout << "Erstelle Graph mit Datei " << file << endl;
 	Graph g = Graph();
 
 	g.setGraph(file, true);
 
+	clock_t start,finish;
+	double time;
+	start = clock();
+
 	// Shortcuts berechnen und die Liste zurückgeben
 	list<Shortcut>** sclist = new list<Shortcut>*;
 	list<unsigned int>** nodelist = new list<unsigned int>*;
 	CHConstruction<Graph>(&g).calcOneRound(sclist, nodelist);
 
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
+
 	// vis test
-	vector<vis::text>* txt = new vector<vis::text>;
+	/*vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
 	berechneVis(txt, txtsc, sclist, lnsc, &g);
@@ -268,5 +276,5 @@ int main(int argc, char *argv[]){
 	mapWidget->setProjection(Mercator);
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
 	mapWidget->show();
-	return app.exec();
+	return app.exec();*/
 }
