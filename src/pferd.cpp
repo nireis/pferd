@@ -245,18 +245,27 @@ int main(int argc, char *argv[]){
 	cout << "( http://www.asciiworld.com/-Horses-.html )" << endl;
 	cout << " " << endl;
 	cout << " " << endl;
-	string file = "../data/15K.txt";
 
-	cout << "Erstelle Graph mit Datei " << file << endl;
-	Graph g = Graph();
 
-	g.setGraph(file, true);
+	string file = "../data/15K.txt.grp";
 
 	clock_t start,finish;
 	double time;
+
+	cout << "Erstelle Graph mit Datei " << file << endl;
+	start = clock();
+	Graph g = Graph();
+
+	g.setGraph(file, true);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
+
+
 	start = clock();
 
 	// Shortcuts berechnen und die Liste zurückgeben
+	cout << "Berechne Shortcuts für eine Runde." << endl;
 	list<Shortcut>* sclist = new list<Shortcut>;
 	list<unsigned int>* nodelist = new list<unsigned int>;
 	CHConstruction<Graph>(&g).calcOneRound(sclist, nodelist);
@@ -278,7 +287,7 @@ int main(int argc, char *argv[]){
 //	mapWidget->show();
 //	app.exec();
 //	delete mapWidget;
-//	delete sclist;
-//	delete nodelist;
+	delete sclist;
+	delete nodelist;
 	return 0;
 }
