@@ -247,7 +247,7 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 
-	string file = "../data/15K.txt.grp";
+	string file = "../data/15000.txt.grp";
 
 	clock_t start,finish;
 	double time;
@@ -275,18 +275,18 @@ int main(int argc, char *argv[]){
 	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
 
 	// vis test
-//	vector<vis::text>* txt = new vector<vis::text>;
-//	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
-//	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
-//	berechneVis(txt, txtsc, sclist, lnsc, &g);
-//	QApplication app(argc,argv);
-//	vis *mapWidget = new vis(&g, txt, txtsc, nodelist, lnsc);
-//	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
-//	mapWidget->setProjection(Mercator);
-//	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
-//	mapWidget->show();
-//	app.exec();
-//	delete mapWidget;
+	/*vector<vis::text>* txt = new vector<vis::text>;
+	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
+	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
+	berechneVis(txt, txtsc, sclist, lnsc, &g);
+	QApplication app(argc,argv);
+	vis *mapWidget = new vis(&g, txt, txtsc, nodelist, lnsc);
+	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+	mapWidget->setProjection(Mercator);
+	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
+	mapWidget->show();
+	app.exec();
+	delete mapWidget;*/
 	delete sclist;
 	delete nodelist;
 	return 0;

@@ -19,6 +19,9 @@ void vis::customPaint(GeoPainter* painter)
 	for(unsigned int i=0; i<g->getNodeCount(); i++){
 		nd = g->getNodeData(i);
 		painter->drawEllipse(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), 5, 5);
+		/*stringstream sstr;
+		sstr << i;
+		painter->drawText(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), sstr.str().c_str());*/
 	}
 	// Die normalen Kanten einzeichnen
 	for(vector<text>::iterator it = txt->begin(); it!=txt->end(); it++){
