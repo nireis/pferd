@@ -289,6 +289,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 		}
 		lastDist = dist[tmpid];
 		U.pop();
+
 		// Die restlichen Knoten abarbeiten.
 		while((tmpid = U.top().targetedge->other_node) != targetnode){
 			// Prüfen ob noch uneindeutige kürzeste Wege gefunden werden können.
@@ -324,6 +325,11 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 			}
 			lastDist = dist[tmpid];
 			U.pop();
+		if(U.empty())
+			std::cout << " U IST EMPTY " << std::endl;
+
+		std::cout << U.top().targetedge->other_node << std::endl;
+
 		}
 		resetlist.push_front(targetnode);
 	}
