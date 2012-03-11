@@ -250,10 +250,8 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 	// Mögliche Kanten der Länge 0 werden im Moment NICHT berücksichtigt! TODO??
 	lastDist = U.top().distance;
 	U.pop();
-	while(!U.empty() && U.top().distance == lastDist){
-		if(sameDist.count(tmpnode = U.top().targetedge->other_node)){
-			sameDist.erase(tmpnode);
-		}
+	while(U.top().distance == lastDist && !U.empty()){
+		sameDist.erase(U.top().targetedge->other_node);
 		U.pop();
 	}
 	// Die letzten Shortcuts einfügen.
@@ -295,10 +293,8 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 		while((tmpid = U.top().targetedge->other_node) != targetnode){
 			// Prüfen ob noch uneindeutige kürzeste Wege gefunden werden können.
 			if(lastDist == U.top().distance){
-				// Prüfen ob einer gefunden wurde.
-				if(sameDist.count(tmpid)){
-					sameDist.erase(tmpid);
-				}
+				// Löschen, wenn einer existiert.
+				sameDist.erase(tmpid);
 			}
 			else{
 				for(map<unsigned int, Shortcut>::iterator it=sameDist.begin(); it!=sameDist.end(); it++){
