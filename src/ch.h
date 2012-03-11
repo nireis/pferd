@@ -10,6 +10,7 @@
 #include "graph.h"
 #include "structs.h"
 #include "CHConstruction.h"
+#include <list>
 
 
 class CH {
@@ -21,9 +22,18 @@ class CH {
 
 		unsigned int rounds;
 
+		list<Shortcut>* sclistpointer;
+		list<unsigned int>* bnlistpointer;
+
 	public:
 		CH(Graph* gr, SCGraph* scgr);
+		~CH();
 
+		void doRond();
+
+		void finish();
+
+		void calcCH(unsigned int rounds);
 
 };
 

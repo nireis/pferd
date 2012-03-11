@@ -164,7 +164,7 @@ void testSCGraph(Graph* g){
 }
 
 void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortcut>* sclist,
-		vector<vis::linesc>* lnsc, Graph* g){
+		vector<vis::linesc>* lnsc, SCGraph* g){
 	vector<unsigned int> edgePainted(g->getEdgeCount(),false);
 	vector<unsigned int> nodeSeen(g->getNodeCount(),false);
 	list<unsigned int> seenNodes;
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 
-	string file = "../data/15000.txt.grp";
+	string file = "../data/15K.txt.grp";
 
 	clock_t start,finish;
 	double time;
@@ -261,32 +261,48 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
 
-
+	cout << "Erstelle neuen Graph: " << endl;
 	start = clock();
+	SCGraph scg = SCGraph(&g);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "SCGraph erstellt in zeit: : " << time << endl;
+	
 
+	for(int i=0; i<14; i++){
+		start = clock();
+		TDijkstra<SCGraph>(&scg, i);
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit für Template-Dijkstra mit SCGraph von " << i << " aus: "<< time << endl;
+	}
+
+
+	
+	start = clock();
 	// Shortcuts berechnen und die Liste zurückgeben
 	cout << "Berechne Shortcuts für eine Runde." << endl;
 	list<Shortcut>* sclist = new list<Shortcut>;
 	list<unsigned int>* nodelist = new list<unsigned int>;
-	CHConstruction<Graph>(&g).calcOneRound(sclist, nodelist);
+	CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
 
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
 
 	// vis test
-	/*vector<vis::text>* txt = new vector<vis::text>;
+	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
-	berechneVis(txt, txtsc, sclist, lnsc, &g);
+	berechneVis(txt, txtsc, sclist, lnsc, &scg);
 	QApplication app(argc,argv);
-	vis *mapWidget = new vis(&g, txt, txtsc, nodelist, lnsc);
+	vis *mapWidget = new vis(&scg, txt, txtsc, nodelist, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
 	mapWidget->show();
 	app.exec();
-	delete mapWidget;*/
+	delete mapWidget;
 	delete sclist;
 	delete nodelist;
 	return 0;

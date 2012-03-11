@@ -305,6 +305,11 @@ SCGraph::SCGraph(Graph* gr) :
 		node_lvl[i] = 0;
 	}
 
+	// TODO
+	for(unsigned int i = 0; i < node_count; i++){
+		node_data[i].elevation = 0;
+	}
+
 	for(unsigned int i = 0; i <= node_count; i++){
 		nodes_in_offs[i] = gr->getLowerInEdgeBound(i);
 	}
@@ -383,6 +388,7 @@ bool SCGraph::mergeRound(unsigned int lvl){
 		n = round_node_blacklist.front();
 		round_node_blacklist.pop_front();
 		node_lvl[n] = lvl;
+		node_data[n].elevation = lvl; // TODO
 		
 		// das andere ende der in-edges löschen
 		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n]+node_in_edges_count[n]; i++){
