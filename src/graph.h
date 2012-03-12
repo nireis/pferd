@@ -234,8 +234,10 @@ class SCGraph {
 		unsigned int getEdgeCount(unsigned int node_id);
 		unsigned int getEdgeCount_Round(unsigned int node_id);
 		unsigned int getShortcutCount();
-		std::list<Shortcut>* getShortcutListPointer(){ return &round_shortcutlist; }
-		std::list<unsigned int>* getBlackNodesListPointer(){ return &round_node_blacklist; }
+		std::list<Shortcut>* getShortcutListPointer(){ 
+			return &round_shortcutlist; }
+		std::list<unsigned int>* getBlackNodesListPointer(){ 
+			return &round_node_blacklist; }
 
 		ND getNodeData(unsigned int node_id);
 		ED getEdgeData(unsigned int edge_id);

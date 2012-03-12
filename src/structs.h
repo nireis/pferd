@@ -36,13 +36,16 @@ struct ParserEdge {
  * die ID verweist auf die zugehörige Stelle im Daten-Array
  */
 struct Edge {
-	Edge() : id(0), value(0), other_node(0) {}
+	Edge() : id(0), value(0), other_node(0), other_lvl(0) {}
 	Edge(unsigned int i, unsigned int v, unsigned int o) : 
-		id(i), value(v), other_node(o) {}
+		id(i), value(v), other_node(o), other_lvl(0) {}
+	Edge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
+		id(i), value(v), other_node(o), other_lvl(ol) {}
 	
-	unsigned int id; 
+	unsigned int id;
 	unsigned int value;
 	unsigned int other_node;
+	unsigned int other_lvl;
 };
 struct EdgeData {
 	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0) {}

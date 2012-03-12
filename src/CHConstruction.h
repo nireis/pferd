@@ -154,12 +154,12 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
       if(!is_node_black[i] && !marked[i]){
          solution->push_front(i);
          // Alle ausgehenden Kanten verfolgen
-         it = g->getOutEdgesIt(i);
+         it = g->getOutEdgesIt_Round(i);
          while(it.hasNext()){
             marked[it.getNext()->other_node] = true;
          }
          // Alle eingehenden Kanten verfolgen
-         it = g->getInEdgesIt(i);
+         it = g->getInEdgesIt_Round(i);
          while(it.hasNext()){
             marked[it.getNext()->other_node] = true;
          }
@@ -171,12 +171,12 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
       if(!is_node_black[i] && !marked[i]){
          solution->push_front(i);
          // Alle ausgehenden Kanten verfolgen
-         it = g->getOutEdgesIt(i);
+         it = g->getOutEdgesIt_Round(i);
          while(it.hasNext()){
             marked[it.getNext()->other_node] = true;
          }
          // Alle eingehenden Kanten verfolgen
-         it = g->getInEdgesIt(i);
+         it = g->getInEdgesIt_Round(i);
          while(it.hasNext()){
             marked[it.getNext()->other_node] = true;
          }
@@ -197,7 +197,7 @@ void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
 template <typename G>
 void CHConstruction<G>::contract_node(unsigned int conode){
 	list<Shortcut> sclist;
-	EdgesIterator it = g->getInEdgesIt(conode);
+	EdgesIterator it = g->getInEdgesIt_Round(conode);
 	Edge* c_edge;
 	// Die möglichen Shortcuts berechnen und speichern.
 	while(it.hasNext()){
@@ -205,7 +205,7 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 		addShortcuts(&sclist, conode, c_edge);
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	if(sclist.size() < (g->getEdgeCount(conode))){
+	if(sclist.size() < (g->getEdgeCount_Round(conode))){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
 		allsclist->splice(allsclist->begin(), sclist);
@@ -219,7 +219,7 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 	unsigned int scnode = firstSCE->other_node;
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
-	EdgesIterator it = g->getOutEdgesIt(scnode);
+	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
 	lastDist = 0;
 	dist[scnode] = 0;
 	found[scnode] = true;
@@ -237,7 +237,7 @@ void CHConstruction<G>::addShortcuts(list<Shortcut>* sclist,
 		cout << "Warnung: U ist leer" << endl;
 	}
 	// Alle zu erreichenden Knoten durchgehen.
-	it = g->getOutEdgesIt(conode);
+	it = g->getOutEdgesIt_Round(conode);
 	while(it.hasNext()){
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
@@ -277,7 +277,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 	if((tmpid = U.top().targetedge->other_node) != targetnode){
 		dist[tmpid] = U.top().distance;
 		found[tmpid] = true;
-		it = g->getOutEdgesIt(tmpid);
+		it = g->getOutEdgesIt_Round(tmpid);
 		while(it.hasNext()){
 			currentEdge = it.getNext();
 			// Wenn sie noch nicht gefunden wurde...
@@ -312,7 +312,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 							Shortcut(U.top().targetedge->value+firstSCE->value,
 								firstSCE->other_node, tmpid, firstSCE->id, U.top().targetedge->id)));
 				}
-				it = g->getOutEdgesIt(tmpid);
+				it = g->getOutEdgesIt_Round(tmpid);
 				while(it.hasNext()){
 					currentEdge = it.getNext();
 					// Wenn sie noch nicht gefunden wurde...

@@ -175,38 +175,38 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 		double lon;
 		double lat;
 		string val;
-		it = g->getOutEdgesIt(i);
+		it = g->getOutEdgesIt_Round(i);
 		while(it.hasNext()){
 			tmpedge = it.getNext();
-			if(!edgePainted[tmpedge->id]){
+			//if(!edgePainted[tmpedge->id]){
 				// Die Kante einfügen
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
 				stringstream sstr;
-				sstr << tmpedge->value;
+				sstr << tmpedge->value << " " << i;
 				val = sstr.str();
 				txt->push_back(vis::text(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
-				edgePainted[tmpedge->id] = true;
-			}
-			nodeSeen[tmpedge->other_node] = true;
+				//edgePainted[tmpedge->id] = true;
+			//}
+			//nodeSeen[tmpedge->other_node] = true;
 			seenNodes.push_back(tmpedge->other_node);
 		}
-		it = g->getInEdgesIt(i);
+		it = g->getInEdgesIt_Round(i);
 		while(it.hasNext()){
 			tmpedge = it.getNext();
 			// Die Kante wurde schon eingefügt
-			if(nodeSeen[tmpedge->other_node]){
-				edgePainted[tmpedge->id] = true;
-			}
-			else{
+			//if(nodeSeen[tmpedge->other_node]){
+				//edgePainted[tmpedge->id] = true;
+			//}
+			//else{
 				// Die Kante einfügen
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
 				stringstream sstr;
-				sstr << tmpedge->value;
+				sstr << tmpedge->value << "                 " << i;
 				val = sstr.str();
 				txt->push_back(vis::text(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
-			}
+			//}
 		}
 	}
 	double lon;
@@ -281,23 +281,27 @@ int main(int argc, char *argv[]){
 	
 	start = clock();
 	// Shortcuts berechnen und die Liste zurückgeben
-	cout << "Berechne Shortcuts für eine Runde." << endl;
+	
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
-	CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
+	unsigned int max_rounds = 2;
 
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
-
-	cout << "Merge Shortcuts in SCGraph. " << time << endl;
-	start = clock();
-	scg.mergeRound(1);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit für Mergen der Shortcuts: " << time << endl;
-
-	cin.get();
+	for(unsigned int j = 1; j < max_rounds; j++){
+		cout << "Berechne Shortcuts für Runde " <<  j ;
+		CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << ", Zeit: " << time << endl;
+	
+		cout << "Merge Shortcuts in SCGraph. ";
+		start = clock();
+		scg.mergeRound(j);
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << time << endl;
+		cout << " => Runde " << j << " fertig."  << endl;
+	}
+	//scg.mergeShortcutsAndGraph(max_rounds);
 
 	// vis test
 	vector<vis::text>* txt = new vector<vis::text>;

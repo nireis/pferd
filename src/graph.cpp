@@ -15,7 +15,7 @@ Graph::Graph() :
 	node_data(0),
 	edge_data(0) {
 }
-const int Graph::BinID = 45;
+const int Graph::BinID = 47;
 const std::string Graph::dateiendung = "grp";
 
 
@@ -326,17 +326,19 @@ SCGraph::SCGraph(Graph* gr) :
 	for(unsigned int i = 0; i < node_count; i++){
 		node_out_edges_count[i] = nodes_out_offs[i+1] - nodes_out_offs[i];
 	}
+	
+	for(unsigned int i = 0; i < edge_count; i++){
+		edge_data[i] = gr->getEdgeData(i);
+	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
 		in_edges[i] = * (gr->getInEdge(i));
+		in_edges[i].other_lvl = edge_data[ in_edges[i].id ].out_index ;
 	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
 		out_edges[i] = * (gr->getOutEdge(i));
-	}
-	
-	for(unsigned int i = 0; i < edge_count; i++){
-		edge_data[i] = gr->getEdgeData(i);
+		out_edges[i].other_lvl = edge_data[ out_edges[i].id ].in_index ;
 	}
 }
 
@@ -365,90 +367,151 @@ void SCGraph::blacklistNode(unsigned int node_id){
 //	return blacklist.get(node_id);
 //}
 
-bool SCGraph::mergeRound(unsigned int lvl){
-	
-	list<unsigned int>::const_iterator it = round_node_blacklist.begin();
-	// frei werdende edge-ids für shortcuts sichern
-	unsigned int scount = round_shortcutlist.size();
-	EdgesIterator eit;
-	while( scount > 0 ){
-		if( it != round_node_blacklist.end() ){
-			eit = getInEdgesIt( *it ) ;
-			++it;
-			while( eit.hasNext() && (scount > 0) ){
-				free_edge_ids.push( (eit.getNext())->id );
-				scount --;
-			}
-		}
-	}
-	unsigned int n;
-	/* der große manitu mache, dass dieser code das tut, was er soll */
 
-	// markieren und nach hinten schieben ungültiger kanten
+bool SCGraph::mergeRound(unsigned int lvl){
+	unsigned int n;
+
+	// nehme kontrahierte knoten raus
 	while( ! round_node_blacklist.empty() ){
 		n = round_node_blacklist.front();
 		round_node_blacklist.pop_front();
 		node_lvl[n] = lvl;
 		node_data[n].elevation = lvl; // TODO
-		
-		// das andere ende der in-edges löschen
-		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n]+node_in_edges_count[n]; i++){
-			unsigned int edgeid = in_edges[ i ].id;
-		//	if( edgeid >= edge_count ){
-		//		edgeid = edgeid - edge_count;
-		//	}
-			unsigned int other = in_edges[ i ].other_node;
-			node_out_edges_count[ other ] --;
-			// lezte aktive edge merken
-			E tmp = out_edges[ nodes_out_offs[ other ] + node_out_edges_count[ other ] ]; 
-			// letzte edge "ungültig" setzen
-			out_edges[ nodes_out_offs[ other ] + node_out_edges_count[ other ] ] = E(); 
-			// überschreibe auf n zeigende kante
-			out_edges[ edge_data[ edgeid ].out_index ] = tmp; 
-			// passe index der verschobenen kante an
-			edge_data[ tmp.id ].out_index = edge_data[ edgeid ].out_index;
-		}
-		// das andere ende der out-edges löschen
-		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n]; i++){
-			unsigned int edgeid = out_edges[ i ].id;
-		//	if( edgeid >= edge_count ){
-		//		edgeid = edgeid - edge_count;
-		//	}
-			unsigned int other = out_edges[ i ].other_node;
-			node_in_edges_count[ other ] --;
-			E tmp = in_edges[ nodes_in_offs[ other ] + node_in_edges_count[ other ] ];
-			in_edges[ nodes_in_offs[ other ] + node_in_edges_count[ other ] ] = E();
-			in_edges[ edge_data[ edgeid ].in_index ] = tmp;
-			edge_data[ tmp.id ].in_index = edge_data[ edgeid ].in_index;
-		}
 
+		//schneide andere enden der in-edges ab
+		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n] + node_in_edges_count[n];i++){
+			unsigned int othernode = in_edges[i].other_node;
+			unsigned int otherlvl = in_edges[i].other_lvl;
+			
+			node_out_edges_count[ othernode ] --;
+
+			E lastedge = out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ];
+			out_edges[ otherlvl ] = lastedge;
+
+			out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ] = E();
+		}
+		//schneide andere enden der out-edges ab
+		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n] ;i++){
+			unsigned int othernode = out_edges[i].other_node;
+			unsigned int otherlvl = out_edges[i].other_lvl;
+
+			node_in_edges_count[ othernode ] --;
+
+			E lastedge = in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ];
+			in_edges[ otherlvl ] = lastedge;
+
+			in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ] = E();
+		}
+		//mache kanten von n unerreichbar
 		node_in_edges_count[n] = 0;
 		node_out_edges_count[n] = 0;
-		//blacklist.set(n);
 	}
-	
-	// shortcuts hinzufügen
-	while( !round_shortcutlist.empty() ){
+
+	// verteile shortcuts
+/*	while( ! round_shortcutlist.empty() ){
 		S stmp = round_shortcutlist.front();
 		round_shortcutlist.pop_front();
-		unsigned int edgeid = free_edge_ids.pop();
-		unsigned int oindex = nodes_out_offs[ stmp.source ] + node_out_edges_count[ stmp.source ];
-		unsigned int iindex = nodes_in_offs[ stmp.target ] + node_in_edges_count[ stmp.target ];
 		shortcutlist.push(stmp);
-		
-		in_edges[ iindex ] = E(/*edge_count +*/ edgeid, stmp.value, stmp.source);
-		node_in_edges_count[ stmp.target ]++;
-	
-		out_edges[ oindex ] = E(/*edge_count +*/ edgeid, stmp.value, stmp.target);
-		node_out_edges_count[ stmp.source ]++;
-
-		edge_data[ edgeid ] = ED(oindex, iindex, stmp.value, 0, 0);
-
-		shortcut_count++;
+		shortcut_count ++;
 	}
-
-	return true; 
+*/
+	return true;
 }
+
+
+
+
+//bool SCGraph::mergeRound(unsigned int lvl){
+//	unsigned int n;
+//
+//	// markieren und nach hinten schieben ungültiger kanten
+//	while( ! round_node_blacklist.empty() ){
+//		n = round_node_blacklist.front();
+//		round_node_blacklist.pop_front();
+//		node_lvl[n] = lvl;
+//		node_data[n].elevation = lvl; // TODO
+//		
+//		// das andere ende der in-edges löschen
+//		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n] + node_in_edges_count[n]; i++){
+//			unsigned int othernode = in_edges[i].other_node;
+//			node_out_edges_count[ othernode ] --;
+//			
+//			E other_nodes_last_out_edge = 
+//				out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ];
+//
+//			out_edges[ in_edges[i].other_lvl ] = other_nodes_last_out_edge;
+//		}
+//		// das andere ende der out-edges löschen
+//		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n]; i++){
+//			unsigned int othernode = out_edges[i].other_node;
+//			node_in_edges_count[ othernode ] --;
+//
+//			E other_nodes_last_out_edge = 
+//				in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ];
+//
+//			in_edges[ out_edges[i].other_lvl ] = other_nodes_last_out_edge;
+//		}
+//
+///*		// das andere ende der in-edges löschen
+//		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n]+node_in_edges_count[n]; i++){
+//			unsigned int edgeid = in_edges[ i ].id;
+//		//	if( edgeid >= edge_count ){
+//		//		edgeid = edgeid - edge_count;
+//		//	}
+//			unsigned int other = in_edges[ i ].other_node;
+//			node_out_edges_count[ other ] --;
+//			// lezte aktive edge merken
+//			E tmp = out_edges[ nodes_out_offs[ other ] + node_out_edges_count[ other ] ]; 
+//			// letzte edge "ungültig" setzen
+//			out_edges[ nodes_out_offs[ other ] + node_out_edges_count[ other ] ] = E(); 
+//			// überschreibe auf n zeigende kante
+//			out_edges[ edge_data[ edgeid ].out_index ] = tmp; 
+//			// passe index der verschobenen kante an
+//			edge_data[ tmp.id ].out_index = edge_data[ edgeid ].out_index;
+//		}
+//		// das andere ende der out-edges löschen
+//		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n]; i++){
+//			unsigned int edgeid = out_edges[ i ].id;
+//		//	if( edgeid >= edge_count ){
+//		//		edgeid = edgeid - edge_count;
+//		//	}
+//			unsigned int other = out_edges[ i ].other_node;
+//			node_in_edges_count[ other ] --;
+//			E tmp = in_edges[ nodes_in_offs[ other ] + node_in_edges_count[ other ] ];
+//			in_edges[ nodes_in_offs[ other ] + node_in_edges_count[ other ] ] = E();
+//			in_edges[ edge_data[ edgeid ].in_index ] = tmp;
+//			edge_data[ tmp.id ].in_index = edge_data[ edgeid ].in_index;
+//		}
+//*/
+//
+//		node_in_edges_count[n] = 0;
+//		node_out_edges_count[n] = 0;
+//		//blacklist.set(n);
+//	}
+//	
+//	// shortcuts hinzufügen
+//	while( !round_shortcutlist.empty() ){
+//		S stmp = round_shortcutlist.front();
+//		round_shortcutlist.pop_front();
+//
+//		//unsigned int edgeid = free_edge_ids.pop();
+//		unsigned int oindex = nodes_out_offs[ stmp.source ] + node_out_edges_count[ stmp.source ];
+//		unsigned int iindex = nodes_in_offs[ stmp.target ] + node_in_edges_count[ stmp.target ];
+//		shortcutlist.push(stmp);
+//		
+//		in_edges[ iindex ] = E(edge_count + shortcut_count, stmp.value, stmp.source, oindex);
+//		node_in_edges_count[ stmp.target ]++;
+//	
+//		out_edges[ oindex ] = E(edge_count + shortcut_count, stmp.value, stmp.target, iindex);
+//		node_out_edges_count[ stmp.source ]++;
+//
+//		//edge_data[ edgeid ] = ED(oindex, iindex, stmp.value, 0, 0);
+//
+//		shortcut_count++;
+//	}
+//
+//	return true; 
+//}
 
 void SCGraph::clearEverything(){
 	delete[] nodes_in_offs; nodes_in_offs = 0;
@@ -495,8 +558,10 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 
 	// letztes lvl verteilen
 	for(unsigned int i = 0; i < node_count; i++){
-		if( node_lvl[i] == 0)
+		if( node_lvl[i] == 0){
 			node_lvl[i] = lvl;
+			node_data[i].elevation = lvl; // TODO
+		}
 	}
 	
 	nodes_in_offs = new N[ node_count +1 ];
