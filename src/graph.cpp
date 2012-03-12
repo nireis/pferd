@@ -252,7 +252,7 @@ E* Graph::getOutEdge(unsigned int id){
 }
 E* Graph::getInEdge(unsigned int id){
 //	if(id < edge_count)
-		return in_edges + edge_data[id].in_index;
+		return in_edges + id; //edge_data[id].in_index;
 //	E* e=0;
 //	return e;
 }
@@ -280,7 +280,6 @@ unsigned int Graph::getUpperInEdgeBound(unsigned int id){
 SCGraph::SCGraph(Graph* gr) : 
 	g(gr),
 	shortcut_count( 0 ), 
-	node_data( gr->getNodeDataPointer() ),
 	// shortcut_data( 0 ),
 	shortcutlist(),
 	round_shortcutlist(),
@@ -292,6 +291,7 @@ SCGraph::SCGraph(Graph* gr) :
 	edge_count = gr->getEdgeCount();
 	//blacklist.init( node_count );
 	//blacklist.reset();
+	node_data = new ND[ node_count ];
 	node_lvl = new unsigned int[ node_count ];
 	nodes_in_offs = new N[ node_count +1 ];
 	nodes_out_offs = new N[ node_count +1 ];
@@ -307,6 +307,7 @@ SCGraph::SCGraph(Graph* gr) :
 
 	// TODO
 	for(unsigned int i = 0; i < node_count; i++){
+		node_data[i] = gr->getNodeData(i);
 		node_data[i].elevation = 0;
 	}
 
@@ -327,11 +328,11 @@ SCGraph::SCGraph(Graph* gr) :
 	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
-		in_edges[i] = * gr->getInEdge(i);
+		in_edges[i] = * (gr->getInEdge(i));
 	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
-		out_edges[i] = * gr->getOutEdge(i);
+		out_edges[i] = * (gr->getOutEdge(i));
 	}
 	
 	for(unsigned int i = 0; i < edge_count; i++){
@@ -341,7 +342,7 @@ SCGraph::SCGraph(Graph* gr) :
 
 SCGraph::~SCGraph(){
 	g = 0;
-	node_data = 0;
+	delete[] node_data; node_data = 0;
 	delete[] node_lvl; node_lvl = 0;
 
 	clearEverything();

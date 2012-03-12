@@ -282,13 +282,22 @@ int main(int argc, char *argv[]){
 	start = clock();
 	// Shortcuts berechnen und die Liste zurückgeben
 	cout << "Berechne Shortcuts für eine Runde." << endl;
-	list<Shortcut>* sclist = new list<Shortcut>;
-	list<unsigned int>* nodelist = new list<unsigned int>;
+	list<Shortcut>* sclist = scg.getShortcutListPointer();
+	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
 
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit für erste Runde der CH-Berechnung: " << time << endl;
+
+	cout << "Merge Shortcuts in SCGraph. " << time << endl;
+	start = clock();
+	scg.mergeRound(1);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit für Mergen der Shortcuts: " << time << endl;
+
+	cin.get();
 
 	// vis test
 	vector<vis::text>* txt = new vector<vis::text>;
@@ -303,7 +312,5 @@ int main(int argc, char *argv[]){
 	mapWidget->show();
 	app.exec();
 	delete mapWidget;
-	delete sclist;
-	delete nodelist;
 	return 0;
 }

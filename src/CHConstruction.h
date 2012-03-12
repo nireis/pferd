@@ -146,7 +146,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
    EdgesIterator it;
    // Random Nummer für den Startknoten
    srand((unsigned)time(0));
-   unsigned int r = rand() % nr_of_nodes;
+   unsigned int r = 0;//rand() % nr_of_nodes;
 
    // Erster Part der Knoten (wegen der Randomisierung)
    for(unsigned int i=r; i<nr_of_nodes; i++){
@@ -325,11 +325,6 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 			}
 			lastDist = dist[tmpid];
 			U.pop();
-		if(U.empty())
-			std::cout << " U IST EMPTY " << std::endl;
-
-		std::cout << U.top().targetedge->other_node << std::endl;
-
 		}
 		resetlist.push_front(targetnode);
 	}

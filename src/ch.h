@@ -21,6 +21,7 @@ class CH {
 		CHConstruction<SCGraph> algos;
 
 		unsigned int rounds;
+		unsigned int max_rounds;
 
 		list<Shortcut>* sclistpointer;
 		list<unsigned int>* bnlistpointer;
@@ -29,12 +30,11 @@ class CH {
 		CH(Graph* gr, SCGraph* scgr);
 		~CH();
 
-		void doRond();
+		void doRound();
 
 		void finish();
 
 		void calcCH(unsigned int rounds);
-
 };
 
 

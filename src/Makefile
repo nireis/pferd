@@ -1,6 +1,6 @@
 CC = g++
-CXXFLAGS = -Wall -g -O3 -std=c++0x -lmarblewidget -lQtGui
-CFLAGS = -Wall -g -O3
+CXXFLAGS = -Wall -g -std=c++0x -lmarblewidget -lQtGui
+CFLAGS = -Wall -g 
 LDFLAGS = -Il /usr/lib/libQtCore.so.4
 BIN =pferd
 
