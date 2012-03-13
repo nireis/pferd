@@ -384,11 +384,13 @@ bool SCGraph::mergeRound(unsigned int lvl){
 			unsigned int otherlvl = in_edges[i].other_lvl;
 			
 			node_out_edges_count[ othernode ] --;
-
+			
+			// tausche letzte gültige edge mit ungültiger
 			E lastedge = out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ];
 			out_edges[ otherlvl ] = lastedge;
 
-			out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ] = E();
+			// sag partner von getauschter gültiger, wo neuer sitzplatz
+			in_edges[ lastedge.other_lvl ].other_lvl = otherlvl;
 		}
 		//schneide andere enden der out-edges ab
 		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n] ;i++){
@@ -400,7 +402,7 @@ bool SCGraph::mergeRound(unsigned int lvl){
 			E lastedge = in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ];
 			in_edges[ otherlvl ] = lastedge;
 
-			in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ] = E();
+			out_edges[ lastedge.other_lvl ].other_lvl = otherlvl;
 		}
 		//mache kanten von n unerreichbar
 		node_in_edges_count[n] = 0;

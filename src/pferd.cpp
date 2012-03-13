@@ -180,11 +180,13 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 			tmpedge = it.getNext();
 			//if(!edgePainted[tmpedge->id]){
 				// Die Kante einfügen
+				stringstream sstr;
+		if(tmpedge->value == 999999)
+			cout << "   VALUE = 999999 ! " << "out von : " <<  i << endl;
+				sstr << tmpedge->value << " " << i ;//<< " (" << tmpedge->id << ")";
+				val = sstr.str();
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
-				stringstream sstr;
-				sstr << tmpedge->value << " " << i;
-				val = sstr.str();
 				txt->push_back(vis::text(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
 				//edgePainted[tmpedge->id] = true;
 			//}
@@ -203,11 +205,14 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
 				stringstream sstr;
-				sstr << tmpedge->value << "                 " << i;
+		if(tmpedge->value == 999999)
+			cout << "   VALUE = 999999 ! " << " in von : " << tmpedge->other_node << endl;
+				sstr << tmpedge->value << "      " << i ;//<< " (" << tmpedge->id << ")";
 				val = sstr.str();
 				txt->push_back(vis::text(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
 			//}
 		}
+		
 	}
 	double lon;
 	double lat;
