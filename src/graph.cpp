@@ -371,7 +371,7 @@ void SCGraph::blacklistNode(unsigned int node_id){
 void printEdges(EdgesIterator it){
 	while( it.hasNext() ){
 		Edge* e = it.getNext();
-		cout << e->id << " " << e->value << " " << e->other_lvl << " " << e->other_node << endl;
+		cout << " ## " << e->id << " " << e->value << " " << e->other_lvl << " " << e->other_node << endl;
 	}
 }
 
@@ -379,16 +379,25 @@ void printEdges(EdgesIterator it){
 bool SCGraph::mergeRoundNegative(unsigned int lvl){
 	unsigned int n;
 
+	unsigned int* contracted_by = new unsigned int[node_count];//TODO
+	for(unsigned int i = 0; i < node_count; i++){
+		contracted_by[i] = node_count;
+	}
+
 	// nehme kontrahierte knoten raus
 	while( ! round_node_blacklist.empty() ){
 		n = round_node_blacklist.front();
 		node_lvl[n] = lvl;
 		node_data[n].elevation = lvl; // TODO
 
+		contracted_by[n] = node_count + 1;//TODO
+
 		//schneide andere enden der in-edges ab
 		for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n] + node_in_edges_count[n];i++){
 			unsigned int othernode = in_edges[i].other_node;
 			unsigned int otherlvl = in_edges[i].other_lvl;
+
+			contracted_by[othernode] = n;//TODO
 
 //			cout << endl << "== " << " OUT " << n << ", " << i << " == " << endl;
 //			printEdges(getOutEdgesIt(othernode));
@@ -412,6 +421,8 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n] ;i++){
 			unsigned int othernode = out_edges[i].other_node;
 			unsigned int otherlvl = out_edges[i].other_lvl;
+
+			contracted_by[othernode] = n;//TODO
 
 			node_in_edges_count[ othernode ] --;
 
@@ -441,19 +452,37 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		std::cout << std::endl;
 		if( node_in_edges_count[stmp.target] >= (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target])){
 			std::cout << "TARGET - ERROR - hat kante zu viel " << stmp.target << std::endl;
+			printEdges(getInEdgesIt( stmp.target ));
+			cout << " # Touched Edges?: " << (contracted_by[ stmp.target ] != node_count) << endl;
+			cout << " # Forbidden Node?: " << (contracted_by[ stmp.target ] == node_count + 1) << endl;
+			if(contracted_by[ stmp.target ] != node_count && contracted_by[stmp.target ] == node_count + 1)
+				cout << " BIG-ERROR: Shortcut zeigt auf kontrahierten Knoten" << endl;
 		} else if( node_in_edges_count[stmp.target] == (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target] - 1)) {
 			std::cout << "TARGET - hat EINE kante weniger " << stmp.target << std::endl;
 		} else if( node_in_edges_count[stmp.target] < (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target] - 1)){
 			std::cout << "TARGET - hat VIEL weniger kante " << stmp.target << std::endl;
 		}
+		if(contracted_by[ stmp.target ] == node_count)
+			cout << "#TARGET " << stmp.target << " wurde nicht angefasst" << endl;
+		if(contracted_by[ stmp.target ] == node_count + 1)
+			cout << "#TARGET " << stmp.target << " ist kontrahierter Knoten" << endl;
 
 		if( node_out_edges_count[stmp.source] >= (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source])){
 			std::cout << "SOURCE - ERROR - hat kante zu viel " << stmp.source << std::endl;
+			printEdges(getOutEdgesIt( stmp.source ));
+			cout << " # Touched Edges?: " << (contracted_by[ stmp.source ] != node_count) << endl;
+			cout << " # Forbidden Node?: " << (contracted_by[ stmp.source ] == node_count + 1) << endl;
+			if(contracted_by[ stmp.source ] != node_count && contracted_by[stmp.source ] == node_count + 1)
+				cout << " BIG-ERROR: Shortcut zeigt auf kontrahierten Knoten" << endl;
 		} else if( node_out_edges_count[stmp.source] == (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source] - 1)){
 			std::cout << "SOURCE - hat EINE kante weniger " << stmp.source << std::endl;
 		} else if( node_out_edges_count[stmp.source] < (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source] - 1)){
 			std::cout << "SOURCE - hat VIEL weniger kante " << stmp.source << std::endl;
 		}
+		if(contracted_by[ stmp.source ] == node_count)
+			cout << "#SOURCE " << stmp.source << " wurde nicht angefasst" << endl;
+		if(contracted_by[ stmp.source ] == node_count + 1)
+			cout << "#SOURCE " << stmp.source << " ist kontrahierter Knoten" << endl;
 
 		EdgesIterator it = getOutEdgesIt( stmp.source );
 		while( it.hasNext() ){
@@ -490,6 +519,8 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		shortcut_count ++;
 		round_shortcutlist.pop_front();
 	} 
+
+	delete[] contracted_by; contracted_by = 0;//TODO
 
 	return true;
 }
