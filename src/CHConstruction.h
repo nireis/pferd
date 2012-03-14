@@ -324,7 +324,23 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 				}
 			}
 			lastDist = dist[tmpid];
-			U.pop();
+/*			if(U.empty()){
+				std::cout << " U EMPTY " << ( U.top().targetedge->id >= g->getEdgeCount() ) <<  " "<< U.top().sourceid << " " << U.top().targetedge->id  << std::endl;
+				EdgesIterator teit = g->getOutEdgesIt_Round( U.top().sourceid );
+				while( teit.hasNext() ){
+					Edge* te = teit.getNext();
+					std::cout << " "<< te->id << ( te->id >= g->getEdgeCount() ) << " "<< te->other_node << std::endl;
+				}
+				teit = g->getOutEdgesIt( U.top().sourceid );
+				std::cout << " = = = " << std::endl;
+				while( teit.hasNext() ){
+					Edge* te = teit.getNext();
+					std::cout << " "<< te->id << ( te->id >= g->getEdgeCount() ) << " "<< te->other_node << std::endl;
+				}
+				std::cout << "< = = = >" << std::endl;
+			}
+				std::cout << ( U.top().targetedge->id >= g->getEdgeCount() ) <<std::endl;
+*/			U.pop();
 		}
 		resetlist.push_front(targetnode);
 	}

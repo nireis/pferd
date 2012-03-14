@@ -221,7 +221,7 @@ class SCGraph {
 
 		//bool isBlack(unsigned int node_id);
 
-		bool mergeRound(unsigned int lvl);
+		bool mergeRoundNegative(unsigned int lvl);
 
 		bool mergeShortcutsAndGraph(unsigned int lvl);
 

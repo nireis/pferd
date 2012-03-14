@@ -10,6 +10,52 @@
 
 using namespace std;
 
+void testGraphs(){
+	Graph g = Graph();
+	Graph g2 = Graph();
+	g.setGraph("../data/15K.txt",false);
+	g2.setGraph("../data/15K.txt.grp",false);
+
+	if(g.getNodeCount() != g2.getNodeCount())
+		cout << "nodecounts ungleich" << endl;
+
+	if( g.getEdgeCount() != g2.getEdgeCount() )
+		cout << "edgecoutns ungleich" << endl;
+
+	for(unsigned int i = 0; i < g.getNodeCount(); i++){
+		if( g.getNodeData(i).id != g2.getNodeData(i).id || g.getNodeData(i).lat != g2.getNodeData(i).lat || g.getNodeData(i).lon != g2.getNodeData(i).lon || g.getNodeData(i).elevation != g2.getNodeData(i).elevation )
+			cout << "node-data ungleich" << endl;
+
+		if( g.getLowerInEdgeBound(i) != g2.getLowerInEdgeBound(i) )
+			cout << "edge-in-offsets nicht ok" << endl;
+		if( g.getLowerOutEdgeBound(i) != g2.getLowerOutEdgeBound(i) )
+			cout << "edge-out-offsets nicht ok" << endl;
+	}
+		if( g.getLowerInEdgeBound(g.getNodeCount() ) != g2.getLowerInEdgeBound(g.getNodeCount() ) )
+			cout << "edge-in-offsets nicht ok" << endl;
+		if( g.getLowerOutEdgeBound(g.getNodeCount() ) != g2.getLowerOutEdgeBound(g.getNodeCount() ) )
+			cout << "edge-out-offsets nicht ok" << endl;
+
+		Edge* goe = g.getOutEdge(0);
+		Edge* g2oe = g2.getOutEdge(0);
+		Edge* gie = g.getInEdge(0);
+		Edge* g2ie = g2.getInEdge(0);
+	for(unsigned int i = 0; i < g.getEdgeCount(); i++){	
+		if( g.getEdgeData(i).in_index != g2.getEdgeData(i).in_index ||  g.getEdgeData(i).out_index != g2.getEdgeData(i).out_index ||  g.getEdgeData(i).distance != g2.getEdgeData(i).distance ||   g.getEdgeData(i).type != g2.getEdgeData(i).type ||  g.getEdgeData(i).load != g2.getEdgeData(i).load  )
+			cout << "edge-data ungleich" << endl;
+
+		if((goe+i)->other_lvl != (g2oe+i)->other_lvl || (goe+i)->other_node != (g2oe+i)->other_node || (goe+i)->id != (g2oe+i)->id || (goe+i)->value != (g2oe+i)->value )
+			cout << "out-edges ungleich" << endl;
+
+		if((gie+i)->other_lvl != (g2ie+i)->other_lvl || (gie+i)->other_node != (g2ie+i)->other_node || (gie+i)->id != (g2ie+i)->id || (gie+i)->value != (g2ie+i)->value )
+			cout << "in-edges ungleich" << endl;
+	}
+
+//	if( g. != g2. ){
+//		cout << " ungleich" << endl;
+
+}
+
 
 
 //	void CallSCGraph(Graph* g){
@@ -152,7 +198,7 @@ void testSCGraph(Graph* g){
 	
 	SCGraph scg = SCGraph(g);
 	
-	cout << scg.mergeRound(1) << endl;
+	cout << scg.mergeRoundNegative(1) << endl;
 	start = clock();
 	cout << scg.mergeShortcutsAndGraph(1) << endl;
 	finish = clock();
@@ -183,7 +229,9 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 				stringstream sstr;
 		if(tmpedge->value == 999999)
 			cout << "   VALUE = 999999 ! " << "out von : " <<  i << endl;
-				sstr << tmpedge->value << " " << i ;//<< " (" << tmpedge->id << ")";
+				sstr << tmpedge->value ;//<< " " << i ;//<< " (" << tmpedge->id << ")";
+				if(tmpedge -> id >= g->getEdgeCount())
+					sstr << " (SC)";
 				val = sstr.str();
 				lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 				lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
@@ -207,7 +255,9 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 				stringstream sstr;
 		if(tmpedge->value == 999999)
 			cout << "   VALUE = 999999 ! " << " in von : " << tmpedge->other_node << endl;
-				sstr << tmpedge->value << "      " << i ;//<< " (" << tmpedge->id << ")";
+				sstr << tmpedge->value ;//<< "      " << i ;//<< " (" << tmpedge->id << ")";
+				if(tmpedge -> id >= g->getEdgeCount())
+					sstr << " (SC)";
 				val = sstr.str();
 				txt->push_back(vis::text(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
 			//}
@@ -252,6 +302,11 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 
+//	testGraphs();
+//
+//	cout << "tests fertig" << endl;
+//	cin.get();
+
 	string file = "../data/15K.txt.grp";
 
 	clock_t start,finish;
@@ -262,6 +317,7 @@ int main(int argc, char *argv[]){
 	Graph g = Graph();
 
 	g.setGraph(file, true);
+
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
@@ -289,7 +345,8 @@ int main(int argc, char *argv[]){
 	
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
-	unsigned int max_rounds = 2;
+	list<Shortcut> drawSClist = list<Shortcut>();
+	unsigned int max_rounds = 3;
 
 	for(unsigned int j = 1; j < max_rounds; j++){
 		cout << "Berechne Shortcuts für Runde " <<  j ;
@@ -297,10 +354,14 @@ int main(int argc, char *argv[]){
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << ", Zeit: " << time << endl;
-	
+
+		for(list<Shortcut>::iterator it = sclist->begin(); it != sclist->end(); it++){
+			drawSClist.push_front( Shortcut( *it ) );
+		}
+
 		cout << "Merge Shortcuts in SCGraph. ";
 		start = clock();
-		scg.mergeRound(j);
+		scg.mergeRoundNegative(j);
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << time << endl;
@@ -308,11 +369,14 @@ int main(int argc, char *argv[]){
 	}
 	//scg.mergeShortcutsAndGraph(max_rounds);
 
+	cout << "Runden fertig. Eingabetaste:" << endl;
+	cin.get();
+
 	// vis test
 	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
-	berechneVis(txt, txtsc, sclist, lnsc, &scg);
+	berechneVis(txt, txtsc, &drawSClist, lnsc, &scg);
 	QApplication app(argc,argv);
 	vis *mapWidget = new vis(&scg, txt, txtsc, nodelist, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");

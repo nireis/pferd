@@ -117,6 +117,9 @@ struct Shortcut {
 		mama_edge = sc.mama_edge;
 		return *this;
 	}
+
+	Shortcut(const Shortcut& sc) : 
+		value(sc.value), source(sc.source), target(sc.target), papa_edge(sc.papa_edge), mama_edge(sc.mama_edge) {}
 };
 
 /*

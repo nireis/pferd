@@ -16,7 +16,7 @@ CH::~CH(){
 
 void CH::doRound(){
 	algos.calcOneRound(sclistpointer, bnlistpointer);
-	scg->mergeRound(rounds);
+	scg->mergeRoundNegative(rounds);
 	rounds++;
 }
 
