@@ -60,13 +60,6 @@ class CHConstruction{
 		 */
 		list<unsigned int>* independent_set();
 		/*
-		 * Kontrahiert die Knoten aus der Liste und fügt die 
-		 * entstandenen Shortcuts in die Struktur ein.
-		 *
-		 * @nodes Zu kontrahierende Knoten.
-		 */
-		void contract_nodes(list<unsigned int>* nodes);
-		/*
 		 * Kontrahiert einen Knoten.
 		 *
 		 * @conode Der zu kontrahierende Knoten.
@@ -136,7 +129,12 @@ template <typename G>
 void CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
 	allsclist = sclist;
 	conodelist = nodelist;
-	contract_nodes(independent_set());
+	list<unsigned int>* nodes = independent_set();
+	while(!nodes->empty()){
+		contract_node(nodes->front());
+		nodes->pop_front();
+	}
+	delete nodes;
 }
 
 template <typename G>
@@ -186,15 +184,6 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 }
 
 template <typename G>
-void CHConstruction<G>::contract_nodes(list<unsigned int>* nodes){
-	while(!nodes->empty()){
-		contract_node(nodes->front());
-		nodes->pop_front();
-	}
-	delete nodes;
-}
-
-template <typename G>
 void CHConstruction<G>::contract_node(unsigned int conode){
 	list<Shortcut> sclist;
 	EdgesIterator it = g->getInEdgesIt(conode);
@@ -208,7 +197,7 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 	if(sclist.size() < (g->getEdgeCount(conode))){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
-		allsclist->splice(allsclist->begin(), sclist);
+		allsclist->splice(allsclist->end(), sclist);
 	}
 }
 
