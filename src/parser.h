@@ -10,14 +10,14 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-using namespace std;
 
 class parser
 {
 private:
 	unsigned int NodeCount, EdgeCount;
-	Node* graphNodes;
-	Edge* graphEdges;
+	ParserNode* graphNodes;
+	ParserEdge* graphEdges;
+	std::string graphfile;
 
 	/*
 	 * createNode - erstellt einen neuen Knoten
@@ -25,7 +25,7 @@ private:
 	 * string - aus datei eingelesene Zeile
 	 * Node* - Zeiger auf den Knoten dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createNode(string, Node*);
+	void createNode(std::string inputString, ParserNode* rNode);
 
 	/*
 	 * createEdge - erstellt eine neue Kante
@@ -34,21 +34,19 @@ private:
 	 * unsinged int - Indexstelle des Arrays, KantenID
 	 * Edge* - Zeiger auf die Kante dessen Werte gesetzt werden (in/out varible !)
 	 */
-	void createEdge(string,unsigned int, Edge*);
+	void createEdge(std::string inputString,unsigned int, ParserEdge* rEdge);
 public:
 	/*
 	 *default constructer
 	 */
-	parser(void);
+	parser();
+	parser(std::string graphdata);
+	void getNodesAndEdges(ParserNode* n,ParserEdge* e );
 	/*
 	 *default desctucter
 	 */
-	~parser(void);
+	~parser();
 
-	/*
-	 * readFile - bekommt den Pfad einer Datei als String übergeben und liest sie ein
-	 */
-	bool readFile(string);
 	/*
 	 * getNodeCount - Gibt Knotenanzahl zurück
 	 */
@@ -60,11 +58,11 @@ public:
 	/*
 	 * getNodes - Gibt Knotenarray zurück
 	 */
-	Node* getNodes();
+	ParserNode* getNodes();
 	/*
 	 * getEdges - Gibt Kantenarray zurück
 	 */
-	Edge* getEdges();
+	ParserEdge* getEdges();
 };
 
 #endif

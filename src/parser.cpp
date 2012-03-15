@@ -6,21 +6,18 @@
  */
 
 #include "parser.h"
+using namespace std;
 
-
-parser::parser(void)
+parser::parser()
 {
 }
 
-parser::~parser(void)
+parser::~parser()
 {
 }
 
-void parser::createNode(string inputString, Node* rNode)
+void parser::createNode(string inputString, ParserNode* rNode)
 {
-	rNode->in_edge_offset = 0;
-	rNode->out_edge_offset = 0;
-
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
 	string::iterator itr2 = inputString.begin();
@@ -35,7 +32,8 @@ void parser::createNode(string inputString, Node* rNode)
 	    {
 			if(currentComponent == 1)
 			{
-				//Node ID - Varibale im Node jedoch nicht enthalten
+				tempStr.assign(itr2, itr1);
+				rNode->id = atoi(tempStr.c_str());
 				currentComponent++;
 				itr2 = (itr1 + 1);
 			}
@@ -64,10 +62,8 @@ void parser::createNode(string inputString, Node* rNode)
 	rNode->elevation = atoi(tempStr.c_str());
 }
 
-void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
+void parser::createEdge(string inputString, unsigned int edgeID, ParserEdge* rEdge)
 {
-	rEdge->id = edgeID;
-
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
 	string::iterator itr2 = inputString.begin();
@@ -75,8 +71,6 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 	unsigned int currentComponent = 1;
 	//Temporaere Variable vom Typ String, weil ich gerade zu blöd bin es ohne zu machen
 	string tempStr;
-	//Temporaere Varibale vom Typ char* für die sehr ekelhaft, aber hoffentlich platzsparende type Zuweisung der Kanten
-	unsigned char* tempChar = new unsigned char[2];
 
 	for (itr1=inputString.begin(); itr1 != inputString.end(); itr1++)
     {
@@ -111,67 +105,67 @@ void parser::createEdge(string inputString, unsigned int edgeID, Edge* rEdge)
 	 */
 	tempStr.assign(itr2, itr1);
 	// Vorsicht! Die Doku der Quelldatei spricht hier zwar von integer, aber nirei hielt char* für eine gute Idee
-	strcpy((char*)tempChar, tempStr.c_str());
-	rEdge->type = tempChar;
+	
+	rEdge->type =(unsigned int) atoi(tempStr.c_str());
 }
 
-bool parser::readFile(string filename)
+parser::parser(string graphdata)
 {
 	string buffer;
-	unsigned int currentline = 1;
-
+//	unsigned int currentline = 1;
+	graphfile = graphdata;
 	ifstream file;
-	file.open(filename.c_str(), ios::in);
+	file.open(graphdata.c_str(), ios::in);
 
 	if( file.is_open())
 	{
 		file.seekg(0, ios::beg);
-		while( !file.eof())
-		{
+		
+		getline(file,buffer,'\n');
+		NodeCount = (unsigned int)atoi(buffer.c_str());
+
+		getline(file,buffer,'\n');
+		EdgeCount = (unsigned int)atoi(buffer.c_str());
+		file.close();
+	}
+}
+
+void parser::getNodesAndEdges(ParserNode* n, ParserEdge* e)
+{
+	string buffer;
+//	unsigned int currentline = 1;
+
+	ifstream file;
+	file.open(graphfile.c_str(), ios::in);
+
+	if( file.is_open())
+	{
+		file.seekg(0, ios::beg);
+		
+		getline(file,buffer,'\n');
+		NodeCount = (unsigned int)atoi(buffer.c_str());
+		graphNodes = n;
+
+
+		getline(file,buffer,'\n');
+		EdgeCount = (unsigned int)atoi(buffer.c_str());
+		graphEdges = e;
+
+		for(unsigned int i = 0; i < NodeCount; i++){
 			getline(file,buffer,'\n');
-
-			if(currentline == 1 && buffer.size() > 1)
-			{
-				NodeCount = (unsigned int)atoi(buffer.c_str());
-				graphNodes = new Node[NodeCount+1];
-			}
-			else if(currentline == 2 && buffer.size() > 1)
-			{
-				EdgeCount = (unsigned int)atoi(buffer.c_str());
-				graphEdges = new Edge[EdgeCount];
-			}
-			else if(2 < currentline && currentline < (NodeCount+3) && buffer.size() > 1)
-			{
-				createNode(buffer, &graphNodes[currentline -3]);
-			}
-			else if((NodeCount+2) < currentline && currentline < (NodeCount+EdgeCount+3) && buffer.size() > 1)
-			{
-				createEdge(buffer, (currentline -NodeCount -3), &graphEdges[currentline -NodeCount -3]);
-			}
-			else
-			{
-				return false;
-			}
-
-			currentline = currentline + 1;
-
+			createNode(buffer, &graphNodes[i]);
+		}
+		unsigned int j = 0;
+		while(j < EdgeCount ){
+			getline(file,buffer,'\n');
+			createEdge(buffer, j, &graphEdges[j]);
+			j++;
 		}
 
 		file.close();
-		//Dummy Node als letzten Eintrag im Knotenarray
-		Node DummyNode;
-		DummyNode.lat=0;
-		DummyNode.lon=0;
-		DummyNode.elevation=0;
-		DummyNode.in_edge_offset=0;
-		DummyNode.out_edge_offset=0;
-		graphNodes[NodeCount] = DummyNode;
-		
-		return true;
 	}
 	else
 	{
-		return false;
 	}
 }
 
@@ -185,12 +179,13 @@ unsigned int parser::getEdgeCount()
 	return EdgeCount;
 }
 
-Node* parser::getNodes()
+ParserNode* parser::getNodes()
 {
 	return graphNodes;
 }
 
-Edge* parser::getEdges()
+ParserEdge* parser::getEdges()
 {
 	return graphEdges;
 }
+
