@@ -20,7 +20,9 @@ void vis::customPaint(GeoPainter* painter)
 		nd = g->getNodeData(i);
 		painter->drawEllipse(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), 5, 5);
 		stringstream sstr;
-		sstr << nd.elevation ;//<< " ("<< nd.id << ")";
+		sstr << nd.elevation << " ("<< nd.id << ") " ;
+		if(nd.id == 1998)
+			sstr << " ================================================";
 		painter->drawText(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), sstr.str().c_str());
 		/*stringstream sstr;
 		sstr << i;

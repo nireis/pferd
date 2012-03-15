@@ -346,7 +346,7 @@ int main(int argc, char *argv[]){
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
-	unsigned int max_rounds = 3;
+	unsigned int max_rounds = 2;
 
 	for(unsigned int j = 1; j < max_rounds; j++){
 		cout << "Berechne Shortcuts für Runde " <<  j ;
