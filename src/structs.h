@@ -90,7 +90,7 @@ struct NodeData {
 //Nodetype 1 for openGL Vis
 struct openGL_Node_2d {
 	openGL_Node_2d() : lon(0), lat(0) {}
-	openGL_Node_2d(double lo, double la) : 
+	openGL_Node_2d(float lo, float la) : 
 		lon(lo), lat(la) {}
 	double lon;
 	double lat;
@@ -99,7 +99,7 @@ struct openGL_Node_2d {
 //Nodetype 2 for openGL Vis
 struct openGL_Node_3d {
 	openGL_Node_3d() : lon(0), lat(0), extra(0) {}
-	openGL_Node_3d(double lo, double la, double e) : 
+	openGL_Node_3d(float lo, float la, float e) : 
 		lon(lo), lat(la), extra(e) {}
 	float lon;
 	float lat;
