@@ -6,10 +6,10 @@ int main(int argc, char* argv[])
 {
 	ParserNode* pNodes;
 	ParserEdge* pEdges;
-	parser testParser("1500K.txt");
+	parser testParser("150K.txt");
 
-	double camX = 0.0;
-	double camY = 0.0;
+	float camX = 0.0;
+	float camY = 0.0;
 
 	unsigned int node_count = testParser.getNodeCount();
 	unsigned int edge_count = testParser.getEdgeCount();

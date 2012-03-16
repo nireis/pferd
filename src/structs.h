@@ -101,9 +101,9 @@ struct openGL_Node_3d {
 	openGL_Node_3d() : lon(0), lat(0), extra(0) {}
 	openGL_Node_3d(double lo, double la, double e) : 
 		lon(lo), lat(la), extra(e) {}
-	double lon;
-	double lat;
-	double extra;
+	float lon;
+	float lat;
+	float extra;
 };
 
 /*

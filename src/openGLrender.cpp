@@ -32,10 +32,9 @@ void openGLrender::setNodeCount(int count)
 void openGLrender::setEdgeCount(int count)
 {
 	this->edgeCount = count;
-	std::cout << count;
 }
 
-void openGLrender::setCamera(double x,double y,double z)
+void openGLrender::setCamera(float x,float y,float z)
 {
 	cameraPos = glm::vec3(x,y,z);
 }
@@ -120,9 +119,9 @@ bool openGLrender::initNodes()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_nodes);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*nodeCount, nodeArray, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),NULL);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),NULL);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(double)+sizeof(double)));
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(float)+sizeof(float)));
 
 	glBindVertexArray(0);
 
@@ -137,9 +136,9 @@ bool openGLrender::initEdges()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_edges);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*edgeCount, edgeArray, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d), NULL);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d), NULL);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(double) + sizeof(double)));
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(float) + sizeof(float)));
 
 	glBindVertexArray(0);
 

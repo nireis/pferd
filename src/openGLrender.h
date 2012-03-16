@@ -101,7 +101,7 @@ public:
 	void setEdgeCount(int);
 	void setNodeArray(openGL_Node_3d*);
 	void setEdgeArray(openGL_Node_3d*);
-	void setCamera(double,double,double);
+	void setCamera(float,float,float);
 
 };
 
