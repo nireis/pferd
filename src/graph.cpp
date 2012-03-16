@@ -346,7 +346,11 @@ SCGraph::~SCGraph(){
 
 	clearEverything();
 
-	shortcutlist.clear();
+	// shortcutlist.clear();
+	while( ! shortcutlist.empty() ){
+		ShortcutArray a = shortcutlist.pop();
+		delete[] a.array; a.array = 0;
+	}
 	round_shortcutlist.clear();
 	round_node_blacklist.clear();
 }
@@ -435,12 +439,12 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 	// neue anzahl an kanten zählen
 	unsigned int edgesum = 0;
 	unsigned int edgesum2 = 0;//TODO
-	for(unsigned int i = 0; i < current_edge_arrays_size; i++){
+	for(unsigned int i = 0; i < node_count; i++){
 		edgesum = edgesum + node_in_edges_count[i];
 		edgesum2 = edgesum2 + node_out_edges_count[i];//TODO
 	}
 	if(edgesum2 != edgesum) // TODO
-		cout << "EdgeSums ungleich!" << endl;//TODO
+		cout << "EdgeSums ungleich! 1, 2: " << edgesum << " "<< edgesum2 << endl;//TODO
 
 	unsigned int roundshortcutssize = round_shortcutlist.size();
 
@@ -459,6 +463,9 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		nodes_in_offs[i+1] = node_in_edges_count[i];
 	}
 
+	if( nodes_in_offs[0] != 0 || nodes_out_offs[0] != 0)
+		cout << "nodes-ofs anfang ungleich null" << endl;
+
 	// shortcuts umlagern und offsets um shortcuts erweitern
 	S* roundshortcuts = new S[ roundshortcutssize ];
 
@@ -469,6 +476,16 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		nodes_out_offs[ stmp.source +1]++;
 		nodes_in_offs[ stmp.target +1]++;
 	}
+
+	unsigned int g1 = 0; // TODO 
+	unsigned int g2 = 0; // TODO 
+	for(unsigned int i = 0; i < node_count; i++){
+		g1 += nodes_out_offs[ i +1];
+		g2 += nodes_in_offs[ i +1];
+	}
+	if( g1 != g2 )
+		cout << "verteilte kanten ungleich!" << endl;
+
 	// merke shortcuts
 	shortcutlist.push(ShortcutArray(roundshortcuts, roundshortcutssize));
 	
@@ -489,10 +506,12 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		}
 		newI = newI + k;
 		// überspringe ungültige edges im alten array
-		while((old_edge_arrays_size >= oldI+1) &&  out_edges[ oldI ].other_node == out_edges[ oldI + 1 ].other_node){
+//		while((old_edge_arrays_size >= oldI+1) &&  out_edges[ oldI ].other_node == out_edges[ oldI + 1 ].other_node){
+//			oldI++;
+//		}
+		while(oldI < old_edge_arrays_size && out_edges[ oldI ].other_node == node_count + i){
 			oldI++;
 		}
-		oldI++;
 	}
 	if(newI != current_edge_arrays_size) // TODO
 		cout << "Anzahl neues Edges und Index komisch: index, size:" << newI 
@@ -520,11 +539,15 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		delete[] out_edges;
 		out_edges = tmpedges;
 		tmpedges = new E[ current_edge_arrays_size ];
+
+		cout << "brauche größeres array für out-edges" << endl; // TODO
 	} else {
-		// behalte alte arrays, verwende tmpedges wieder
+		// behalte alte edges arrays, verwende tmpedges wieder
 		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
 			out_edges[i] = tmpedges[i];
 		}
+
+		cout << "brauche kein größeres array für out-edges" << endl; //TODO
 	}
 
 	/* nun verteilen der in-edges in tmpedges */
@@ -543,10 +566,13 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		}
 		newI = newI + k;
 		// überspringe ungültige edges im alten array
-		while((old_edge_arrays_size >= oldI+1) &&  in_edges[ oldI ].other_node == in_edges[ oldI + 1 ].other_node){
+	//	while((old_edge_arrays_size >= oldI+1) &&  in_edges[ oldI ].other_node == in_edges[ oldI + 1 ].other_node){
+	//		oldI++;
+	//	}
+	//	oldI++;
+		while(oldI < old_edge_arrays_size && in_edges[ oldI ].other_node == node_count + i){
 			oldI++;
 		}
-		oldI++;
 	}
 	if(newI != current_edge_arrays_size) // TODO
 		cout << "Anzahl neues Edges und Index komisch: index, size:" << newI 
@@ -564,92 +590,54 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 			out_edges[ tmpedges[i].other_lvl ].other_lvl = i;
 	}
 
+	// kopiere in-edges aus tmpedges zurück
+	if(current_edge_arrays_size > old_edge_arrays_size){
+		// wir brauchen nun größere arrays für in/out_edges
+		delete[] in_edges;
+		in_edges = tmpedges;
+		tmpedges = 0;
+
+		cout << "brauche größeres array für in-edges" << endl; // TODO
+	} else {
+		// behalte alte edges arrays
+		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
+			in_edges[i] = tmpedges[i];
+		}
+		delete[] tmpedges; tmpedges = 0;
+
+		cout << "brauche kein größeres array für in-edges" << endl; //TODO
+	}
+
 	// verteile shortcuts
-
-
-
-
-
-	// verteile shortcuts
-/*	while( ! round_shortcutlist.empty() ){
-		S stmp = round_shortcutlist.front();
-		shortcutlist.push(stmp);
-
-		unsigned int oindex = 
-			nodes_out_offs[ stmp.source ] + node_out_edges_count[ stmp.source ];
-		unsigned int iindex = 
-			nodes_in_offs[ stmp.target ] + node_in_edges_count[ stmp.target ];
-
-		std::cout << std::endl;
-		if( node_in_edges_count[stmp.target] >= (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target])){
-			std::cout << "TARGET " << stmp.target << " - ERROR - hat kante zu viel "<<" contr. by:" <<  contracted_by[ stmp.target ] << std::endl;
-			printEdges(getInEdgesIt( stmp.target ));
-			cout << " # Touched Edges?: " << (contracted_by[ stmp.target ] != node_count) << endl;
-			cout << " # Forbidden Node?: " << (contracted_by[ stmp.target ] == node_count + 1) << endl;
-			if(contracted_by[ stmp.target ] != node_count && contracted_by[stmp.target ] == node_count + 1)
-				cout << " BIG-ERROR: Shortcut zeigt auf kontrahierten Knoten" << endl;
-		} else if( node_in_edges_count[stmp.target] == (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target] - 1)) {
-			std::cout << "TARGET "<< stmp.target << " - hat EINE kante weniger " <<" contr. by:" <<  contracted_by[ stmp.target ] << std::endl;
-		} else if( node_in_edges_count[stmp.target] < (nodes_in_offs[ stmp.target +1] - nodes_in_offs[stmp.target] - 1)){
-			std::cout << "TARGET " << stmp.target <<" - hat VIEL weniger kante "<<" contr. by:" <<  contracted_by[ stmp.target ] << std::endl;
+	for(unsigned int i = 0; i < roundshortcutssize; i++){
+		S stmp = roundshortcuts[i];
+		unsigned int oindex = nodes_out_offs[ stmp.source +1] -1;
+		while( out_edges[ oindex ].other_node != node_count ){
+			oindex--;
+			if( oindex == nodes_out_offs[ stmp.source ] && out_edges[ oindex ].other_node != node_count ) // TODO
+				cout << "shortcut hat keinen platz? outindex: " << oindex << endl;
 		}
-		if(contracted_by[ stmp.target ] == node_count)
-			cout << "#TARGET " << stmp.target << " wurde nicht angefasst" << endl;
-		if(contracted_by[ stmp.target ] == node_count + 1)
-			cout << "#TARGET " << stmp.target << " ist kontrahierter Knoten" << endl;
-
-		if( node_out_edges_count[stmp.source] >= (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source])){
-			std::cout << "SOURCE " << stmp.source <<" - ERROR - hat kante zu viel "<<" contr. by:" << contracted_by[ stmp.source ] << std::endl;
-			printEdges(getOutEdgesIt( stmp.source ));
-			cout << " # Touched Edges?: " << (contracted_by[ stmp.source ] != node_count) << endl;
-			cout << " # Forbidden Node?: " << (contracted_by[ stmp.source ] == node_count + 1) << endl;
-			if(contracted_by[ stmp.source ] != node_count && contracted_by[stmp.source ] == node_count + 1)
-				cout << " BIG-ERROR: Shortcut zeigt auf kontrahierten Knoten" << endl;
-		} else if( node_out_edges_count[stmp.source] == (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source] - 1)){
-			std::cout << "SOURCE "<< stmp.source <<" - hat EINE kante weniger " <<" contr. by:" << contracted_by[ stmp.source ] << std::endl;
-		} else if( node_out_edges_count[stmp.source] < (nodes_out_offs[ stmp.source +1] - nodes_out_offs[stmp.source] - 1)){
-			std::cout << "SOURCE " << stmp.source <<" - hat VIEL weniger kante "<<" contr. by:" << contracted_by[ stmp.source ] << std::endl;
-		}
-		if(contracted_by[ stmp.source ] == node_count)
-			cout << "#SOURCE " << stmp.source << " wurde nicht angefasst" << endl;
-		if(contracted_by[ stmp.source ] == node_count + 1)
-			cout << "#SOURCE " << stmp.source << " ist kontrahierter Knoten" << endl;
-
-		EdgesIterator it = getOutEdgesIt( stmp.source );
-		while( it.hasNext() ){
-			Edge* e = it.getNext();
-			if( e->other_node == node_count)
-				std::cout << "other node ist groß - OUT" << std::endl;
-		}
-		it = getInEdgesIt( stmp.target );
-		while( it.hasNext() ){
-			Edge* e = it.getNext();
-			if( e->other_node == node_count)
-				std::cout << "other node ist groß - IN" << std::endl;
-		}
-		
-		if( in_edges[ iindex ].other_node == node_count){
-			std::cout << "IN: verteile shortcut richtig " << std::endl;
-		} else {
-			std::cout << "IN: FALSCH shortcut verteilt" << std::endl; 
-		}
-		if( out_edges[ oindex ].other_node == node_count){
-			std::cout << "OUT: verteile shortcut richtig " << std::endl;
-		} else {
-			std::cout << "OUT: FALSCH shortcut verteilt" << std::endl << std::endl; 
+		unsigned int iindex = nodes_in_offs[ stmp.target +1] -1;
+		while( in_edges[ iindex ].other_node != node_count ){
+			iindex--;
+			if( iindex == nodes_in_offs[ stmp.target ] && in_edges[ iindex ].other_node != node_count ) // TODO
+				cout << "shortcut hat keinen platz? inindex: " << iindex << endl;
+			if( iindex + 1 == 0)
+				cout << "iindex underfolw" << endl;
 		}
 
-		in_edges[ iindex ] = 
-			E(edge_count + shortcut_count, stmp.value, stmp.source, oindex);
-		node_in_edges_count[ stmp.target ]++;
-	
-		out_edges[ oindex ] = 
-			E(edge_count + shortcut_count, stmp.value, stmp.target, iindex);
-		node_out_edges_count[ stmp.source ]++;
+		out_edges[ oindex ] = Edge(edge_count + shortcut_count + i, stmp.value, stmp.target, iindex);
+		in_edges[ iindex ] = Edge(edge_count + shortcut_count + i, stmp.value, stmp.source, oindex);
+	}
+	shortcut_count = shortcut_count + roundshortcutssize;
 
-		shortcut_count ++;
-		round_shortcutlist.pop_front();
-	} */
+	// neue anzahl an kanten verteilen
+	for(unsigned int i = 0; i < node_count; i++){
+		node_in_edges_count[i] = nodes_in_offs[i+1] - nodes_in_offs[i];
+	}
+	for(unsigned int i = 0; i < node_count; i++){
+		node_out_edges_count[i] = nodes_out_offs[i+1] - nodes_out_offs[i];
+	}
 
 	delete[] contracted_by; contracted_by = 0;//TODO
 
@@ -676,27 +664,20 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 	
 	// um fragmentierung ein wenig "vorzubeugen" verlagern wir aus der liste
 	// in ein array, um den platz der gelöschten liste dann für neue arrays zu haben
-	shortcut_count = shortcutlist.size();
+	// shortcut_count = shortcutlist.size(); TODO
 	S* shortcuts = new S[shortcut_count];
 
-	for(unsigned int i=0; i < shortcut_count; i++){
-		if( shortcutlist.empty() )
-			return false; // TODO falls false, nicht alles wegwerfen
-
-		// TODO shortcuts[i] = shortcutlist.pop();
+	unsigned int sindex = 0;
+	while(  !shortcutlist.empty() ){
+		ShortcutArray sa = shortcutlist.pop();
+		for(unsigned int j = 0; j < sa.size; j++){
+			shortcuts[sindex] = sa.array[j];
+			sindex++;
+		}
+		delete[] sa.array; sa.array = 0; // TODO
 	}
-	if( !shortcutlist.empty() )
-		return false;
 
 	clearEverything();
-
-//	if( !round_shortcutlist.empty() )
-//		return false;
-//
-//	if( !round_node_blacklist.empty() )
-//		return false;
-
-	//blacklist.del();
 
 	// letztes lvl verteilen
 	for(unsigned int i = 0; i < node_count; i++){
@@ -780,6 +761,16 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 		}
 	}
 	delete[] shortcuts; shortcuts = 0;
+
+	// TODO neue anzahl an kanten verteilen TODO 
+	for(unsigned int i = 0; i < node_count; i++){
+		node_in_edges_count[i] = 
+			nodes_in_offs[i+1] - 
+			nodes_in_offs[i];
+	}
+	for(unsigned int i = 0; i < node_count; i++){
+		node_out_edges_count[i] = nodes_out_offs[i+1] - nodes_out_offs[i];
+	}
 
 	return true;
 }

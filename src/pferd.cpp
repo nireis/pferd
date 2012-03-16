@@ -330,7 +330,7 @@ int main(int argc, char *argv[]){
 	cout << "SCGraph erstellt in zeit: : " << time << endl;
 	
 
-	for(int i=0; i<14; i++){
+	for(int i=0; i<1; i++){
 		start = clock();
 		TDijkstra<SCGraph>(&scg, i);
 		finish = clock();
@@ -346,12 +346,12 @@ int main(int argc, char *argv[]){
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
-	unsigned int max_rounds = 2;
+	unsigned int max_rounds = 3;
 
 	for(unsigned int j = 1; j < max_rounds; j++){
 		cout << "Berechne Shortcuts für Runde " <<  j ;
+		start = clock();
 		CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
-		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << ", Zeit: " << time << endl;
 
@@ -367,7 +367,7 @@ int main(int argc, char *argv[]){
 		cout << "Zeit: " << time << endl;
 		cout << " => Runde " << j << " fertig."  << endl;
 	}
-	//scg.mergeShortcutsAndGraph(max_rounds);
+	// scg.mergeShortcutsAndGraph(max_rounds);
 
 	cout << "Runden fertig. Eingabetaste:" << endl;
 	cin.get();
