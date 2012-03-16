@@ -26,15 +26,6 @@ struct ParserEdge {
 	unsigned int type;
 };
 
-struct openGL_Edge_Node {
-	openGL_Edge_Node(){}
-	openGL_Edge_Node(double sla, double slo , unsigned int v) 
-		: source_lat(sla), source_lon(slo) ,value(v) {}
-	double source_lon;
-	double source_lat;
-	float value;
-};
-
 /*
  * "kleine" Strukturen, die optionale Daten
  * von wichtigen trennen
@@ -89,12 +80,30 @@ struct NodeData {
 	NodeData() : id(0), elevation(0), lat(0), lon(0) {}
 	NodeData(unsigned int i, int e, double la, double lo) : 
 		id(i), elevation(e), lat(la), lon(lo) {}
-	NodeData(ParserNode n) : id(n.id), elevation(n.elevation), lat(n.lat), lon(n.lon) {}
 	
 	unsigned int id;
-	float elevation;
+	int elevation;
+	double lat;
+	double lon;
+};
+
+//Nodetype 1 for openGL Vis
+struct openGL_Node_2d {
+	openGL_Node_2d() : lon(0), lat(0) {}
+	openGL_Node_2d(double lo, double la) : 
+		lon(lo), lat(la) {}
 	double lon;
 	double lat;
+};
+
+//Nodetype 2 for openGL Vis
+struct openGL_Node_3d {
+	openGL_Node_3d() : lon(0), lat(0), extra(0) {}
+	openGL_Node_3d(double lo, double la, double e) : 
+		lon(lo), lat(la), extra(e) {}
+	double lon;
+	double lat;
+	double extra;
 };
 
 /*

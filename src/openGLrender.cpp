@@ -3,22 +3,24 @@
 
 openGLrender::openGLrender()
 {
-	cameraPos = glm::vec3(8.573532f,48.9447792f,2.0f);
+	//cameraPos = glm::vec3(8.573532f,48.9447792f,2.0f);
+	showNodes = true;
+	showEdges = false;
 }
 
 openGLrender::~openGLrender()
 {
 }
 
-void openGLrender::setNodeArray(NodeData *in_Nodes)
+void openGLrender::setNodeArray(openGL_Node_3d *in_Nodes)
 {
-	nodeArray = new NodeData[nodeCount];
+	nodeArray = new openGL_Node_3d[nodeCount];
 	nodeArray = in_Nodes;
 }
 
-void openGLrender::setEdgeArray(openGL_Edge_Node *in_Edges)
+void openGLrender::setEdgeArray(openGL_Node_3d *in_Edges)
 {
-	edgeArray = new openGL_Edge_Node[edgeCount];
+	edgeArray = new openGL_Node_3d[edgeCount];
 	edgeArray = in_Edges;
 }
 
@@ -30,6 +32,12 @@ void openGLrender::setNodeCount(int count)
 void openGLrender::setEdgeCount(int count)
 {
 	this->edgeCount = count;
+	std::cout << count;
+}
+
+void openGLrender::setCamera(double x,double y,double z)
+{
+	cameraPos = glm::vec3(x,y,z);
 }
 
 char* openGLrender::file_read(const char* filename)
@@ -110,11 +118,11 @@ bool openGLrender::initNodes()
 	glBindVertexArray(vbo_nodes);
 	glGenBuffers(1, &vbo_nodes);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_nodes);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(NodeData)*nodeCount, nodeArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*nodeCount, nodeArray, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(NodeData),(GLvoid*) (sizeof(unsigned int)+sizeof(float)));
+	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),NULL);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(NodeData),(GLvoid*) (sizeof(unsigned int)));
+	glVertexAttribPointer(1, 1, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(double)+sizeof(double)));
 
 	glBindVertexArray(0);
 
@@ -127,11 +135,11 @@ bool openGLrender::initEdges()
 	glBindVertexArray(vbo_edges);
 	glGenBuffers(1, &vbo_edges);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_edges);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Edge_Node)*edgeCount, edgeArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*edgeCount, edgeArray, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(openGL_Edge_Node), 0);
+	glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d), NULL);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(openGL_Edge_Node),(GLvoid*) (sizeof(double) + sizeof(double)));
+	glVertexAttribPointer(1, 1, GL_DOUBLE, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(double) + sizeof(double)));
 
 	glBindVertexArray(0);
 
@@ -157,6 +165,14 @@ void openGLrender::keyboard (unsigned char key, int x, int y)
 			break;
 		case '-':
 			cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
+			glutPostRedisplay();
+			break;
+		case 'n':
+			showNodes = !showNodes;
+			glutPostRedisplay();
+			break;
+		case 'e':
+			showEdges = !showEdges;
 			glutPostRedisplay();
 			break;
 	}
@@ -202,10 +218,10 @@ void openGLrender::display()
 	//set projection matrix
 	float fnear = 0.001f;
     float fov = 45;
-    float aspect = 1;
+    float aspect = float(wWidth) / float(wHeight);
     projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
 	//set view matrix
-	viewMX = glm::lookAt(cameraPos, cameraPos - glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	viewMX = glm::lookAt(cameraPos,cameraPos - glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	//set model matrix
 	modelMX = glm::mat4(1.0f);
 	//set model_view_projection matrix
@@ -217,11 +233,16 @@ void openGLrender::display()
 	glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
 	//glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
 	
-	glBindVertexArray(vbo_nodes);
-	glDrawArrays(GL_POINTS, 0, nodeCount);
-	
-	glBindVertexArray(vbo_edges);
-	glDrawArrays(GL_LINES, 0, edgeCount);
+	if(showNodes)
+	{
+		glBindVertexArray(vbo_nodes);
+		glDrawArrays(GL_POINTS, 0, nodeCount);
+	}
+	if(showEdges)
+	{
+		glBindVertexArray(vbo_edges);
+		glDrawArrays(GL_LINES, 0, edgeCount);
+	}
 
 	glutSwapBuffers();
 }
@@ -241,6 +262,18 @@ void openGLrender::idleCallback()
 	currentInstance -> idle();
 }
 
+void openGLrender::resize(int w, int h)
+{
+	glViewport( 0, 0, (GLsizei)w, (GLsizei)h );
+    wWidth = w;
+    wHeight = h;
+}
+
+void openGLrender::resizeCallback(int w, int h)
+{
+	currentInstance->resize(w,h);
+}
+
 openGLrender* openGLrender::currentInstance = 0;
 
 void openGLrender::setInstance(openGLrender* instance)
@@ -251,7 +284,7 @@ void openGLrender::setInstance(openGLrender* instance)
 bool openGLrender::start(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA|GLUT_ALPHA|GLUT_DOUBLE|GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Pferd");
 
@@ -282,6 +315,7 @@ bool openGLrender::start(int argc, char* argv[])
 	setInstance(this);
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
+	glutReshapeFunc(resizeCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(keyboardArrowsCallback);
 	glEnable(GL_BLEND);

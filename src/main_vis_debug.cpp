@@ -1,4 +1,5 @@
 #include "openGLrender.h"
+#include "parser.h"
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -7,26 +8,31 @@ int main(int argc, char* argv[])
 	ParserEdge* pEdges;
 	parser testParser("1500K.txt");
 
+	double camX = 0.0;
+	double camY = 0.0;
+
 	unsigned int node_count = testParser.getNodeCount();
 	unsigned int edge_count = testParser.getEdgeCount();
 
-	NodeData* node_data = new NodeData[node_count];
-	openGL_Edge_Node* ogledge = new openGL_Edge_Node[edge_count*2];
+	openGL_Node_3d* node_data = new openGL_Node_3d[node_count];
+	openGL_Node_3d* ogledge = new openGL_Node_3d[edge_count*2];
 
 	ParserNode* nodes = new ParserNode[node_count];
 	ParserEdge* edges = new ParserEdge[edge_count];
 	testParser.getNodesAndEdges(nodes, edges);
 
 	for(unsigned int i = 0; i < node_count; i++){
-		node_data[i] = NodeData(nodes[i]);
+		node_data[i] = openGL_Node_3d(nodes[i].lon,nodes[i].lat,nodes[i].elevation);
+		camX = camX + node_data[i].lon;
+		camY = camY + node_data[i].lat;
 	}
 
 	unsigned int index = 0;
 	for(unsigned int i = 0; i < edge_count; i++){
-		ogledge[index] = openGL_Edge_Node(node_data[ edges[i].source ].lat, node_data[ edges[i].source ].lon, 
+		ogledge[index] = openGL_Node_3d(node_data[ edges[i].source ].lon, node_data[ edges[i].source ].lat, 
 			edges[i].distance);
 		index++;
-		ogledge[index] = openGL_Edge_Node(node_data[ edges[i].target ].lat, node_data[ edges[i].target ].lon,
+		ogledge[index] = openGL_Node_3d(node_data[ edges[i].target ].lon, node_data[ edges[i].target ].lat,
 			edges[i].distance);
 		index++;
 	}
@@ -39,6 +45,7 @@ int main(int argc, char* argv[])
 	testRender->setNodeArray(node_data);
 	testRender->setEdgeCount(edge_count*2);
 	testRender->setEdgeArray(ogledge);
+	testRender->setCamera((camX/double(node_count)),(camY/double(node_count)),2.0);
 	testRender->start(argc,argv);
 
 	delete[] node_data; node_data = 0;

@@ -1,32 +1,40 @@
 /*
 //	Lightweigth OpenGL visualization for graph nodes and graph edges.
 //	Requires freeglut, glew and glm. Check the respective website for the sources.
-//	HOW TO: Coming soon...
+//	HOW TO:
+//	(Windows)
+//	Ask me for the VisualStudio Project file...
+//	(Linux)
+//	Put freeglut,glew and glm folders in the directory of your sources,
+//	linking will probably be required for freeglut and glew.
+//	Put the shader files (.glsl) in the directory of your binaries.
 */
-
-
-
 
 #ifndef openGLrender_h
 #define openGLrender_h
 
-//für file_read bnötigt
+//needed for file_read
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include <iostream>
 
+//freeglut and glew
+#include "glew\include\GL\glew.h"
+#include "freeglut\include\GL\freeglut.h"
+
+//openGL Math Lib
 #include "glm/glm.hpp"
 #include "glm/core/type_vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+//stores the vertex data structes
 #include "structs.h"
-#include "parser.h"
 
 #pragma comment(lib,"glew32.lib")
 
+//Rendering is managed completly by this class
 class openGLrender
 {
 private:
@@ -41,19 +49,32 @@ private:
 	static void keyboardCallback(static unsigned char, static int, static int);
 	static void keyboardArrowsCallback(static int, static int, static int);
 	static void idleCallback();
+	static void resizeCallback(static int, static int);
 
+	//local reference of the data in the system memory
 	unsigned int nodeCount;
 	unsigned int edgeCount;
-	NodeData *nodeArray;
-	openGL_Edge_Node *edgeArray;
+	openGL_Node_3d *nodeArray;
+	openGL_Node_3d *edgeArray;
 
+	//stuff needed for openGL
+	bool showNodes;
+	bool showEdges;
+	int wWidth;
+	int wHeight;
 	glm::vec3 cameraPos;
+
+	//transformation matrixes
 	glm::mat4 projMX, modelMX, viewMX;
+
+	//openGL buffer objects
 	GLuint vbo_nodes;
 	GLuint vbo_edges;
+
+	//shader program
 	GLuint program;
 
-	//organisierte Methode zum Einlesen von Shadern - wird noch ersetzt
+	//used to read the shader source code - needs to be replaced
 	char* file_read(const char*);
 
 	GLint loadShader(const char*, GLenum);
@@ -66,17 +87,21 @@ private:
 	void keyboardArrows(int, int, int);
 	void display();
 	void idle();
+	void resize(int, int);
 
 public:
+	//default Constructor/Destructor
 	openGLrender();
 	~openGLrender();
 
+	//starts the visualization
 	bool start(int argc, char* argv[]);
-
+	//set methods
 	void setNodeCount(int);
 	void setEdgeCount(int);
-	void setNodeArray(NodeData*);
-	void setEdgeArray(openGL_Edge_Node*);
+	void setNodeArray(openGL_Node_3d*);
+	void setEdgeArray(openGL_Node_3d*);
+	void setCamera(double,double,double);
 
 };
 
