@@ -307,7 +307,7 @@ int main(int argc, char *argv[]){
 //	cout << "tests fertig" << endl;
 //	cin.get();
 
-	string file = "../data/15000.txt.grp";
+	string file = "../data/15K.txt.grp";
 
 	clock_t start,finish;
 	double time;
@@ -346,7 +346,7 @@ int main(int argc, char *argv[]){
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
-	unsigned int max_rounds = 7;
+	unsigned int max_rounds = 10;
 
 	for(unsigned int j = 1; j < max_rounds; j++){
 		cout << "Berechne Shortcuts für Runde " <<  j ;
