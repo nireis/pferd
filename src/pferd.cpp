@@ -307,7 +307,7 @@ int main(int argc, char *argv[]){
 //	cout << "tests fertig" << endl;
 //	cin.get();
 
-	string file = "../data/15K.txt.grp";
+	string file = "../data/1500K.txt";
 
 	clock_t start,finish;
 	double time;
@@ -338,11 +338,6 @@ int main(int argc, char *argv[]){
 		cout << "Zeit für Template-Dijkstra mit SCGraph von " << i << " aus: "<< time << endl;
 	}
 
-
-	
-	start = clock();
-	// Shortcuts berechnen und die Liste zurückgeben
-	
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
@@ -350,28 +345,29 @@ int main(int argc, char *argv[]){
 	// unsigned int max_rounds = 200;
 
 	//for(unsigned int j = 1; j < max_rounds; j++){
-	unsigned int j = 1;
-	cout << "Berechne Shortcuts für Runde " <<  j ;
+	cout << "Berechne Shortcuts" << endl;
 	start = clock();
 	while(chc.calcOneRound(sclist, nodelist)){
-		finish = clock();
-		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << ", Zeit: " << time << endl;
-		j++;
-
-		for(list<Shortcut>::iterator it = sclist->begin(); it != sclist->end(); it++){
+		/*for(list<Shortcut>::iterator it = sclist->begin(); it != sclist->end(); it++){
 			drawSClist.push_front( Shortcut( *it ) );
 		}
 
 		cout << "Merge Shortcuts in SCGraph. " << endl;
-		start = clock();
-		scg.mergeRoundNegative(j);
-		finish = clock();
+		start = clock();*/
+		scg.mergeRoundNegative(200);
+		/*finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << "Zeit: " << time << endl;
-		cout << " => Runde " << j << " fertig."  << endl;
+		start = clock();*/
+		/*finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit: " << time << endl;
+		cout << " => Runde " << j << " fertig."  << endl;*/
 	}
-	cout << "Merge Shortcuts und original-Graph. " << endl;
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit: " << time << endl;
+	/*cout << "Merge Shortcuts und original-Graph. " << endl;
 	start = clock();
 	scg.mergeShortcutsAndGraph(j);
 	finish = clock();
@@ -379,7 +375,7 @@ int main(int argc, char *argv[]){
 	cout << "Zeit: " << time << endl;
 
 	cout << "Runden fertig. Eingabetaste für Start der Visualisierung:" << endl;
-	cin.get();
+	cin.get();*/
 
 	// vis test
 	/*vector<vis::text>* txt = new vector<vis::text>;

@@ -142,10 +142,10 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 		nodes->pop_front();
 	}
 	delete nodes;
+	cout << len << endl;
+	// cout << arithMean << endl;
 	if(len != 0){
-		if(arithMean < tmpArithMean/len){
-			arithMean = tmpArithMean/len;
-		}
+		arithMean = tmpArithMean/len;
 		return true;
 	}
 	else{
