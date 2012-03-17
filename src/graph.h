@@ -213,6 +213,9 @@ class SCGraph {
 		unsigned int* node_in_edges_count;
 		unsigned int* node_out_edges_count;
 
+		unsigned int* goodNodes;
+		unsigned int goodNodesSize;
+
 		SCGraph(){ std::cout << "Error: -41" << std::endl; }
 
 		void clearEverything();
@@ -224,8 +227,6 @@ class SCGraph {
 		void addShortcut(S sc);
 		
 		void blacklistNode(unsigned int node_id);
-
-		//bool isBlack(unsigned int node_id);
 
 		bool mergeRoundNegative(unsigned int lvl);
 
@@ -247,7 +248,6 @@ class SCGraph {
 
 		ND getNodeData(unsigned int node_id);
 		ED getEdgeData(unsigned int edge_id);
-		//SD getShortcutData(unsigned int edge_id);
 
 		EdgesIterator getOutEdgesIt(unsigned int node){
 			unsigned int nofs = nodes_out_offs[node] ;
@@ -270,6 +270,9 @@ class SCGraph {
 			unsigned int c = node_in_edges_count[node] ;
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
+
+		unsigned int* getGoodNodes();
+		unsigned int getGoodNodesSize();
 
 };
 

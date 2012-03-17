@@ -297,6 +297,12 @@ SCGraph::SCGraph(Graph* gr) :
 	edge_data = new ED[ edge_count ];
 	in_edges = new E[ edge_count ];
 	out_edges = new E[ edge_count ];
+	goodNodes = new unsigned int[ node_count ];
+	goodNodesSize = node_count;
+
+	for(unsigned int i = 0; i < node_count; i++){
+		goodNodes[i] = i;
+	}
 
 	for(unsigned int i = 0; i < node_count; i++){
 		node_lvl[i] = 0;
@@ -355,6 +361,7 @@ SCGraph::~SCGraph(){
 	round_node_blacklist.clear();
 	delete[] node_in_edges_count; node_in_edges_count = 0;
 	delete[] node_out_edges_count; node_out_edges_count = 0;
+	delete[] goodNodes; goodNodes = 0;
 }
 
 void SCGraph::addShortcut(S sc){
@@ -387,6 +394,8 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 //	for(unsigned int i = 0; i < node_count; i++){
 //		contracted_by[i] = node_count;
 //	}
+
+	goodNodesSize = goodNodesSize - round_node_blacklist.size();
 
 	// nehme kontrahierte knoten raus
 	while( ! round_node_blacklist.empty() ){
@@ -438,6 +447,14 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		round_node_blacklist.pop_front();
 	}
 
+	unsigned int goodNodesCounter = 0;
+	for(unsigned int i = 0; i < node_count; i++){
+		if( node_lvl[i] == 0 ){
+			goodNodes[ goodNodesCounter ] = i;
+			goodNodesCounter++;
+		}
+	}
+
 	// neue anzahl an kanten zählen
 	unsigned int edgesum = 0;
 // 	unsigned int edgesum2 = 0;//TODO
@@ -465,8 +482,8 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 		nodes_in_offs[i+1] = node_in_edges_count[i];
 	}
 
-	if( nodes_in_offs[0] != 0 || nodes_out_offs[0] != 0)
-		cout << "nodes-ofs anfang ungleich null" << endl;
+	//if( nodes_in_offs[0] != 0 || nodes_out_offs[0] != 0) // TODO
+	//	cout << "nodes-ofs anfang ungleich null" << endl;
 
 	// shortcuts umlagern und offsets um shortcuts erweitern
 	S* roundshortcuts = new S[ roundshortcutssize ];
@@ -817,6 +834,13 @@ ND SCGraph::getNodeData(unsigned int node_id){
 }
 ED SCGraph::getEdgeData(unsigned int edge_id){
 	return edge_data[ edge_id ];
+}
+
+unsigned int* SCGraph::getGoodNodes(){
+	return goodNodes;
+}
+unsigned int SCGraph::getGoodNodesSize(){
+	return goodNodesSize;
 }
 //SD SCGraph::getShortcutData(unsigned int id){
 //	return shortcut_data[id - edge_count];
