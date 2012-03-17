@@ -107,8 +107,9 @@ class CHConstruction{
 		 * auf die zu legenden Shortcuts geschrieben werden.
 		 * @nodelist Zu übergebender Pointer, in den ein Pointer auf die zu 
 		 * löschenden Knoten geschrieben werden.
+		 * @return Gibt true zurück, solange man noch nicht fertig ist.
 		 */
-		void calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist);
+		bool calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist);
 };
 
 template <typename G>
@@ -130,18 +131,26 @@ CHConstruction<G>::~CHConstruction(){
 }
 
 template <typename G>
-void CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
+bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
 	allsclist = sclist;
 	conodelist = nodelist;
 	tmpArithMean = 0;
 	list<unsigned int>* nodes = independent_set();
-	unsigned int len = nodes->size();
+	int len = nodes->size();
 	while(!nodes->empty()){
 		contract_node(nodes->front());
 		nodes->pop_front();
 	}
-	arithMean = tmpArithMean/len;
 	delete nodes;
+	if(len != 0){
+		if(arithMean < tmpArithMean/len){
+			arithMean = tmpArithMean/len;
+		}
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 template <typename G>
@@ -151,7 +160,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
    EdgesIterator it;
    // Random Nummer für den Startknoten
    srand((unsigned)time(0));
-   unsigned int r = 0;//rand() % nr_of_nodes;
+   unsigned int r = rand() % nr_of_nodes;
 
    // Erster Part der Knoten (wegen der Randomisierung)
    for(unsigned int i=r; i<nr_of_nodes; i++){

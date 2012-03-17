@@ -346,15 +346,18 @@ int main(int argc, char *argv[]){
 	list<Shortcut>* sclist = scg.getShortcutListPointer();
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
-	unsigned int max_rounds = 10;
+	CHConstruction<SCGraph> chc(&scg);
+	// unsigned int max_rounds = 200;
 
-	for(unsigned int j = 1; j < max_rounds; j++){
-		cout << "Berechne Shortcuts für Runde " <<  j ;
-		start = clock();
-		CHConstruction<SCGraph>(&scg).calcOneRound(sclist, nodelist);
+	//for(unsigned int j = 1; j < max_rounds; j++){
+	unsigned int j = 1;
+	cout << "Berechne Shortcuts für Runde " <<  j ;
+	start = clock();
+	while(chc.calcOneRound(sclist, nodelist)){
 		finish = clock();
 		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 		cout << ", Zeit: " << time << endl;
+		j++;
 
 		for(list<Shortcut>::iterator it = sclist->begin(); it != sclist->end(); it++){
 			drawSClist.push_front( Shortcut( *it ) );
@@ -370,7 +373,7 @@ int main(int argc, char *argv[]){
 	}
 	cout << "Merge Shortcuts und original-Graph. " << endl;
 	start = clock();
-	scg.mergeShortcutsAndGraph(max_rounds);
+	scg.mergeShortcutsAndGraph(j);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit: " << time << endl;
@@ -379,7 +382,7 @@ int main(int argc, char *argv[]){
 	cin.get();
 
 	// vis test
-	vector<vis::text>* txt = new vector<vis::text>;
+	/*vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
 	berechneVis(txt, txtsc, &drawSClist, lnsc, &scg);
@@ -390,6 +393,6 @@ int main(int argc, char *argv[]){
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
 	mapWidget->show();
 	app.exec();
-	delete mapWidget;
+	delete mapWidget;*/
 	return 0;
 }
