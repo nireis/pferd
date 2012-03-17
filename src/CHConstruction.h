@@ -51,6 +51,9 @@ class CHConstruction{
 		// Listen um den Graphen nachher umzubauen
 		list<Shortcut>* allsclist;
 		list<unsigned int>* conodelist;
+		// Um sich das Arithmetische Mittel der letzten Runde zu merken.
+		int arithMean;
+		int tmpArithMean;
 
 		/*
 		 * Berechnet ein Maximal Independent Set (randomisiert).
@@ -113,7 +116,8 @@ CHConstruction<G>::CHConstruction(G* g):
 	nr_of_nodes(g->getNodeCount()),
 	found(nr_of_nodes,false),
 	is_node_black(nr_of_nodes,false),
-	dist(nr_of_nodes,numeric_limits<unsigned int>::max()){
+	dist(nr_of_nodes,numeric_limits<unsigned int>::max()),
+	arithMean(0){
 	this->g = g;
 	allsclist = 0;
 	conodelist = 0;
@@ -129,11 +133,14 @@ template <typename G>
 void CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
 	allsclist = sclist;
 	conodelist = nodelist;
+	tmpArithMean = 0;
 	list<unsigned int>* nodes = independent_set();
+	unsigned int len = nodes->size();
 	while(!nodes->empty()){
 		contract_node(nodes->front());
 		nodes->pop_front();
 	}
+	arithMean = tmpArithMean/len;
 	delete nodes;
 }
 
@@ -194,7 +201,9 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 		addShortcuts(&sclist, conode, c_edge);
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	if(sclist.size() < (g->getEdgeCount(conode))){
+	int tmpEdgeDiff = sclist.size() - (g->getEdgeCount(conode));
+	tmpArithMean += tmpEdgeDiff;
+	if(tmpEdgeDiff <= arithMean){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
 		allsclist->splice(allsclist->end(), sclist);
