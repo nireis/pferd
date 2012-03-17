@@ -10,6 +10,7 @@
 #include "graph.h"
 #include "structs.h"
 #include "CHConstruction.h"
+#include <list>
 
 
 class CH {
@@ -20,11 +21,20 @@ class CH {
 		CHConstruction<SCGraph> algos;
 
 		unsigned int rounds;
+		unsigned int max_rounds;
+
+		list<Shortcut>* sclistpointer;
+		list<unsigned int>* bnlistpointer;
 
 	public:
 		CH(Graph* gr, SCGraph* scgr);
+		~CH();
 
+		void doRound();
 
+		void finish();
+
+		void calcCH(unsigned int rounds);
 };
 
 

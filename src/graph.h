@@ -186,6 +186,8 @@ class SCGraph {
 		unsigned int edge_count;
 		unsigned int shortcut_count;
 
+		unsigned int current_edge_arrays_size;
+
 		N* nodes_in_offs;
 		E* in_edges; 
 		N* nodes_out_offs;
@@ -193,16 +195,20 @@ class SCGraph {
 
 		ND* node_data;
 		ED* edge_data;
-		//SD* shortcut_data;
 	
-		SList<S> shortcutlist;
+		struct ShortcutArray {
+			ShortcutArray() : array(0), size(0) {}
+			ShortcutArray(Shortcut* a, unsigned int s) :
+				array(a), size(s) {}
+			~ShortcutArray(){ array = 0; }
+			Shortcut* array;
+			unsigned int size;
+		};
+
+		SList<ShortcutArray> shortcutlist;
 
 		std::list<Shortcut> round_shortcutlist;
 		std::list<unsigned int> round_node_blacklist;
-
-		SList<unsigned int> free_edge_ids;
-
-		//bitvec blacklist;
 
 		unsigned int* node_in_edges_count;
 		unsigned int* node_out_edges_count;
@@ -221,7 +227,7 @@ class SCGraph {
 
 		//bool isBlack(unsigned int node_id);
 
-		bool mergeRound(unsigned int lvl);
+		bool mergeRoundNegative(unsigned int lvl);
 
 		bool mergeShortcutsAndGraph(unsigned int lvl);
 
@@ -234,6 +240,10 @@ class SCGraph {
 		unsigned int getEdgeCount(unsigned int node_id);
 		unsigned int getEdgeCount_Round(unsigned int node_id);
 		unsigned int getShortcutCount();
+		std::list<Shortcut>* getShortcutListPointer(){ 
+			return &round_shortcutlist; }
+		std::list<unsigned int>* getBlackNodesListPointer(){ 
+			return &round_node_blacklist; }
 
 		ND getNodeData(unsigned int node_id);
 		ED getEdgeData(unsigned int edge_id);

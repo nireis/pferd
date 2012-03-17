@@ -1,7 +1,36 @@
 #include "ch.h"
 
 
+CH::CH(Graph* gr, SCGraph* scgr) : 
+	g(gr), scg(scgr), algos(scgr), rounds(1),
+	sclistpointer(scgr->getShortcutListPointer()), 
+	bnlistpointer(scgr->getBlackNodesListPointer())
+{}
 
+CH::~CH(){
+	g = 0;
+	scg = 0;
+	sclistpointer = 0;
+	bnlistpointer = 0;
+}
+
+void CH::doRound(){
+	algos.calcOneRound(sclistpointer, bnlistpointer);
+	scg->mergeRoundNegative(rounds);
+	rounds++;
+}
+
+void CH::finish(){
+	scg->mergeShortcutsAndGraph(max_rounds);
+}
+
+void CH::calcCH(unsigned int rnds){
+	max_rounds = rnds;
+	while(rounds < max_rounds){
+		doRound();
+	}
+	finish();
+}
 
 
 

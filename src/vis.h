@@ -34,13 +34,13 @@ class vis: public MarbleWidget
 			linesc(GeoDataCoordinates g1, GeoDataCoordinates g2):gdc1(g1),gdc2(g2){}
 		};
 	private:
-		Graph* g;
+		SCGraph* g;
 		vector<text>* txt;
 		vector<textsc>* txtsc;
 		list<unsigned int>* blackn;
 		vector<linesc>* lnsc;
 	public:
-		vis(Graph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>* blackn,
+		vis(SCGraph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>* blackn,
 				vector<linesc>* lnsc);
 		virtual void customPaint(GeoPainter* painter);
 };

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-vis::vis(Graph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>* blackn,
+vis::vis(SCGraph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>* blackn,
 		vector<linesc>* lnsc){
 	this->g = g;
 	this->txt = txt;
@@ -19,6 +19,11 @@ void vis::customPaint(GeoPainter* painter)
 	for(unsigned int i=0; i<g->getNodeCount(); i++){
 		nd = g->getNodeData(i);
 		painter->drawEllipse(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), 5, 5);
+		stringstream sstr;
+		sstr << nd.elevation << " ("<< nd.id << ") " ;
+		if(nd.id == 1998)
+			sstr << " ================================================";
+		painter->drawText(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), sstr.str().c_str());
 		/*stringstream sstr;
 		sstr << i;
 		painter->drawText(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), sstr.str().c_str());*/
