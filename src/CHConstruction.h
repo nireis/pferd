@@ -31,6 +31,18 @@ class CHConstruction{
 				return u1.distance > u2.distance;
 			}
 		};
+
+		struct contractNode{
+			int edgeDiff;
+			unsigned int node_id;
+			list<Shortcut> sclist;
+
+			contractNode(int e, unsigned int n, list<Shortcut> sc)
+				:edgeDiff(e), node_id(n), sclist(sc){}
+
+			contractNode()
+				:edgeDiff(0), node_id(0), sclist(){}
+		};
 		
 		G* g;
 		unsigned int nr_of_nodes;
@@ -48,12 +60,10 @@ class CHConstruction{
 		// Reset Liste, um zu wissen welche Felder zurück
 		// gesetzt werden müssen. Sollte Laufzeit verbessern.
 		list<unsigned int> resetlist;
-		// Listen um den Graphen nachher umzubauen
-		list<Shortcut>* allsclist;
-		list<unsigned int>* conodelist;
-		// Um sich das Arithmetische Mittel der letzten Runde zu merken.
+		list<contractNode> conodelist;
 		int arithMean;
-		int tmpArithMean;
+		// test
+		double t;
 
 		/*
 		 * Berechnet ein Maximal Independent Set (randomisiert).
@@ -117,40 +127,49 @@ CHConstruction<G>::CHConstruction(G* g):
 	nr_of_nodes(g->getNodeCount()),
 	found(nr_of_nodes,false),
 	is_node_black(nr_of_nodes,false),
-	dist(nr_of_nodes,numeric_limits<unsigned int>::max()),
-	arithMean(0){
+	dist(nr_of_nodes,numeric_limits<unsigned int>::max()){
 	this->g = g;
-	allsclist = 0;
-	conodelist = 0;
+	//test
+	t = 0;
 }
 
 template <typename G>
-CHConstruction<G>::~CHConstruction(){
-	allsclist = 0;
-	conodelist = 0;
-}
+CHConstruction<G>::~CHConstruction(){}
 
 template <typename G>
 bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
-	allsclist = sclist;
-	conodelist = nodelist;
-	tmpArithMean = 0;
+	conodelist = list<contractNode>();
+	arithMean = 0;
+	// int numContNodes = 0;
 	list<unsigned int>* nodes = independent_set();
-	int len = nodes->size();
-	while(!nodes->empty()){
-		contract_node(nodes->front());
-		nodes->pop_front();
+	clock_t start = clock();
+	for(list<unsigned int>::iterator i = nodes->begin(); i != nodes->end(); i++){
+		contract_node(*i);
 	}
-	delete nodes;
+	int len = nodes->size();
 	cout << len << endl;
-	// cout << arithMean << endl;
+	delete nodes;
 	if(len != 0){
-		arithMean = tmpArithMean/len;
-		return true;
+		arithMean = arithMean/len;
 	}
 	else{
 		return false;
 	}
+	cout << arithMean << endl;
+	for(typename list<contractNode>::iterator i = conodelist.begin(); i != conodelist.end(); i++){
+		contractNode cn = *i;
+		if(cn.edgeDiff <= arithMean){
+			// numContNodes++;
+			nodelist->push_front(cn.node_id);
+			is_node_black[cn.node_id] = true;
+			sclist->splice(sclist->end(), cn.sclist);
+		}
+	}
+	clock_t finish = clock();
+	// cout << numContNodes << endl;
+	t += (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit:" << t << endl;
+	return true;
 }
 
 template <typename G>
@@ -211,12 +230,8 @@ void CHConstruction<G>::contract_node(unsigned int conode){
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	int tmpEdgeDiff = sclist.size() - (g->getEdgeCount(conode));
-	tmpArithMean += tmpEdgeDiff;
-	if(tmpEdgeDiff <= arithMean){
-		conodelist->push_front(conode);
-		is_node_black[conode] = true;
-		allsclist->splice(allsclist->end(), sclist);
-	}
+	arithMean += tmpEdgeDiff;
+	conodelist.push_front(contractNode(tmpEdgeDiff, conode, sclist));
 }
 
 template <typename G>
@@ -331,23 +346,7 @@ void CHConstruction<G>::shortDijkstra(unsigned int targetnode, unsigned int cono
 				}
 			}
 			lastDist = dist[tmpid];
-/*			if(U.empty()){
-				std::cout << " U EMPTY " << ( U.top().targetedge->id >= g->getEdgeCount() ) <<  " "<< U.top().sourceid << " " << U.top().targetedge->id  << std::endl;
-				EdgesIterator teit = g->getOutEdgesIt_Round( U.top().sourceid );
-				while( teit.hasNext() ){
-					Edge* te = teit.getNext();
-					std::cout << " "<< te->id << ( te->id >= g->getEdgeCount() ) << " "<< te->other_node << std::endl;
-				}
-				teit = g->getOutEdgesIt( U.top().sourceid );
-				std::cout << " = = = " << std::endl;
-				while( teit.hasNext() ){
-					Edge* te = teit.getNext();
-					std::cout << " "<< te->id << ( te->id >= g->getEdgeCount() ) << " "<< te->other_node << std::endl;
-				}
-				std::cout << "< = = = >" << std::endl;
-			}
-				std::cout << ( U.top().targetedge->id >= g->getEdgeCount() ) <<std::endl;
-*/			U.pop();
+			U.pop();
 		}
 		resetlist.push_front(targetnode);
 	}
