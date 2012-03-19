@@ -13,14 +13,14 @@ OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o vis.o
 
 OGLBIN =main_vis_debug
 OGLOBJ =main_vis_debug.o openGLrender.o parser.o
-OGLFLAGS = -Wall -g -O3 -std=c++0x -lglut -lGL -lGLU -I/usr/include -I. -L/usr/X11R6/lib64 -lXxf86vm -L/lib -L/usr/lib -L/usr/X11R6/lib -lXext -lXmu -lXi -lSDL -lSDL_mixer -lX11 -lm
+OGLFLAGS = -Wall -g -O3 -std=c++0x -lglut -lGL 
 
 CXXFLAGS = $(OGLFLAGS)
 
 opengl : $(OGLBIN)
 
 $(OGLBIN) : $(OGLOBJ)
-	$(CC) $(OGLFLAGS) -o $(OGLBIN) $(OGLOBJ) /usr/lib/libGLEW.so.1.7
+	$(CC) $(OGLFLAGS) -o $(OGLBIN) $(OGLOBJ) /usr/lib/libGLEW.so
 
 $(OGLOBJ) : $(wildcard *.h) $(wildcard *.hpp)
 
@@ -33,7 +33,7 @@ $(BIN): $(OBJ)
 $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
 
 clean:
-	rm -f $(BIN) $(OBJ)
+	rm -f $(BIN) $(OBJ) *.o
 
 #fucking...
 .PHONY: all clean

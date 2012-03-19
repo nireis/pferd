@@ -94,9 +94,9 @@ bool openGLrender::initShaderProgram()
 {
 	GLuint vShader;
 	GLuint fShader;
-	if ((vShader = loadShader("pferdVertex.glsl", GL_VERTEX_SHADER)) == 0)
-	{ return false; };
 	if ((fShader = loadShader("pferdFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
+	{ return false; };
+	if ((vShader = loadShader("pferdVertex.glsl", GL_VERTEX_SHADER)) == 0)
 	{ return false; };
 
 	program = glCreateProgram();

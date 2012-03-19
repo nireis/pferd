@@ -16,8 +16,8 @@
 //freeglut and glew
 //#include "glew\include\GL\glew.h"
 //#include "freeglut\include\GL\freeglut.h"
-#include "/usr/include/GL/glew.h"
-#include "/usr/include/GL/freeglut.h"
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
 //needed for file_read
 #include <stdio.h>
@@ -25,12 +25,11 @@
 
 #include <iostream>
 
-
 //openGL Math Lib
-#include "/usr/include/glm/glm.hpp"
-#include "/usr/include/glm/core/type_vec3.hpp"
-#include "/usr/include/glm/gtc/matrix_transform.hpp"
-#include "/usr/include/glm/gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
+#include <glm/core/type_vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //stores the vertex data structes
 #include "structs.h"
