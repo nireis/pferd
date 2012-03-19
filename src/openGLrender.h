@@ -13,21 +13,24 @@
 #ifndef openGLrender_h
 #define openGLrender_h
 
+//freeglut and glew
+//#include "glew\include\GL\glew.h"
+//#include "freeglut\include\GL\freeglut.h"
+#include "/usr/include/GL/glew.h"
+#include "/usr/include/GL/freeglut.h"
+
 //needed for file_read
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <iostream>
 
-//freeglut and glew
-#include "glew\include\GL\glew.h"
-#include "freeglut\include\GL\freeglut.h"
 
 //openGL Math Lib
-#include "glm/glm.hpp"
-#include "glm/core/type_vec3.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include "/usr/include/glm/glm.hpp"
+#include "/usr/include/glm/core/type_vec3.hpp"
+#include "/usr/include/glm/gtc/matrix_transform.hpp"
+#include "/usr/include/glm/gtc/type_ptr.hpp"
 
 //stores the vertex data structes
 #include "structs.h"
@@ -46,10 +49,10 @@ private:
 	static openGLrender* currentInstance;
 	static void setInstance(openGLrender*);
 	static void displayCallback();
-	static void keyboardCallback(static unsigned char, static int, static int);
-	static void keyboardArrowsCallback(static int, static int, static int);
+	static void keyboardCallback(/*static*/ unsigned char key, /*static*/ int x, /*static*/ int y);
+	static void keyboardArrowsCallback(/*static*/ int, /*static*/ int,/*static*/ int);
 	static void idleCallback();
-	static void resizeCallback(static int, static int);
+	static void resizeCallback(/*static*/ int, /*static*/ int);
 
 	//local reference of the data in the system memory
 	unsigned int nodeCount;
