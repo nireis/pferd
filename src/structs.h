@@ -106,6 +106,19 @@ struct openGL_Node_3d {
 	float extra;
 };
 
+//Nodetype 3 for openGL Vis
+struct openGL_Node_3d_uv {
+	openGL_Node_3d_uv() : lon(0), lat(0), extra(0) {}
+	openGL_Node_3d_uv(float lo, float la, float e, float u, float v) : 
+		lon(lo), lat(la), extra(e), u_coord(u), v_coord(v) {}
+	float lon;
+	float lat;
+	float extra;
+	float u_coord;
+	float v_coord;
+};
+
+
 /*
  * Shortcut, wie der Graph ihn als Eingabe erwartet
  *

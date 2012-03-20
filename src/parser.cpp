@@ -166,9 +166,7 @@ void parser::getNodesAndEdges(ParserNode* n, ParserEdge* e)
 	}
 	else
 	{
-		cout << "Oh no!";
 	}
-	cout << "Fertig";
 }
 
 unsigned int parser::getNodeCount()

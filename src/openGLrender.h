@@ -1,13 +1,29 @@
 /*
-//	Lightweigth OpenGL visualization for graph nodes and graph edges.
-//	Requires freeglut, glew and glm. Check the respective website for the sources.
+//            _|\\__/|,
+//          ,((\\````\\\\_ 
+//        ,(())     `))\\
+//      ,(()))       ,_ \\
+//     ((())'   |        \\
+//     )))))     >.__     \\
+//     ((('     /    `-. .c|
+//hjw          /        `-`'
+//http://www.asciiworld.com/-Horses-.html 
+//
+//	Pferd's lightweigth openGL visualization
+//	Version 0.7 (texture testing)
+//	TODO for 0.8: complete texture loading & displaying
+//	TODO for 0.9: add labels for nodes/edges
+//	TODO for 1.0: optimize version 0.9
+//
+//	Requires freeglut, glew, glm and SOIL! Check the respective website for the sources.
+//
 //	HOW TO:
 //	(Windows)
-//	Ask me for the VisualStudio Project file...
+//	Ask me for the VisualStudio Project files etc...
 //	(Linux)
-//	Put freeglut,glew and glm folders in the directory of your sources,
-//	linking will probably be required for freeglut and glew.
+//	Link glew and SOIL Libs.
 //	Put the shader files (.glsl) in the directory of your binaries.
+//	For testing the latest build: Put textures files in the directory of your binaries.
 */
 
 #ifndef openGLrender_h
@@ -20,8 +36,8 @@
 #include <iostream>
 
 //freeglut and glew
-#include "glew\include\GL\glew.h"
-#include "freeglut\include\GL\freeglut.h"
+#include "GL/glew.h"
+#include "GL/freeglut.h"
 
 //openGL Math Lib
 #include "glm/glm.hpp"
@@ -29,10 +45,16 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+//library for easy texture loading
+//chek http://www.lonesock.net/soil.html for more information
+#include "soil/include/SOIL.h"
+
 //stores the vertex data structes
 #include "structs.h"
 
+//pragmas seem to be only necessary in windows
 #pragma comment(lib,"glew32.lib")
+#pragma comment(lib,"SOIL.lib")
 
 //Rendering is managed completly by this class
 class openGLrender
@@ -46,10 +68,10 @@ private:
 	static openGLrender* currentInstance;
 	static void setInstance(openGLrender*);
 	static void displayCallback();
-	static void keyboardCallback(static unsigned char, static int, static int);
-	static void keyboardArrowsCallback(static int, static int, static int);
+	static void keyboardCallback(unsigned char, int, int);
+	static void keyboardArrowsCallback(int, int, int);
 	static void idleCallback();
-	static void resizeCallback(static int, static int);
+	static void resizeCallback(int, int);
 
 	//local reference of the data in the system memory
 	unsigned int nodeCount;
@@ -60,6 +82,7 @@ private:
 	//stuff needed for openGL
 	bool showNodes;
 	bool showEdges;
+	bool showMap;
 	int wWidth;
 	int wHeight;
 	glm::vec3 cameraPos;
@@ -68,19 +91,34 @@ private:
 	glm::mat4 projMX, modelMX, viewMX;
 
 	//openGL buffer objects
+	GLuint vbo_map;
 	GLuint vbo_nodes;
 	GLuint vbo_edges;
 
+	//openGL textures
+	GLuint *map_textures;
+	int textureCount;
+
 	//shader program
 	GLuint program;
+	GLuint program2;
 
 	//used to read the shader source code - needs to be replaced
 	char* file_read(const char*);
 
+	//loads & compiles shader sources
 	GLint loadShader(const char*, GLenum);
+	//initializes shader programs
 	bool initShaderProgram();
+	//loads all nodes
 	bool initNodes();
+	//loads all edge geometry
 	bool initEdges();
+	//loads map geometry
+	bool initMap();
+	//loads map textures and actually heavily relies on SOIL to do all the nasty stuff
+	bool initTextures();
+	//clean up
 	void uninit();
 
 	void keyboard(unsigned char, int, int);
