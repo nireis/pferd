@@ -29,21 +29,23 @@
 #ifndef openGLrender_h
 #define openGLrender_h
 
+//freeglut and glew
+//#include "glew\include\GL\glew.h"
+//#include "freeglut\include\GL\freeglut.h"
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+
 //needed for file_read
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <iostream>
 
-//freeglut and glew
-#include "GL/glew.h"
-#include "GL/freeglut.h"
-
 //openGL Math Lib
-#include "glm/glm.hpp"
-#include "glm/core/type_vec3.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
+#include <glm/core/type_vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //library for easy texture loading
 //chek http://www.lonesock.net/soil.html for more information
