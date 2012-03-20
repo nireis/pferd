@@ -47,7 +47,7 @@
 
 //library for easy texture loading
 //chek http://www.lonesock.net/soil.html for more information
-#include "soil/include/SOIL.h"
+#include "SOIL.h"
 
 //stores the vertex data structes
 #include "structs.h"

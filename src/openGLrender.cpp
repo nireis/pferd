@@ -197,7 +197,7 @@ bool openGLrender::initTextures()
 	for(int i = 0; i < textureCount; i++)
 	{
 		map_textures[i] = SOIL_load_OGL_texture(
-			"48_486649_9_10.png",
+			"../data/48_486649_9_10.png",
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT

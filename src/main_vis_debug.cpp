@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
 {
 	ParserNode* pNodes;
 	ParserEdge* pEdges;
-	parser testParser("1500K.txt");
+	parser testParser("../data/1500K.txt");
 
 	float camX = 0.0;
 	float camY = 0.0;
