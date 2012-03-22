@@ -153,6 +153,7 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 	}
 }
 
+/* // OLD IS
 template <typename G>
 list<unsigned int>* CHConstruction<G>::independent_set(){
    list<unsigned int>* solution = new list<unsigned int>;
@@ -197,7 +198,66 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
       }
    }
    return solution;
+}*/ // OLD IS
+
+template <typename G>
+list<unsigned int>* CHConstruction<G>::independent_set(){
+   list<unsigned int>* solution = new list<unsigned int>;
+
+	if( g->getGoodNodesSize() == 0 )
+		return solution;
+
+   vector<bool> marked(nr_of_nodes,false);
+   EdgesIterator it;
+   // Random Nummer für den Startknoten
+   srand((unsigned)time(0));
+   
+	unsigned int r = rand() % g->getGoodNodesSize(); // TODO nr_of_nodes;
+	unsigned int* goodNodes = g->getGoodNodes();
+
+   // Erster Part der Knoten (wegen der Randomisierung)
+   for(unsigned int* gn= goodNodes + r; gn< g->getGoodNodesSize() + goodNodes; gn++){ // TODO nr_of_nodes; i++){
+      // Prüfen ob der Knoten aufgenommen werden kann
+      // TODO if(!is_node_black[i] && !marked[i]){
+		unsigned int i = *gn;
+      if( !marked[i]){
+         solution->push_front(i);
+         // Alle ausgehenden Kanten verfolgen
+         it = g->getOutEdgesIt_Round(i);
+         while(it.hasNext()){
+            marked[it.getNext()->other_node] = true;
+         }
+         // Alle eingehenden Kanten verfolgen
+         it = g->getInEdgesIt_Round(i);
+         while(it.hasNext()){
+            marked[it.getNext()->other_node] = true;
+         }
+      }
+   }
+   // Zweiter Part der Knoten
+   // TODO for(unsigned int i=0; i<r; i++){
+   for(unsigned int* gn= goodNodes; gn< r + goodNodes; gn++){ // TODO nr_of_nodes; i++){
+      // Prüfen ob der Knoten aufgenommen werden kann
+      // TODO if(!is_node_black[i] && !marked[i]){
+		unsigned int i = *gn;
+      // Prüfen ob der Knoten aufgenommen werden kann
+      if( !marked[i]){
+         solution->push_front(i);
+         // Alle ausgehenden Kanten verfolgen
+         it = g->getOutEdgesIt_Round(i);
+         while(it.hasNext()){
+            marked[it.getNext()->other_node] = true;
+         }
+         // Alle eingehenden Kanten verfolgen
+         it = g->getInEdgesIt_Round(i);
+         while(it.hasNext()){
+            marked[it.getNext()->other_node] = true;
+         }
+      }
+   }
+   return solution;
 }
+
 
 template <typename G>
 void CHConstruction<G>::contract_node(unsigned int conode){

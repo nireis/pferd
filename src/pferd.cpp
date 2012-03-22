@@ -6,7 +6,7 @@
 #include "structs.h"
 #include "ch.h"
 #include "rlparser.h"
-#include "vis.h"
+//#include "vis.h"
 
 using namespace std;
 
@@ -209,6 +209,7 @@ void testSCGraph(Graph* g){
 	
 }
 
+/*
 void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortcut>* sclist,
 		vector<vis::linesc>* lnsc, SCGraph* g){
 	vector<unsigned int> edgePainted(g->getEdgeCount(),false);
@@ -287,6 +288,7 @@ void berechneVis(vector<vis::text>* txt, vector<vis::textsc>* txtsc, list<Shortc
 		txtsc->push_back(vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
 	}
 }
+*/
 
 int main(int argc, char *argv[]){
 	cout << "            _|\\__/|, " << endl;
@@ -302,14 +304,27 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 
-//	testGraphs();
-//
-//	cout << "tests fertig" << endl;
-//	cin.get();
+	// string file = "../data/15000.txt.grp";
+   
+   if(argc != 2){
+		cout << "---" << endl 
+				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Graphendatei " << endl
+				<< "-- Graphdatei: Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
+				<< "---" << endl;
+		return 0;
+	} 
 
-	string file = "../data/1500K.txt";
+	string file = argv[1];
+
+	ifstream checkfile(file.c_str());
+	if(!checkfile){
+		cout << "-> angegebene Datei existiert nicht." << endl;
+		return 0;
+	}
+   
 
 	clock_t start,finish;
+	double alltime = 0.0;
 	double time;
 
 	cout << "Erstelle Graph mit Datei " << file << endl;
@@ -321,6 +336,9 @@ int main(int argc, char *argv[]){
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
+
+	cout << "Neuen Graph erstellen: Eingabetaste" << endl;
+	cin.get();
 
 	cout << "Erstelle neuen Graph: " << endl;
 	start = clock();
@@ -342,43 +360,45 @@ int main(int argc, char *argv[]){
 	list<unsigned int>* nodelist = scg.getBlackNodesListPointer();
 	list<Shortcut> drawSClist = list<Shortcut>();
 	CHConstruction<SCGraph> chc(&scg);
-	// unsigned int max_rounds = 200;
 
-	//for(unsigned int j = 1; j < max_rounds; j++){
-	cout << "Berechne Shortcuts" << endl;
-	start = clock();
-	while(chc.calcOneRound(sclist, nodelist)){
-		/*for(list<Shortcut>::iterator it = sclist->begin(); it != sclist->end(); it++){
-			drawSClist.push_front( Shortcut( *it ) );
-		}
+	bool run = true;
+
+	unsigned int j = 1;
+
+	while(run){
+		cout << "Berechne Shortcuts" << endl;
+		start = clock();
+		run = chc.calcOneRound(sclist, nodelist);
+		finish = clock();
+		time = (double(finish)-double(start));
+		alltime += time;
+		time = time /CLOCKS_PER_SEC;
+		cout << "Zeit: " << time << endl;
 
 		cout << "Merge Shortcuts in SCGraph. " << endl;
-		start = clock();*/
-		scg.mergeRoundNegative(200);
-		/*finish = clock();
-		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		start = clock();
+		scg.mergeRoundNegative(j);
+		finish = clock();
+		time = (double(finish)-double(start));
+		alltime += time;
+		time = time /CLOCKS_PER_SEC;
 		cout << "Zeit: " << time << endl;
-		start = clock();*/
-		/*finish = clock();
-		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Zeit: " << time << endl;
-		cout << " => Runde " << j << " fertig."  << endl;*/
+		cout << " => Runde " << j << " fertig."  << endl;
+		j++;
 	}
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit: " << time << endl;
-	/*cout << "Merge Shortcuts und original-Graph. " << endl;
+	cout << "Insgesamt gebrauchte Zeit für Runden: " << (alltime/CLOCKS_PER_SEC) / 60.0 << " Minuten " << endl;
+	cout << "Merge Shortcuts und original-Graph. " << endl;
 	start = clock();
 	scg.mergeShortcutsAndGraph(j);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit: " << time << endl;
 
-	cout << "Runden fertig. Eingabetaste für Start der Visualisierung:" << endl;
-	cin.get();*/
+	cout << "Runden fertig. Eingabetaste für Ende des Programms." << endl;
+	cin.get();
 
 	// vis test
-	/*vector<vis::text>* txt = new vector<vis::text>;
+/*	vector<vis::text>* txt = new vector<vis::text>;
 	vector<vis::textsc>* txtsc = new vector<vis::textsc>;
 	vector<vis::linesc>* lnsc = new vector<vis::linesc>;
 	berechneVis(txt, txtsc, &drawSClist, lnsc, &scg);
@@ -389,6 +409,6 @@ int main(int argc, char *argv[]){
 	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
 	mapWidget->show();
 	app.exec();
-	delete mapWidget;*/
+	delete mapWidget; */
 	return 0;
 }

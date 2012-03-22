@@ -660,6 +660,9 @@ bool SCGraph::mergeRoundNegative(unsigned int lvl){
 
 // 	delete[] contracted_by; contracted_by = 0;//TODO
 
+	cout << "übrige Graphknoten: " << goodNodesSize << " ( " << (((double) goodNodesSize)/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl;
+	cout << "aktuelle Anzahl Kanten: " << ( (double)current_edge_arrays_size / (double)edge_count ) * 100.0 << "% der urspr. Kanten" << endl;
+
 	return true;
 }
 
