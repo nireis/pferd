@@ -4,9 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-	ParserNode* pNodes;
-	ParserEdge* pEdges;
-	parser testParser("../data/1500K.txt");
+	parser testParser("../data/15K.txt");
 
 	float camX = 0.0;
 	float camY = 0.0;
@@ -46,7 +44,15 @@ int main(int argc, char* argv[])
 	testRender->setEdgeCount(edge_count*2);
 	testRender->setEdgeArray(ogledge);
 	testRender->setCamera((camX/float(node_count))*0.6649,(camY/float(node_count)),2.0);
-	testRender->start(argc,argv);
+	// testRender->start(argc,argv);
+	testRender->start(0,0);
+	std::cout << 0 << std::endl;
+
+	std::cin.get();
+	std::cout << 1 << std::endl;
+
+	testRender->start(0,0);
+	std::cout << 2 << std::endl;
 
 	delete[] node_data; node_data = 0;
 	delete[] ogledge; ogledge = 0;

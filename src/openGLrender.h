@@ -30,8 +30,6 @@
 #define openGLrender_h
 
 //freeglut and glew
-//#include "glew\include\GL\glew.h"
-//#include "freeglut\include\GL\freeglut.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
@@ -49,14 +47,20 @@
 
 //library for easy texture loading
 //chek http://www.lonesock.net/soil.html for more information
-#include "SOIL.h"
+#ifdef _WIN32
+	#include "soil/include/SOIL.h"
+#else
+	#include <SOIL.h>
+#endif
 
 //stores the vertex data structes
 #include "structs.h"
 
 //pragmas seem to be only necessary in windows
-#pragma comment(lib,"glew32.lib")
-#pragma comment(lib,"SOIL.lib")
+#ifdef _WIN32
+	#pragma comment(lib,"glew32.lib")
+	#pragma comment(lib,"SOIL.lib")
+#endif
 
 //Rendering is managed completly by this class
 class openGLrender
