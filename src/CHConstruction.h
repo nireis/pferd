@@ -44,7 +44,8 @@ class CHConstruction{
 		list<Shortcut>* allsclist;
 		list<unsigned int>* conodelist;
 		// Um sich das Arithmetische Mittel der letzten Runde zu merken.
-		int arithMean;
+		int lastArithMean;
+		int tmpArithMean;
 		// Mutexes für die Parallelisierung.
       mutex mBlacken;
       mutex mGetNext;
@@ -176,7 +177,7 @@ void run(CHConstruction<G>* chc){
 template <typename G>
 CHConstruction<G>::CHConstruction(G* g):
 	nr_of_nodes(g->getNodeCount()),
-	arithMean(0){
+	lastArithMean(0){
 	this->g = g;
 	allsclist = 0;
 	conodelist = 0;
@@ -192,7 +193,7 @@ template <typename G>
 bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
    allsclist = sclist;
    conodelist = nodelist;
-	arithMean = 0;
+	tmpArithMean = 0;
 	nodes = independent_set();
 	int len = nodes->size();
    list<thread> threadlist;
@@ -209,8 +210,8 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 	cout << len << endl;
 	// Das arithmetische Mittel dieser Runde berechnen.
 	if(len != 0){
-		cout << "Arith Mean: " << arithMean/len << endl;
-		arithMean = arithMean/len;
+		cout << "Arith Mean: " << tmpArithMean/len << endl;
+		lastArithMean = tmpArithMean/len;
 		return true;
 	}
 	return false;
@@ -288,7 +289,7 @@ void CHConstruction<G>::contract_node(DijkstraData* dd, unsigned int conode){
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	int tmpEdgeDiff = sclist->size() - (g->getEdgeCount(conode));
 	dd->tmpArithMean += tmpEdgeDiff;
-	if(tmpEdgeDiff <= arithMean){
+	if(tmpEdgeDiff <= lastArithMean){
 		blackenNode(conode);
 		insertShortcuts(sclist);
 	}
@@ -446,7 +447,7 @@ bool CHConstruction<G>::getNextNode(unsigned int* id){
 template <typename G>
 void CHConstruction<G>::addArithMean(int am){
 	unique_lock<mutex> lock(mArithMean);
-	arithMean += am;
+	tmpArithMean += am;
 }
 
 template <typename G>
