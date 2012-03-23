@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -Wall -g -std=c++0x -pthread -O3
+CXXFLAGS = -Wall -g -std=c++0x -pthread
 LDFLAGS = -Il 
 BIN =pferd
 

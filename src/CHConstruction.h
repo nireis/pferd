@@ -40,7 +40,6 @@ class CHConstruction{
 
 		// Die zu kontrahierenden Knoten
 		list<unsigned int>* nodes;
-		vector<bool> is_node_black;
 		// Listen um den Graphen nachher umzubauen
 		list<Shortcut>* allsclist;
 		list<unsigned int>* conodelist;
@@ -92,7 +91,7 @@ class CHConstruction{
 		 * @conode Der Knoten, welcher kontrahiert wird.
 		 * @firstSCE Pointer auf die (einzig mögliche) erste Shortcut Kante.
 		 */
-		void addShortcuts(DijkstraData dd, list<Shortcut>* sclist, unsigned int conode, Edge* firstSCE);
+		void addShortcuts(DijkstraData* dd, list<Shortcut>* sclist, unsigned int conode, Edge* firstSCE);
 		/*
 		 * Macht einen kurzen Dijkstra zu targetnode und fügt auch sonst alle 
 		 * anfallende Shortcuts ein.
@@ -101,13 +100,13 @@ class CHConstruction{
 		 * @sclist Liste der Shortcuts.
 		 * @firstSCE Pointer auf die (einzig mögliche) erste Shortcut Kante.
 		 */
-		void shortDijkstra(DijkstraData dd, unsigned int targetnode, unsigned int conode, list<Shortcut>* sclist, Edge* firstSCE);
+		void shortDijkstra(DijkstraData* dd, unsigned int targetnode, unsigned int conode, list<Shortcut>* sclist, Edge* firstSCE);
 		/*
 		 * Setzt die benutzten Felder des found und dist Arrays zurück
 		 * um ihn für weitere Dijkstras brauchbar zu machen. U wird auch zurückgesetzt.
 		 * Sollte die Laufzeit verbessern.
 		 */
-		void resetDij(DijkstraData dd);
+		void resetDij(DijkstraData* dd);
       /*
        * Schwärzt einen Knoten.
        *
@@ -141,7 +140,7 @@ class CHConstruction{
 		 *
 		 * @conode Der zu kontrahierende Knoten.
 		 */
-		void contract_node(DijkstraData dd, unsigned int conode);
+		void contract_node(DijkstraData* dd, unsigned int conode);
       /*
        * Holt sich den nächsten zu kontrahierenden Knoten.
 		 *
@@ -155,14 +154,21 @@ class CHConstruction{
 		 * @am Den Wert des arith Mittels für einen Thread.
 		 */
 		void addArithMean(int am);
+		unsigned int getNrOfNodes();
 };
 
 template <typename G>
-void run(CHConstruction<G>* chc, typename CHConstruction<G>::DijkstraData dd){
+unsigned int CHConstruction<G>::getNrOfNodes(){
+	return nr_of_nodes;
+}
+
+template <typename G>
+void run(CHConstruction<G>* chc){
 	unsigned int tmpNode;
+	typename CHConstruction<G>::DijkstraData dd(chc->getNrOfNodes());
 	dd.tmpArithMean = 0;
 	while(chc->getNextNode(&tmpNode)){
-		chc->contract_node(dd, tmpNode);
+		chc->contract_node(&dd, tmpNode);
 	}
 	chc->addArithMean(dd.tmpArithMean);
 }
@@ -193,7 +199,7 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
    int numProc = 2;
 	// Threads erstellen, die auf den jeweiligen Prozessoren laufen sollen.
    for(int i=0; i<numProc; i++){
-      threadlist.push_back(thread(&run<G>, this, DijkstraData(nr_of_nodes)));
+      threadlist.push_back(thread(&run<G>, this));
    }
    for(int i=0; i<numProc; i++){
       threadlist.front().join();
@@ -201,6 +207,7 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
    }
    delete nodes;
 	cout << len << endl;
+	cout << "Arith Mean: " << arithMean/len << endl;
 	// Das arithmetische Mittel dieser Runde berechnen.
 	if(len != 0){
 		arithMean = arithMean/len;
@@ -269,45 +276,44 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 
 
 template <typename G>
-void CHConstruction<G>::contract_node(DijkstraData dd, unsigned int conode){
-	list<Shortcut> sclist;
+void CHConstruction<G>::contract_node(DijkstraData* dd, unsigned int conode){
+	list<Shortcut>* sclist = new list<Shortcut>;
 	EdgesIterator it = g->getInEdgesIt_Round(conode);
 	Edge* c_edge;
 	// Die möglichen Shortcuts berechnen und speichern.
 	while(it.hasNext()){
 		c_edge = it.getNext();
-		addShortcuts(dd, &sclist, conode, c_edge);
+		addShortcuts(dd, sclist, conode, c_edge);
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	int tmpEdgeDiff = sclist.size() - (g->getEdgeCount(conode));
-	dd.tmpArithMean += tmpEdgeDiff;
+	int tmpEdgeDiff = sclist->size() - (g->getEdgeCount(conode));
+	dd->tmpArithMean += tmpEdgeDiff;
 	if(tmpEdgeDiff <= arithMean){
-		conodelist->push_front(conode);
-		is_node_black[conode] = true;
-		allsclist->splice(allsclist->end(), sclist);
+		blackenNode(conode);
+		insertShortcuts(sclist);
 	}
 }
 
 template <typename G>
-void CHConstruction<G>::addShortcuts(DijkstraData dd, list<Shortcut>* sclist,
+void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 		unsigned int conode, Edge* firstSCE){
 	unsigned int tmpnode;
 	unsigned int scnode = firstSCE->other_node;
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
 	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
-	dd.lastDist = 0;
-	dd.dist[scnode] = 0;
-	dd.found[scnode] = true;
-	dd.resetlist.push_front(scnode);
+	dd->lastDist = 0;
+	dd->dist[scnode] = 0;
+	dd->found[scnode] = true;
+	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
 		currentEdge = it.getNext();
-		dd.U.push(U_element(scnode,currentEdge,currentEdge->value));
+		dd->U.push(U_element(scnode,currentEdge,currentEdge->value));
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
 	// in shortDijkstra.
-	if(!dd.U.empty()){
-		dd.resetlist.push_front(dd.U.top().targetedge->other_node);
+	if(!dd->U.empty()){
+		dd->resetlist.push_front(dd->U.top().targetedge->other_node);
 	}
 	else{
 		cout << "Warnung: U ist leer" << endl;
@@ -317,30 +323,30 @@ void CHConstruction<G>::addShortcuts(DijkstraData dd, list<Shortcut>* sclist,
 	while(it.hasNext()){
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
-		if(!dd.found[tmpnode]){
+		if(!dd->found[tmpnode]){
 			shortDijkstra(dd, tmpnode, conode, sclist, firstSCE);
 		}
 	}
 	// Prüfen ob noch ein weiterer Pfad mit gleicher Distanz für die
 	// letzten gesichteten Shortcuts mit gleicher Länge existiert.
 	// Mögliche Kanten der Länge 0 werden im Moment NICHT berücksichtigt! TODO??
-	dd.lastDist = dd.U.top().distance;
-	dd.U.pop();
-	while(dd.U.top().distance == dd.lastDist && !dd.U.empty()){
-		dd.sameDist.erase(dd.U.top().targetedge->other_node);
-		dd.U.pop();
+	dd->lastDist = dd->U.top().distance;
+	dd->U.pop();
+	while(dd->U.top().distance == dd->lastDist && !dd->U.empty()){
+		dd->sameDist.erase(dd->U.top().targetedge->other_node);
+		dd->U.pop();
 	}
 	// Die letzten Shortcuts einfügen.
-	for(map<unsigned int, Shortcut>::iterator it=dd.sameDist.begin(); it!=dd.sameDist.end(); it++){
+	for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
 		sclist->push_front(it->second);
 	}
-	dd.sameDist.clear();
+	dd->sameDist.clear();
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
 	resetDij(dd);
 }
 
 template <typename G>
-void CHConstruction<G>::shortDijkstra(DijkstraData dd, unsigned int targetnode,
+void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 		unsigned int conode, list<Shortcut>* sclist, Edge* firstSCE){
 	unsigned int tmpid;
 	EdgesIterator it;
@@ -350,80 +356,80 @@ void CHConstruction<G>::shortDijkstra(DijkstraData dd, unsigned int targetnode,
 	// oder einer der ersten Knoten. Außerdem muss er nicht in die Resetliste einge-
 	// fügt werden, das dies auch schon gemacht wurde, für den Fall, dass er nichtmehr
 	// abgearbeitet werden muss.
-	if((tmpid = dd.U.top().targetedge->other_node) != targetnode){
-		dd.dist[tmpid] = dd.U.top().distance;
-		dd.found[tmpid] = true;
+	if((tmpid = dd->U.top().targetedge->other_node) != targetnode){
+		dd->dist[tmpid] = dd->U.top().distance;
+		dd->found[tmpid] = true;
 		it = g->getOutEdgesIt_Round(tmpid);
 		while(it.hasNext()){
 			currentEdge = it.getNext();
 			// Wenn sie noch nicht gefunden wurde...
-			if(!dd.found[currentEdge->other_node]){
+			if(!dd->found[currentEdge->other_node]){
 				// ...tu sie in U
-				dd.U.push(U_element(
-							tmpid,currentEdge,currentEdge->value+dd.dist[tmpid]));
+				dd->U.push(U_element(
+							tmpid,currentEdge,currentEdge->value+dd->dist[tmpid]));
 			}   
 		}
-		dd.lastDist = dd.dist[tmpid];
-		dd.U.pop();
+		dd->lastDist = dd->dist[tmpid];
+		dd->U.pop();
 
 		// Die restlichen Knoten abarbeiten.
-		while((tmpid = dd.U.top().targetedge->other_node) != targetnode){
+		while((tmpid = dd->U.top().targetedge->other_node) != targetnode){
 			// Prüfen ob noch uneindeutige kürzeste Wege gefunden werden können.
-			if(dd.lastDist == dd.U.top().distance){
+			if(dd->lastDist == dd->U.top().distance){
 				// Löschen, wenn einer existiert.
-				dd.sameDist.erase(tmpid);
+				dd->sameDist.erase(tmpid);
 			}
 			else{
-				for(map<unsigned int, Shortcut>::iterator it=dd.sameDist.begin(); it!=dd.sameDist.end(); it++){
+				for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
 					sclist->push_front(it->second);
 				}
-				dd.sameDist.clear();
+				dd->sameDist.clear();
 			}
-			if(!dd.found[tmpid]){
-				dd.dist[tmpid] = dd.U.top().distance;
-				dd.found[tmpid] = true;
-				dd.resetlist.push_front(tmpid);
-				if(dd.U.top().sourceid == conode){
-					dd.sameDist.insert(pair<unsigned int, Shortcut>(tmpid,
-							Shortcut(dd.U.top().targetedge->value+firstSCE->value,
-								firstSCE->other_node, tmpid, firstSCE->id, dd.U.top().targetedge->id)));
+			if(!dd->found[tmpid]){
+				dd->dist[tmpid] = dd->U.top().distance;
+				dd->found[tmpid] = true;
+				dd->resetlist.push_front(tmpid);
+				if(dd->U.top().sourceid == conode){
+					dd->sameDist.insert(pair<unsigned int, Shortcut>(tmpid,
+							Shortcut(dd->U.top().targetedge->value+firstSCE->value,
+								firstSCE->other_node, tmpid, firstSCE->id, dd->U.top().targetedge->id)));
 				}
 				it = g->getOutEdgesIt_Round(tmpid);
 				while(it.hasNext()){
 					currentEdge = it.getNext();
 					// Wenn sie noch nicht gefunden wurde...
-					if(!dd.found[currentEdge->other_node]){
+					if(!dd->found[currentEdge->other_node]){
 						// ...tu sie in U
-						dd.U.push(U_element(
-								tmpid,currentEdge,currentEdge->value+dd.dist[tmpid]));
+						dd->U.push(U_element(
+								tmpid,currentEdge,currentEdge->value+dd->dist[tmpid]));
 					}   
 				}
 			}
-			dd.lastDist = dd.dist[tmpid];
-			dd.U.pop();
+			dd->lastDist = dd->dist[tmpid];
+			dd->U.pop();
 		}
-		dd.resetlist.push_front(targetnode);
+		dd->resetlist.push_front(targetnode);
 	}
 	// Von targetnode noch die Shortcuts legen und in die Reset Liste einfügen,
 	// falls es der letzte Knoten war, der zu bearbeiten war in dieser Dijkstra
 	// Runde.
-	if(dd.U.top().sourceid == conode){
-		dd.sameDist.insert(pair<unsigned int, Shortcut>(targetnode,
-				Shortcut(dd.U.top().targetedge->value+firstSCE->value, firstSCE->other_node, targetnode,
-					firstSCE->id, dd.U.top().targetedge->id)));
+	if(dd->U.top().sourceid == conode){
+		dd->sameDist.insert(pair<unsigned int, Shortcut>(targetnode,
+				Shortcut(dd->U.top().targetedge->value+firstSCE->value, firstSCE->other_node, targetnode,
+					firstSCE->id, dd->U.top().targetedge->id)));
 	}
 }
 
 template <typename G>
-void CHConstruction<G>::resetDij(DijkstraData dd){
+void CHConstruction<G>::resetDij(DijkstraData* dd){
 	unsigned int current;
-	while(!dd.resetlist.empty()){
-		current = dd.resetlist.front();
-		dd.found[current] = false;
-		dd.dist[current] = numeric_limits<unsigned int>::max();
-		dd.resetlist.pop_front();
+	while(!dd->resetlist.empty()){
+		current = dd->resetlist.front();
+		dd->found[current] = false;
+		dd->dist[current] = numeric_limits<unsigned int>::max();
+		dd->resetlist.pop_front();
 	}
-	dd.U = priority_queue<U_element, vector<U_element>, Compare_U_element>();
+	dd->U = priority_queue<U_element, vector<U_element>, Compare_U_element>();
 }
 
 template <typename G>
@@ -447,13 +453,13 @@ template <typename G>
 void CHConstruction<G>::blackenNode(unsigned int id){
 	unique_lock<mutex> lock(mBlacken);
 	conodelist->push_front(id);
-	is_node_black[id] = true;
 }
 
 template <typename G>
 void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 	unique_lock<mutex> lock(mInsertSC);
 	allsclist->splice(allsclist->end(), *sclist);
+	delete sclist;
 }
 
 #endif
