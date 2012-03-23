@@ -207,9 +207,9 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
    }
    delete nodes;
 	cout << len << endl;
-	cout << "Arith Mean: " << arithMean/len << endl;
 	// Das arithmetische Mittel dieser Runde berechnen.
 	if(len != 0){
+		cout << "Arith Mean: " << arithMean/len << endl;
 		arithMean = arithMean/len;
 		return true;
 	}
