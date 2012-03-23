@@ -293,6 +293,7 @@ void CHConstruction<G>::contract_node(DijkstraData* dd, unsigned int conode){
 		blackenNode(conode);
 		insertShortcuts(sclist);
 	}
+	delete sclist;
 }
 
 template <typename G>
@@ -460,7 +461,6 @@ template <typename G>
 void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 	unique_lock<mutex> lock(mInsertSC);
 	allsclist->splice(allsclist->end(), *sclist);
-	delete sclist;
 }
 
 #endif
