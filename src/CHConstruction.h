@@ -6,6 +6,7 @@
 #include <limits>
 #include <list>
 #include <map>
+#include <thread>
 using namespace std;
 
 struct DijkstraData;
@@ -37,13 +38,19 @@ class CHConstruction{
 		G* g;
 		unsigned int nr_of_nodes;
 
+		// Die zu kontrahierenden Knoten
+		list<unsigned int>* nodes;
 		vector<bool> is_node_black;
 		// Listen um den Graphen nachher umzubauen
 		list<Shortcut>* allsclist;
 		list<unsigned int>* conodelist;
 		// Um sich das Arithmetische Mittel der letzten Runde zu merken.
 		int arithMean;
-		int tmpArithMean;
+		// Mutexes für die Parallelisierung.
+      mutex mBlacken;
+      mutex mGetNext;
+      mutex mInsertSC;
+		mutex mArithMean;
 
 	public:
 		// Strukt für einzelne Daten des Dijkstra.
@@ -58,6 +65,8 @@ class CHConstruction{
 			// Reset Liste, um zu wissen welche Felder zurück
 			// gesetzt werden müssen. Sollte Laufzeit verbessern.
 			list<unsigned int> resetlist;
+			// Um sich das Arithmetisches Mittel zu merken.
+			int tmpArithMean;
 
 			DijkstraData(unsigned int nr_of_nodes):
 				found(nr_of_nodes,false),
@@ -73,12 +82,6 @@ class CHConstruction{
 		 * @return Pointer auf Liste der Knoten des Max Ind Sets.
 		 */
 		list<unsigned int>* independent_set();
-		/*
-		 * Kontrahiert einen Knoten.
-		 *
-		 * @conode Der zu kontrahierende Knoten.
-		 */
-		void contract_node(DijkstraData dd, unsigned int conode);
 		/*
 		 *	Berechnet für einen Knoten die möglichen Shortcuts, die von
 		 *	ihm ausgehen.
@@ -105,6 +108,18 @@ class CHConstruction{
 		 * Sollte die Laufzeit verbessern.
 		 */
 		void resetDij(DijkstraData dd);
+      /*
+       * Schwärzt einen Knoten.
+       *
+       * @id Die id des zu schwärzenden Knoten.
+       */
+      void blackenNode(unsigned int id);
+      /*
+       * Fügt die Shortcuts in die große Liste ein.
+       *
+       * @sclist Die einzufügenden Shortcuts.
+       */
+      void insertShortcuts(list<Shortcut>* sclist);
 
 	public:
 		CHConstruction(G* g);
@@ -121,10 +136,35 @@ class CHConstruction{
 		 * @return Gibt true zurück, solange man noch nicht fertig ist.
 		 */
 		bool calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist);
+		/*
+		 * Kontrahiert einen Knoten.
+		 *
+		 * @conode Der zu kontrahierende Knoten.
+		 */
+		void contract_node(DijkstraData dd, unsigned int conode);
+      /*
+       * Holt sich den nächsten zu kontrahierenden Knoten.
+		 *
+       * @id Der gefragte Knoten.
+       * @return True gdw. noch Knoten vorhanden waren.
+       */
+      bool getNextNode(unsigned int* id);
+		/*
+		 * Das arithmetische Mittel übergeben.
+		 *
+		 * @am Den Wert des arith Mittels für einen Thread.
+		 */
+		void addArithMean(int am);
 };
 
 template <typename G>
-void run(CHConstruction<G>* chc, typename CHConstruction<G>::DijkstraData dd){ //TODO Wieso Typename?
+void run(CHConstruction<G>* chc, typename CHConstruction<G>::DijkstraData dd){
+	unsigned int tmpNode;
+	dd.tmpArithMean = 0;
+	while(chc->getNextNode(&tmpNode)){
+		chc->contract_node(dd, tmpNode);
+	}
+	chc->addArithMean(dd.tmpArithMean);
 }
 
 template <typename G>
@@ -144,25 +184,29 @@ CHConstruction<G>::~CHConstruction(){
 
 template <typename G>
 bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
-	allsclist = sclist;
-	conodelist = nodelist;
-	tmpArithMean = 0;
-	list<unsigned int>* nodes = independent_set();
+   allsclist = sclist;
+   conodelist = nodelist;
+	arithMean = 0;
+	nodes = independent_set();
 	int len = nodes->size();
-	while(!nodes->empty()){
-		contract_node(DijkstraData(nr_of_nodes), nodes->front());
-		nodes->pop_front();
-	}
-	delete nodes;
+   list<thread> threadlist;
+   int numProc = 2;
+	// Threads erstellen, die auf den jeweiligen Prozessoren laufen sollen.
+   for(int i=0; i<numProc; i++){
+      threadlist.push_back(thread(&run<G>, this, DijkstraData(nr_of_nodes)));
+   }
+   for(int i=0; i<numProc; i++){
+      threadlist.front().join();
+      threadlist.pop_front();
+   }
+   delete nodes;
 	cout << len << endl;
-	// cout << arithMean << endl;
+	// Das arithmetische Mittel dieser Runde berechnen.
 	if(len != 0){
-		arithMean = tmpArithMean/len;
+		arithMean = arithMean/len;
 		return true;
 	}
-	else{
-		return false;
-	}
+	return false;
 }
 
 template <typename G>
@@ -236,7 +280,7 @@ void CHConstruction<G>::contract_node(DijkstraData dd, unsigned int conode){
 	}
 	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
 	int tmpEdgeDiff = sclist.size() - (g->getEdgeCount(conode));
-	tmpArithMean += tmpEdgeDiff;
+	dd.tmpArithMean += tmpEdgeDiff;
 	if(tmpEdgeDiff <= arithMean){
 		conodelist->push_front(conode);
 		is_node_black[conode] = true;
@@ -380,6 +424,36 @@ void CHConstruction<G>::resetDij(DijkstraData dd){
 		dd.resetlist.pop_front();
 	}
 	dd.U = priority_queue<U_element, vector<U_element>, Compare_U_element>();
+}
+
+template <typename G>
+bool CHConstruction<G>::getNextNode(unsigned int* id){
+	unique_lock<mutex> lock(mGetNext);
+	if(!nodes->empty()){
+		*id = nodes->front();
+		nodes->pop_front();
+		return true;
+	}
+	return false;
+}
+
+template <typename G>
+void CHConstruction<G>::addArithMean(int am){
+	unique_lock<mutex> lock(mArithMean);
+	arithMean += am;
+}
+
+template <typename G>
+void CHConstruction<G>::blackenNode(unsigned int id){
+	unique_lock<mutex> lock(mBlacken);
+	conodelist->push_front(id);
+	is_node_black[id] = true;
+}
+
+template <typename G>
+void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
+	unique_lock<mutex> lock(mInsertSC);
+	allsclist->splice(allsclist->end(), *sclist);
 }
 
 #endif
