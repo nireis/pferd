@@ -9,13 +9,15 @@
 //hjw          /        `-`'
 //http://www.asciiworld.com/-Horses-.html 
 //
-//	Pferd's lightweigth openGL visualization
-//	Version 0.7 (texture testing)
+//	Pferd's lightweigth openGL visualization!
+//	Version 0.75 (advanced texture testing)
 //	TODO for 0.8: complete texture loading & displaying
 //	TODO for 0.9: add labels for nodes/edges
 //	TODO for 1.0: optimize version 0.9
+//	TODO for 1.1: add mouse support
+//	TODO for 2.0: project map onto a sphere
 //
-//	Requires freeglut, glew, glm and SOIL! Check the respective website for the sources.
+//	Requires freeglut, glew, glm and SOIL! Check the respective websites for the sources.
 //
 //	HOW TO:
 //	(Windows)
@@ -69,7 +71,7 @@ private:
 	/*
 	/	da fuck i just created...
 	/	GLUT doesn't work with non-static member functions
-	/	workaround using static functions as a wrapper for the draw function
+	/	workaround using static functions as a wrappers
 	*/
 	static openGLrender* currentInstance;
 	static void setInstance(openGLrender*);
@@ -103,13 +105,15 @@ private:
 
 	//openGL textures
 	GLuint *map_textures;
-	int textureCount;
+	int mapCount;
 
 	//shader program
 	GLuint program;
 	GLuint program2;
 
 	//used to read the shader source code - needs to be replaced
+	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
+	//for the code
 	char* file_read(const char*);
 
 	//loads & compiles shader sources
@@ -126,11 +130,15 @@ private:
 	bool initTextures();
 	//clean up
 	void uninit();
-
+	
+	//manages keyboard input
 	void keyboard(unsigned char, int, int);
 	void keyboardArrows(int, int, int);
+	//renders geometry on the screen
 	void display();
+	//idle function, called if GLUT eventqueue is empty
 	void idle();
+	//handles window resizing
 	void resize(int, int);
 
 public:
