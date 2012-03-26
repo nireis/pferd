@@ -118,6 +118,15 @@ struct openGL_Node_3d_uv {
 	float v_coord;
 };
 
+//Map-tiles
+struct openGL_quad {
+	openGL_quad() : vert1(), vert2(), vert3(), vert4() {}
+	openGL_Node_3d_uv vert1;
+	openGL_Node_3d_uv vert2;
+	openGL_Node_3d_uv vert3;
+	openGL_Node_3d_uv vert4;
+};
+
 
 /*
  * Shortcut, wie der Graph ihn als Eingabe erwartet
