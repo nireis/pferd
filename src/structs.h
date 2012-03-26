@@ -90,6 +90,47 @@ struct NodeData {
 	double lon;
 };
 
+//Nodetype 1 for openGL Vis
+struct openGL_Node_2d {
+	openGL_Node_2d() : lon(0), lat(0) {}
+	openGL_Node_2d(float lo, float la) : 
+		lon(lo), lat(la) {}
+	double lon;
+	double lat;
+};
+
+//Nodetype 2 for openGL Vis
+struct openGL_Node_3d {
+	openGL_Node_3d() : lon(0), lat(0), extra(0) {}
+	openGL_Node_3d(float lo, float la, float e) : 
+		lon(lo), lat(la), extra(e) {}
+	float lon;
+	float lat;
+	float extra;
+};
+
+//Nodetype 3 for openGL Vis
+struct openGL_Node_3d_uv {
+	openGL_Node_3d_uv() : lon(0), lat(0), extra(0) {}
+	openGL_Node_3d_uv(float lo, float la, float e, float u, float v) : 
+		lon(lo), lat(la), extra(e), u_coord(u), v_coord(v) {}
+	float lon;
+	float lat;
+	float extra;
+	float u_coord;
+	float v_coord;
+};
+
+//Map-tiles
+struct openGL_quad {
+	openGL_quad() : vert1(), vert2(), vert3(), vert4() {}
+	openGL_Node_3d_uv vert1;
+	openGL_Node_3d_uv vert2;
+	openGL_Node_3d_uv vert3;
+	openGL_Node_3d_uv vert4;
+};
+
+
 /*
  * Shortcut, wie der Graph ihn als Eingabe erwartet
  *

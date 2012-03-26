@@ -247,6 +247,7 @@ class SCGraph {
 			return &round_node_blacklist; }
 
 		ND getNodeData(unsigned int node_id);
+		ND* getNodeDataPointer(){ return node_data; }
 		ED getEdgeData(unsigned int edge_id);
 
 		EdgesIterator getOutEdgesIt(unsigned int node){
