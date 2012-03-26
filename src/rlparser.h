@@ -4,7 +4,7 @@
 class RlParser{
 	private:
 		int cs;
-		int fd;
+		FILE* f;
 
 		ParserNode* nodes;
 		ParserEdge* edges;

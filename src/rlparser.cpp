@@ -6,9 +6,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "structs.h"
 #include "rlparser.h"
@@ -34,7 +34,7 @@ RlParser::RlParser(const char* filename){
 	cs = 0;
 	current_node = 0;
 	current_edge = 0;
-	fd = open(filename, O_RDONLY);
+	f = fopen(filename, "r");
 	
 #line 40 "rlparser.cpp"
 	{
@@ -46,13 +46,12 @@ RlParser::RlParser(const char* filename){
 
 unsigned int RlParser::getNodeCount(){
 	char buf[1];
-	int r;
 	do{
-		r = read(fd, buf, sizeof(buf));
+		buf[0] = fgetc(f);
 		const char *p = buf;
 		const char *pe = buf + 1;
 		
-#line 56 "rlparser.cpp"
+#line 55 "rlparser.cpp"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -94,7 +93,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 98 "rlparser.cpp"
+#line 97 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr3;
 		case 13: goto tr4;
@@ -112,7 +111,7 @@ st4:
 	if ( ++p == pe )
 		goto _test_eof4;
 case 4:
-#line 116 "rlparser.cpp"
+#line 115 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st5;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -145,7 +144,7 @@ st6:
 	if ( ++p == pe )
 		goto _test_eof6;
 case 6:
-#line 149 "rlparser.cpp"
+#line 148 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr8;
 		case 13: goto tr9;
@@ -193,7 +192,7 @@ st54:
 	if ( ++p == pe )
 		goto _test_eof54;
 case 54:
-#line 197 "rlparser.cpp"
+#line 196 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st7;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -226,7 +225,7 @@ st8:
 	if ( ++p == pe )
 		goto _test_eof8;
 case 8:
-#line 230 "rlparser.cpp"
+#line 229 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr12;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -242,7 +241,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 246 "rlparser.cpp"
+#line 245 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr14;
 		case 43: goto tr15;
@@ -267,7 +266,7 @@ st10:
 	if ( ++p == pe )
 		goto _test_eof10;
 case 10:
-#line 271 "rlparser.cpp"
+#line 270 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr20;
@@ -296,7 +295,7 @@ st11:
 	if ( ++p == pe )
 		goto _test_eof11;
 case 11:
-#line 300 "rlparser.cpp"
+#line 299 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr24;
@@ -321,7 +320,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 325 "rlparser.cpp"
+#line 324 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -368,7 +367,7 @@ st13:
 	if ( ++p == pe )
 		goto _test_eof13;
 case 13:
-#line 372 "rlparser.cpp"
+#line 371 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr31;
@@ -393,7 +392,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 397 "rlparser.cpp"
+#line 396 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -421,7 +420,7 @@ st15:
 	if ( ++p == pe )
 		goto _test_eof15;
 case 15:
-#line 425 "rlparser.cpp"
+#line 424 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st15;
 		case 43: goto tr39;
@@ -440,7 +439,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 444 "rlparser.cpp"
+#line 443 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr42;
 	goto st0;
@@ -464,7 +463,7 @@ st17:
 	if ( ++p == pe )
 		goto _test_eof17;
 case 17:
-#line 468 "rlparser.cpp"
+#line 467 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -512,7 +511,7 @@ st18:
 	if ( ++p == pe )
 		goto _test_eof18;
 case 18:
-#line 516 "rlparser.cpp"
+#line 515 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st54;
 	goto st0;
@@ -526,7 +525,7 @@ st19:
 	if ( ++p == pe )
 		goto _test_eof19;
 case 19:
-#line 530 "rlparser.cpp"
+#line 529 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr46;
 	goto st0;
@@ -540,7 +539,7 @@ st20:
 	if ( ++p == pe )
 		goto _test_eof20;
 case 20:
-#line 544 "rlparser.cpp"
+#line 543 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -566,7 +565,7 @@ st21:
 	if ( ++p == pe )
 		goto _test_eof21;
 case 21:
-#line 570 "rlparser.cpp"
+#line 569 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr35;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -605,7 +604,7 @@ st22:
 	if ( ++p == pe )
 		goto _test_eof22;
 case 22:
-#line 609 "rlparser.cpp"
+#line 608 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -630,7 +629,7 @@ st23:
 	if ( ++p == pe )
 		goto _test_eof23;
 case 23:
-#line 634 "rlparser.cpp"
+#line 633 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -649,7 +648,7 @@ st24:
 	if ( ++p == pe )
 		goto _test_eof24;
 case 24:
-#line 653 "rlparser.cpp"
+#line 652 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr50;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -669,7 +668,7 @@ st25:
 	if ( ++p == pe )
 		goto _test_eof25;
 case 25:
-#line 673 "rlparser.cpp"
+#line 672 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -697,7 +696,7 @@ st26:
 	if ( ++p == pe )
 		goto _test_eof26;
 case 26:
-#line 701 "rlparser.cpp"
+#line 700 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr27;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -736,7 +735,7 @@ st27:
 	if ( ++p == pe )
 		goto _test_eof27;
 case 27:
-#line 740 "rlparser.cpp"
+#line 739 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -761,7 +760,7 @@ st28:
 	if ( ++p == pe )
 		goto _test_eof28;
 case 28:
-#line 765 "rlparser.cpp"
+#line 764 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -780,7 +779,7 @@ st29:
 	if ( ++p == pe )
 		goto _test_eof29;
 case 29:
-#line 784 "rlparser.cpp"
+#line 783 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr55;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -800,7 +799,7 @@ st30:
 	if ( ++p == pe )
 		goto _test_eof30;
 case 30:
-#line 804 "rlparser.cpp"
+#line 803 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -838,7 +837,7 @@ st31:
 	if ( ++p == pe )
 		goto _test_eof31;
 case 31:
-#line 842 "rlparser.cpp"
+#line 841 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -863,7 +862,7 @@ st32:
 	if ( ++p == pe )
 		goto _test_eof32;
 case 32:
-#line 867 "rlparser.cpp"
+#line 866 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -899,7 +898,7 @@ st33:
 	if ( ++p == pe )
 		goto _test_eof33;
 case 33:
-#line 903 "rlparser.cpp"
+#line 902 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr61;
 		case 46: goto st37;
@@ -927,7 +926,7 @@ st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-#line 931 "rlparser.cpp"
+#line 930 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr64;
@@ -965,7 +964,7 @@ st35:
 	if ( ++p == pe )
 		goto _test_eof35;
 case 35:
-#line 969 "rlparser.cpp"
+#line 968 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -990,7 +989,7 @@ st36:
 	if ( ++p == pe )
 		goto _test_eof36;
 case 36:
-#line 994 "rlparser.cpp"
+#line 993 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -1016,7 +1015,7 @@ st37:
 	if ( ++p == pe )
 		goto _test_eof37;
 case 37:
-#line 1020 "rlparser.cpp"
+#line 1019 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr61;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1039,7 +1038,7 @@ st38:
 	if ( ++p == pe )
 		goto _test_eof38;
 case 38:
-#line 1043 "rlparser.cpp"
+#line 1042 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr70;
 		case 46: goto st39;
@@ -1058,7 +1057,7 @@ st39:
 	if ( ++p == pe )
 		goto _test_eof39;
 case 39:
-#line 1062 "rlparser.cpp"
+#line 1061 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr70;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1074,7 +1073,7 @@ st40:
 	if ( ++p == pe )
 		goto _test_eof40;
 case 40:
-#line 1078 "rlparser.cpp"
+#line 1077 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st4;
 	goto st0;
@@ -1112,7 +1111,7 @@ st56:
 	if ( ++p == pe )
 		goto _test_eof56;
 case 56:
-#line 1116 "rlparser.cpp"
+#line 1115 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st42;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1145,7 +1144,7 @@ st43:
 	if ( ++p == pe )
 		goto _test_eof43;
 case 43:
-#line 1149 "rlparser.cpp"
+#line 1148 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr77;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1161,7 +1160,7 @@ st44:
 	if ( ++p == pe )
 		goto _test_eof44;
 case 44:
-#line 1165 "rlparser.cpp"
+#line 1164 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st44;
 		case 43: goto st45;
@@ -1196,7 +1195,7 @@ st46:
 	if ( ++p == pe )
 		goto _test_eof46;
 case 46:
-#line 1200 "rlparser.cpp"
+#line 1199 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr82;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1212,7 +1211,7 @@ st47:
 	if ( ++p == pe )
 		goto _test_eof47;
 case 47:
-#line 1216 "rlparser.cpp"
+#line 1215 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st47;
 		case 43: goto st48;
@@ -1247,7 +1246,7 @@ st49:
 	if ( ++p == pe )
 		goto _test_eof49;
 case 49:
-#line 1251 "rlparser.cpp"
+#line 1250 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr87;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1263,7 +1262,7 @@ st50:
 	if ( ++p == pe )
 		goto _test_eof50;
 case 50:
-#line 1267 "rlparser.cpp"
+#line 1266 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st50;
 		case 43: goto st51;
@@ -1298,7 +1297,7 @@ st52:
 	if ( ++p == pe )
 		goto _test_eof52;
 case 52:
-#line 1302 "rlparser.cpp"
+#line 1301 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr92;
 		case 13: goto tr93;
@@ -1323,7 +1322,7 @@ st53:
 	if ( ++p == pe )
 		goto _test_eof53;
 case 53:
-#line 1327 "rlparser.cpp"
+#line 1326 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st56;
 	goto st0;
@@ -1388,20 +1387,19 @@ case 53:
 	_out: {}
 	}
 
-#line 148 "rlparser.rl"
-	}while(buf[0] != '\n' && r > 0);
+#line 147 "rlparser.rl"
+	}while(buf[0] != '\n');
 	return node_count;
 }
 
 unsigned int RlParser::getEdgeCount(){
 	char buf[1];
-	int r;
 	do{
-		r = read(fd, buf, sizeof(buf));
+		buf[0] = fgetc(f);
 		const char *p = buf;
 		const char *pe = buf + 1;
 		
-#line 1405 "rlparser.cpp"
+#line 1403 "rlparser.cpp"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -1443,7 +1441,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 1447 "rlparser.cpp"
+#line 1445 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr3;
 		case 13: goto tr4;
@@ -1461,7 +1459,7 @@ st4:
 	if ( ++p == pe )
 		goto _test_eof4;
 case 4:
-#line 1465 "rlparser.cpp"
+#line 1463 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st5;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1494,7 +1492,7 @@ st6:
 	if ( ++p == pe )
 		goto _test_eof6;
 case 6:
-#line 1498 "rlparser.cpp"
+#line 1496 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr8;
 		case 13: goto tr9;
@@ -1542,7 +1540,7 @@ st54:
 	if ( ++p == pe )
 		goto _test_eof54;
 case 54:
-#line 1546 "rlparser.cpp"
+#line 1544 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st7;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1575,7 +1573,7 @@ st8:
 	if ( ++p == pe )
 		goto _test_eof8;
 case 8:
-#line 1579 "rlparser.cpp"
+#line 1577 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr12;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1591,7 +1589,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 1595 "rlparser.cpp"
+#line 1593 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr14;
 		case 43: goto tr15;
@@ -1616,7 +1614,7 @@ st10:
 	if ( ++p == pe )
 		goto _test_eof10;
 case 10:
-#line 1620 "rlparser.cpp"
+#line 1618 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr20;
@@ -1645,7 +1643,7 @@ st11:
 	if ( ++p == pe )
 		goto _test_eof11;
 case 11:
-#line 1649 "rlparser.cpp"
+#line 1647 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr24;
@@ -1670,7 +1668,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 1674 "rlparser.cpp"
+#line 1672 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -1717,7 +1715,7 @@ st13:
 	if ( ++p == pe )
 		goto _test_eof13;
 case 13:
-#line 1721 "rlparser.cpp"
+#line 1719 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr31;
@@ -1742,7 +1740,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 1746 "rlparser.cpp"
+#line 1744 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -1770,7 +1768,7 @@ st15:
 	if ( ++p == pe )
 		goto _test_eof15;
 case 15:
-#line 1774 "rlparser.cpp"
+#line 1772 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st15;
 		case 43: goto tr39;
@@ -1789,7 +1787,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 1793 "rlparser.cpp"
+#line 1791 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr42;
 	goto st0;
@@ -1813,7 +1811,7 @@ st17:
 	if ( ++p == pe )
 		goto _test_eof17;
 case 17:
-#line 1817 "rlparser.cpp"
+#line 1815 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -1861,7 +1859,7 @@ st18:
 	if ( ++p == pe )
 		goto _test_eof18;
 case 18:
-#line 1865 "rlparser.cpp"
+#line 1863 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st54;
 	goto st0;
@@ -1875,7 +1873,7 @@ st19:
 	if ( ++p == pe )
 		goto _test_eof19;
 case 19:
-#line 1879 "rlparser.cpp"
+#line 1877 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr46;
 	goto st0;
@@ -1889,7 +1887,7 @@ st20:
 	if ( ++p == pe )
 		goto _test_eof20;
 case 20:
-#line 1893 "rlparser.cpp"
+#line 1891 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -1915,7 +1913,7 @@ st21:
 	if ( ++p == pe )
 		goto _test_eof21;
 case 21:
-#line 1919 "rlparser.cpp"
+#line 1917 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr35;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -1954,7 +1952,7 @@ st22:
 	if ( ++p == pe )
 		goto _test_eof22;
 case 22:
-#line 1958 "rlparser.cpp"
+#line 1956 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -1979,7 +1977,7 @@ st23:
 	if ( ++p == pe )
 		goto _test_eof23;
 case 23:
-#line 1983 "rlparser.cpp"
+#line 1981 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -1998,7 +1996,7 @@ st24:
 	if ( ++p == pe )
 		goto _test_eof24;
 case 24:
-#line 2002 "rlparser.cpp"
+#line 2000 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr50;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2018,7 +2016,7 @@ st25:
 	if ( ++p == pe )
 		goto _test_eof25;
 case 25:
-#line 2022 "rlparser.cpp"
+#line 2020 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -2046,7 +2044,7 @@ st26:
 	if ( ++p == pe )
 		goto _test_eof26;
 case 26:
-#line 2050 "rlparser.cpp"
+#line 2048 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr27;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2085,7 +2083,7 @@ st27:
 	if ( ++p == pe )
 		goto _test_eof27;
 case 27:
-#line 2089 "rlparser.cpp"
+#line 2087 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -2110,7 +2108,7 @@ st28:
 	if ( ++p == pe )
 		goto _test_eof28;
 case 28:
-#line 2114 "rlparser.cpp"
+#line 2112 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -2129,7 +2127,7 @@ st29:
 	if ( ++p == pe )
 		goto _test_eof29;
 case 29:
-#line 2133 "rlparser.cpp"
+#line 2131 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr55;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2149,7 +2147,7 @@ st30:
 	if ( ++p == pe )
 		goto _test_eof30;
 case 30:
-#line 2153 "rlparser.cpp"
+#line 2151 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -2187,7 +2185,7 @@ st31:
 	if ( ++p == pe )
 		goto _test_eof31;
 case 31:
-#line 2191 "rlparser.cpp"
+#line 2189 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -2212,7 +2210,7 @@ st32:
 	if ( ++p == pe )
 		goto _test_eof32;
 case 32:
-#line 2216 "rlparser.cpp"
+#line 2214 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -2248,7 +2246,7 @@ st33:
 	if ( ++p == pe )
 		goto _test_eof33;
 case 33:
-#line 2252 "rlparser.cpp"
+#line 2250 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr61;
 		case 46: goto st37;
@@ -2276,7 +2274,7 @@ st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-#line 2280 "rlparser.cpp"
+#line 2278 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr64;
@@ -2314,7 +2312,7 @@ st35:
 	if ( ++p == pe )
 		goto _test_eof35;
 case 35:
-#line 2318 "rlparser.cpp"
+#line 2316 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -2339,7 +2337,7 @@ st36:
 	if ( ++p == pe )
 		goto _test_eof36;
 case 36:
-#line 2343 "rlparser.cpp"
+#line 2341 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -2365,7 +2363,7 @@ st37:
 	if ( ++p == pe )
 		goto _test_eof37;
 case 37:
-#line 2369 "rlparser.cpp"
+#line 2367 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr61;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2388,7 +2386,7 @@ st38:
 	if ( ++p == pe )
 		goto _test_eof38;
 case 38:
-#line 2392 "rlparser.cpp"
+#line 2390 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr70;
 		case 46: goto st39;
@@ -2407,7 +2405,7 @@ st39:
 	if ( ++p == pe )
 		goto _test_eof39;
 case 39:
-#line 2411 "rlparser.cpp"
+#line 2409 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr70;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2423,7 +2421,7 @@ st40:
 	if ( ++p == pe )
 		goto _test_eof40;
 case 40:
-#line 2427 "rlparser.cpp"
+#line 2425 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st4;
 	goto st0;
@@ -2461,7 +2459,7 @@ st56:
 	if ( ++p == pe )
 		goto _test_eof56;
 case 56:
-#line 2465 "rlparser.cpp"
+#line 2463 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st42;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2494,7 +2492,7 @@ st43:
 	if ( ++p == pe )
 		goto _test_eof43;
 case 43:
-#line 2498 "rlparser.cpp"
+#line 2496 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr77;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2510,7 +2508,7 @@ st44:
 	if ( ++p == pe )
 		goto _test_eof44;
 case 44:
-#line 2514 "rlparser.cpp"
+#line 2512 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st44;
 		case 43: goto st45;
@@ -2545,7 +2543,7 @@ st46:
 	if ( ++p == pe )
 		goto _test_eof46;
 case 46:
-#line 2549 "rlparser.cpp"
+#line 2547 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr82;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2561,7 +2559,7 @@ st47:
 	if ( ++p == pe )
 		goto _test_eof47;
 case 47:
-#line 2565 "rlparser.cpp"
+#line 2563 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st47;
 		case 43: goto st48;
@@ -2596,7 +2594,7 @@ st49:
 	if ( ++p == pe )
 		goto _test_eof49;
 case 49:
-#line 2600 "rlparser.cpp"
+#line 2598 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr87;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2612,7 +2610,7 @@ st50:
 	if ( ++p == pe )
 		goto _test_eof50;
 case 50:
-#line 2616 "rlparser.cpp"
+#line 2614 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st50;
 		case 43: goto st51;
@@ -2647,7 +2645,7 @@ st52:
 	if ( ++p == pe )
 		goto _test_eof52;
 case 52:
-#line 2651 "rlparser.cpp"
+#line 2649 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr92;
 		case 13: goto tr93;
@@ -2672,7 +2670,7 @@ st53:
 	if ( ++p == pe )
 		goto _test_eof53;
 case 53:
-#line 2676 "rlparser.cpp"
+#line 2674 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st56;
 	goto st0;
@@ -2737,8 +2735,8 @@ case 53:
 	_out: {}
 	}
 
-#line 160 "rlparser.rl"
-	}while(buf[0] != '\n' && r > 0);
+#line 158 "rlparser.rl"
+	}while(buf[0] != '\n');
 	return edge_count;
 }
 
@@ -2748,11 +2746,11 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 	char buf[128*1024];
 	int r;
 
-	while(0 < (r = read(fd, buf, sizeof(buf)))) {
+	while(0 < (r = fread(buf, sizeof(buf), 1, f))) {
 		const char *p = buf;
 		const char *pe = buf + r;
 		
-#line 2756 "rlparser.cpp"
+#line 2754 "rlparser.cpp"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -2794,7 +2792,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 2798 "rlparser.cpp"
+#line 2796 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr3;
 		case 13: goto tr4;
@@ -2812,7 +2810,7 @@ st4:
 	if ( ++p == pe )
 		goto _test_eof4;
 case 4:
-#line 2816 "rlparser.cpp"
+#line 2814 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st5;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2845,7 +2843,7 @@ st6:
 	if ( ++p == pe )
 		goto _test_eof6;
 case 6:
-#line 2849 "rlparser.cpp"
+#line 2847 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr8;
 		case 13: goto tr9;
@@ -2893,7 +2891,7 @@ st54:
 	if ( ++p == pe )
 		goto _test_eof54;
 case 54:
-#line 2897 "rlparser.cpp"
+#line 2895 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st7;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2926,7 +2924,7 @@ st8:
 	if ( ++p == pe )
 		goto _test_eof8;
 case 8:
-#line 2930 "rlparser.cpp"
+#line 2928 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr12;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2942,7 +2940,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 2946 "rlparser.cpp"
+#line 2944 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr14;
 		case 43: goto tr15;
@@ -2967,7 +2965,7 @@ st10:
 	if ( ++p == pe )
 		goto _test_eof10;
 case 10:
-#line 2971 "rlparser.cpp"
+#line 2969 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr20;
@@ -2996,7 +2994,7 @@ st11:
 	if ( ++p == pe )
 		goto _test_eof11;
 case 11:
-#line 3000 "rlparser.cpp"
+#line 2998 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr19;
 		case 43: goto tr24;
@@ -3021,7 +3019,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 3025 "rlparser.cpp"
+#line 3023 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -3068,7 +3066,7 @@ st13:
 	if ( ++p == pe )
 		goto _test_eof13;
 case 13:
-#line 3072 "rlparser.cpp"
+#line 3070 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr31;
@@ -3093,7 +3091,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 3097 "rlparser.cpp"
+#line 3095 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -3121,7 +3119,7 @@ st15:
 	if ( ++p == pe )
 		goto _test_eof15;
 case 15:
-#line 3125 "rlparser.cpp"
+#line 3123 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st15;
 		case 43: goto tr39;
@@ -3140,7 +3138,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 3144 "rlparser.cpp"
+#line 3142 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr42;
 	goto st0;
@@ -3164,7 +3162,7 @@ st17:
 	if ( ++p == pe )
 		goto _test_eof17;
 case 17:
-#line 3168 "rlparser.cpp"
+#line 3166 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -3212,7 +3210,7 @@ st18:
 	if ( ++p == pe )
 		goto _test_eof18;
 case 18:
-#line 3216 "rlparser.cpp"
+#line 3214 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st54;
 	goto st0;
@@ -3226,7 +3224,7 @@ st19:
 	if ( ++p == pe )
 		goto _test_eof19;
 case 19:
-#line 3230 "rlparser.cpp"
+#line 3228 "rlparser.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr46;
 	goto st0;
@@ -3240,7 +3238,7 @@ st20:
 	if ( ++p == pe )
 		goto _test_eof20;
 case 20:
-#line 3244 "rlparser.cpp"
+#line 3242 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -3266,7 +3264,7 @@ st21:
 	if ( ++p == pe )
 		goto _test_eof21;
 case 21:
-#line 3270 "rlparser.cpp"
+#line 3268 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr35;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3305,7 +3303,7 @@ st22:
 	if ( ++p == pe )
 		goto _test_eof22;
 case 22:
-#line 3309 "rlparser.cpp"
+#line 3307 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -3330,7 +3328,7 @@ st23:
 	if ( ++p == pe )
 		goto _test_eof23;
 case 23:
-#line 3334 "rlparser.cpp"
+#line 3332 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -3349,7 +3347,7 @@ st24:
 	if ( ++p == pe )
 		goto _test_eof24;
 case 24:
-#line 3353 "rlparser.cpp"
+#line 3351 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr50;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3369,7 +3367,7 @@ st25:
 	if ( ++p == pe )
 		goto _test_eof25;
 case 25:
-#line 3373 "rlparser.cpp"
+#line 3371 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -3397,7 +3395,7 @@ st26:
 	if ( ++p == pe )
 		goto _test_eof26;
 case 26:
-#line 3401 "rlparser.cpp"
+#line 3399 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr27;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3436,7 +3434,7 @@ st27:
 	if ( ++p == pe )
 		goto _test_eof27;
 case 27:
-#line 3440 "rlparser.cpp"
+#line 3438 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto tr44;
@@ -3461,7 +3459,7 @@ st28:
 	if ( ++p == pe )
 		goto _test_eof28;
 case 28:
-#line 3465 "rlparser.cpp"
+#line 3463 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -3480,7 +3478,7 @@ st29:
 	if ( ++p == pe )
 		goto _test_eof29;
 case 29:
-#line 3484 "rlparser.cpp"
+#line 3482 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr55;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3500,7 +3498,7 @@ st30:
 	if ( ++p == pe )
 		goto _test_eof30;
 case 30:
-#line 3504 "rlparser.cpp"
+#line 3502 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr47;
 		case 13: goto tr48;
@@ -3538,7 +3536,7 @@ st31:
 	if ( ++p == pe )
 		goto _test_eof31;
 case 31:
-#line 3542 "rlparser.cpp"
+#line 3540 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr27;
 		case 46: goto st26;
@@ -3563,7 +3561,7 @@ st32:
 	if ( ++p == pe )
 		goto _test_eof32;
 case 32:
-#line 3567 "rlparser.cpp"
+#line 3565 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr55;
 		case 46: goto st29;
@@ -3599,7 +3597,7 @@ st33:
 	if ( ++p == pe )
 		goto _test_eof33;
 case 33:
-#line 3603 "rlparser.cpp"
+#line 3601 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr61;
 		case 46: goto st37;
@@ -3627,7 +3625,7 @@ st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-#line 3631 "rlparser.cpp"
+#line 3629 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr30;
 		case 43: goto tr64;
@@ -3665,7 +3663,7 @@ st35:
 	if ( ++p == pe )
 		goto _test_eof35;
 case 35:
-#line 3669 "rlparser.cpp"
+#line 3667 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr35;
 		case 46: goto st21;
@@ -3690,7 +3688,7 @@ st36:
 	if ( ++p == pe )
 		goto _test_eof36;
 case 36:
-#line 3694 "rlparser.cpp"
+#line 3692 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr50;
 		case 46: goto st24;
@@ -3716,7 +3714,7 @@ st37:
 	if ( ++p == pe )
 		goto _test_eof37;
 case 37:
-#line 3720 "rlparser.cpp"
+#line 3718 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr61;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3739,7 +3737,7 @@ st38:
 	if ( ++p == pe )
 		goto _test_eof38;
 case 38:
-#line 3743 "rlparser.cpp"
+#line 3741 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto tr70;
 		case 46: goto st39;
@@ -3758,7 +3756,7 @@ st39:
 	if ( ++p == pe )
 		goto _test_eof39;
 case 39:
-#line 3762 "rlparser.cpp"
+#line 3760 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr70;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3774,7 +3772,7 @@ st40:
 	if ( ++p == pe )
 		goto _test_eof40;
 case 40:
-#line 3778 "rlparser.cpp"
+#line 3776 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st4;
 	goto st0;
@@ -3812,7 +3810,7 @@ st56:
 	if ( ++p == pe )
 		goto _test_eof56;
 case 56:
-#line 3816 "rlparser.cpp"
+#line 3814 "rlparser.cpp"
 	if ( (*p) == 43 )
 		goto st42;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3845,7 +3843,7 @@ st43:
 	if ( ++p == pe )
 		goto _test_eof43;
 case 43:
-#line 3849 "rlparser.cpp"
+#line 3847 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr77;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3861,7 +3859,7 @@ st44:
 	if ( ++p == pe )
 		goto _test_eof44;
 case 44:
-#line 3865 "rlparser.cpp"
+#line 3863 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st44;
 		case 43: goto st45;
@@ -3896,7 +3894,7 @@ st46:
 	if ( ++p == pe )
 		goto _test_eof46;
 case 46:
-#line 3900 "rlparser.cpp"
+#line 3898 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr82;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3912,7 +3910,7 @@ st47:
 	if ( ++p == pe )
 		goto _test_eof47;
 case 47:
-#line 3916 "rlparser.cpp"
+#line 3914 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st47;
 		case 43: goto st48;
@@ -3947,7 +3945,7 @@ st49:
 	if ( ++p == pe )
 		goto _test_eof49;
 case 49:
-#line 3951 "rlparser.cpp"
+#line 3949 "rlparser.cpp"
 	if ( (*p) == 32 )
 		goto tr87;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -3963,7 +3961,7 @@ st50:
 	if ( ++p == pe )
 		goto _test_eof50;
 case 50:
-#line 3967 "rlparser.cpp"
+#line 3965 "rlparser.cpp"
 	switch( (*p) ) {
 		case 32: goto st50;
 		case 43: goto st51;
@@ -3998,7 +3996,7 @@ st52:
 	if ( ++p == pe )
 		goto _test_eof52;
 case 52:
-#line 4002 "rlparser.cpp"
+#line 4000 "rlparser.cpp"
 	switch( (*p) ) {
 		case 10: goto tr92;
 		case 13: goto tr93;
@@ -4023,7 +4021,7 @@ st53:
 	if ( ++p == pe )
 		goto _test_eof53;
 case 53:
-#line 4027 "rlparser.cpp"
+#line 4025 "rlparser.cpp"
 	if ( (*p) == 10 )
 		goto st56;
 	goto st0;
@@ -4088,8 +4086,8 @@ case 53:
 	_out: {}
 	}
 
-#line 174 "rlparser.rl"
+#line 172 "rlparser.rl"
 	}
 
-	close(fd);
+	fclose(f);
 }

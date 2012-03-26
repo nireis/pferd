@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "structs.h"
 #include "rlparser.h"
@@ -133,31 +133,29 @@ RlParser::RlParser(const char* filename){
 	cs = 0;
 	current_node = 0;
 	current_edge = 0;
-	fd = open(filename, O_RDONLY);
+	f = fopen(filename, "r");
 	%%write init;
 }
 
 unsigned int RlParser::getNodeCount(){
 	char buf[1];
-	int r;
 	do{
-		r = read(fd, buf, sizeof(buf));
+		buf[0] = fgetc(f);
 		const char *p = buf;
 		const char *pe = buf + 1;
 		%% write exec;
-	}while(buf[0] != '\n' && r > 0);
+	}while(buf[0] != '\n');
 	return node_count;
 }
 
 unsigned int RlParser::getEdgeCount(){
 	char buf[1];
-	int r;
 	do{
-		r = read(fd, buf, sizeof(buf));
+		buf[0] = fgetc(f);
 		const char *p = buf;
 		const char *pe = buf + 1;
 		%% write exec;
-	}while(buf[0] != '\n' && r > 0);
+	}while(buf[0] != '\n');
 	return edge_count;
 }
 
@@ -167,11 +165,11 @@ void RlParser::getNodesAndEdges(ParserNode* n, ParserEdge* e){
 	char buf[128*1024];
 	int r;
 
-	while(0 < (r = read(fd, buf, sizeof(buf)))) {
+	while(0 < (r = fread(buf, sizeof(buf), 1, f))) {
 		const char *p = buf;
 		const char *pe = buf + r;
 		%% write exec;
 	}
 
-	close(fd);
+	fclose(f);
 }
