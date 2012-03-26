@@ -7,6 +7,7 @@
 #include <list>
 #include <map>
 #include <thread>
+#include <mutex>
 using namespace std;
 
 struct DijkstraData;
@@ -235,7 +236,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 	unsigned int r = rand() % g->getGoodNodesSize();
 	unsigned int* goodNodes = g->getGoodNodes();
 
-	// Abwechselnd rauf und runter zählen. TODO vllt die Randomisierung entfernen?
+	// Abwechselnd rauf und runter zählen. 
 	if(numRounds % 2){
 		// Erster Part der Knoten (wegen der Randomisierung)
 		for(unsigned int* gn= goodNodes + r; gn< g->getGoodNodesSize() + goodNodes; gn++){

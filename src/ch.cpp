@@ -1,8 +1,9 @@
 #include "ch.h"
 
+using namespace std;
 
 CH::CH(Graph* gr, SCGraph* scgr) : 
-	g(gr), scg(scgr), algos(scgr), rounds(1),
+	isDone(false), g(gr), scg(scgr), algos(scgr), rounds(1),
 	sclistpointer(scgr->getShortcutListPointer()), 
 	bnlistpointer(scgr->getBlackNodesListPointer())
 {}
@@ -14,22 +15,74 @@ CH::~CH(){
 	bnlistpointer = 0;
 }
 
-void CH::doRound(){
-	algos.calcOneRound(sclistpointer, bnlistpointer);
-	scg->mergeRoundNegative(rounds);
-	rounds++;
-}
-
-void CH::finish(){
-	scg->mergeShortcutsAndGraph(max_rounds);
-}
-
 void CH::calcCH(unsigned int rnds){
+	if( isDone )
+		return;
+
 	max_rounds = rnds;
 	while(rounds < max_rounds){
-		doRound();
+		algos.calcOneRound(sclistpointer, bnlistpointer);
+		scg->mergeRound(rounds);
+		rounds++;
 	}
-	finish();
+	scg->mergeShortcutsAndGraph(max_rounds);
+	isDone = true;
+}
+
+void CH::calcCH(){
+	if( isDone )
+		return;
+
+	while(algos.calcOneRound(sclistpointer, bnlistpointer)){
+		scg->mergeRound(rounds);
+		rounds++;
+	}
+	scg->mergeShortcutsAndGraph(rounds);
+	isDone = true;
+}
+
+void CH::calcCHverbose(){
+	if( isDone )
+		return;
+
+	clock_t start,finish;
+	double alltime = 0.0;
+	double time;
+	bool run = true;
+
+	unsigned int j = 1;
+
+	while(run){
+		cout << "Berechne Shortcuts" << endl;
+		start = clock();
+		run = algos.calcOneRound(sclistpointer, bnlistpointer);
+		finish = clock();
+		time = (double(finish)-double(start));
+		alltime += time;
+		time = time /CLOCKS_PER_SEC;
+		cout << "Zeit: " << time << endl;
+
+		cout << "Merge Shortcuts in SCGraph. " << endl;
+		start = clock();
+		scg->mergeRound(j);
+		finish = clock();
+		time = (double(finish)-double(start));
+		alltime += time;
+		time = time /CLOCKS_PER_SEC;
+		cout << "Zeit: " << time << endl;
+		cout << " => Runde " << j << " fertig."  << endl;
+		j++;
+	}
+	cout << "Insgesamt gebrauchte Zeit für Runden: " << (alltime/CLOCKS_PER_SEC) / 60.0 << " Minuten " << endl;
+	cout << "Merge Shortcuts und original-Graph. " << endl;
+	start = clock();
+	scg->mergeShortcutsAndGraph(j);
+	finish = clock();
+	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "Zeit: " << time << endl;
+
+	cout << "Runden fertig." << endl;
+	isDone = true;
 }
 
 

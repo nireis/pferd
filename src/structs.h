@@ -45,7 +45,7 @@ struct Edge {
 	unsigned int id;
 	unsigned int value;
 	unsigned int other_node;
-	unsigned int other_lvl;
+	unsigned int other_lvl; 
 };
 struct EdgeData {
 	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
@@ -58,26 +58,6 @@ struct EdgeData {
 	unsigned int type;
 	unsigned int load;
 };
-/*struct EdgeData2 {
-	EdgeData2() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
-	EdgeData2(Edge* o, Edge* i, unsigned int d, unsigned int t, unsigned int l) : 
-		out_index(o), in_index(i), distance(d), type(t), load(l) {}
-	
-	Edge* out_index;
-	Edge* in_index;
-	unsigned int distance;
-	unsigned int type;
-	unsigned int load;
-};*/
-
-/*struct Node {
-	Node() : count(0), edges(0) {} //edge_offset(0), shortcut_offset(0) {}
-	
-	unsigned int count;
-	Edge* edges;
-	//unsigned int edge_offset; 
-	//unsigned int shortcut_offset;
-};*/
 
 struct NodeData {
 	NodeData() : id(0), elevation(0), lat(0), lon(0) {}

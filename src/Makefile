@@ -24,20 +24,5 @@ $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
 clean:
 	rm -f $(BIN) $(OBJ)
 
-#########################
-#OGLBIN =main_vis_debug
-#OGLOBJ =main_vis_debug.o openGLrender.o parser.o
-#OGLFLAGS = -Wall -g -O3 -std=c++0x -lglut -lGL 
-#
-#CXXFLAGS = $(OGLFLAGS)
-#
-#opengl : $(OGLBIN)
-#
-#$(OGLBIN) : $(OGLOBJ)
-#	$(CC) $(OGLFLAGS) -o $(OGLBIN) $(OGLOBJ) /usr/lib/libGLEW.so /usr/lib/libSOIL.a
-#
-#$(OGLOBJ) : $(wildcard *.h) $(wildcard *.hpp)
-#######################
-
 #fucking...
 .PHONY: all clean

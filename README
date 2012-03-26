@@ -5,11 +5,28 @@ Projekt-Inf, Universität Stuttgart, 2011/2012
 - Berechnung von Gleichgewichtszuständen für Verkehrsflüsse
 
 Aktueller Meilenstein:
-	Constraction Hierarchies auf Deutschland
+	Simulation und Berechnung von Straßenlasten
 
 Projektseite und Beschreibung:
 	http://www.fmi.uni-stuttgart.de/alg/restricted/ws11-12/EQUI/
 
 Zur Verfügung stehende Graphdaten: 
 	http://www.fmi.uni-stuttgart.de/alg/stuff/DATA/Typ/
+
+
+Dependencies:
+	OpenStreetMap Textures für OpenGL Vis: 
+		http://www.2shared.com/file/l0cyRmSk/Pferd_Texture_BW.html
+
+	Freeglut für OpenGL Vis:
+		http://freeglut.sourceforge.net/
+
+	Glew für OpenGL Vis:
+		http://glew.sourceforge.net/
+
+	OpenGL Mathematics für OpenGL Vis:
+		http://glm.g-truc.net/
+
+	SOIL für OpenGL Vis:
+		http://www.lonesock.net/soil.html
 

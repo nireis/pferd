@@ -1,18 +1,26 @@
 === allgemein ===
 
-* CH soll einen Graph bekommen, diesen um Shortcuts erweitern und einen SCGraph ausgeben. Intern erfolgt die Shortcutverteilung wie besprochen in Runden mit unabhängigen Mengen von Knoten
+* in der vis normale kanten und shortcuts voneinander unabhängig anzeigen lassen können
 
-* Visualisierung des Graphen
+* nach dem beenden des openGL-Fensters sollte das hauptprogramm nicht beendet werden
 
 * wie werden straßenlasten berechnet ? welche informationen brauchen wir dafür in kanten?
-
-* allgemeine, menübasierte test-main aufstellen; erweiterbar um weitere routinen
 
 * genaue zeitmessung für die simulation / initialisierung der objekte => in log?
 
 * interne log/error struktur einführen ?
 
+=== chaot ===
 
+* Ind Set Berechnung mit in*out Heuristik
+
+* Vectors statt Lists
+
+* dist[] nicht auf maxzeug setzen
+
+* Möglicherweise CH selbst testen
+
+* CHDijkstra implementieren
 
 === Stefan ===
 
@@ -35,10 +43,4 @@ Created Sunday 11 December 2011
 * empfehlung: bei vergleichen die konstante auf die linke seite: (' ' == *itr1), (2 == currentComponent), ...
 
 * Copy Constructors/operator =: entweder verbieten oder saubere semantik (d.h. keine leaks und double frees)
-
-Ideen:
-* Verwenden eines Parsergenerators zum lesen, http://www.complang.org/ragel/:
-* da nur Zahlen im Spiel sind das Einlesen blockweise möglich, ohne den vorigen block zu kennen; zahlen können dabei über blockgrenzen gehen
-* besseres error handling möglich
-* für die iterators auf c-arrays könnte man theoretisch auch { T* current, *end; bool hasNext() { return current != end; } T getNext() {return *current++;}} verwenden
 

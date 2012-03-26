@@ -153,24 +153,19 @@ class Graph {
 			unsigned int nifs = nodes_in_offs[node] ;
 			unsigned int c = nodes_in_offs[node+1] - nifs ;
 			return EdgesIterator(in_edges + nifs , c ); 
-
-			//return EdgesIterator
-			//	( &(in_edges[nodes_in_offs[node] ]) 
-			//	 ,nodes_in_offs[node+1] - nodes_in_offs[node] ); 
 		}
 
 };
 
 /*
  * statischer Graph mit Daten eines normalen Graphen
- * und Shortcuts, inklusive deren Daten
+ * und Shortcuts inklusive deren Daten
  *
  * kann über mehrere Runden Shortcuts
- * einfügen (wenn zuvor mindestens so viele Kanten
- * entfernt wurden) und Knoten aus dem Graph schneiden
+ * einfügen und Knoten aus dem Graph schneiden
  *
- * während der Runden sind Shortcuts als solche
- * nicht erkennbar
+ * während der Runden sind die Edge-Daten der 
+ * Edges nicht erreichbar
  *
  * merkt sich über alle Runden übergebene Shortcuts
  * und kann diese dann mit Graph* g
@@ -180,12 +175,20 @@ class SCGraph {
 	private:
 		Graph* g;
 
+		// runde, in der ein knoten kontrahiert wurde
 		unsigned int* node_lvl;
 		
 		unsigned int node_count;
+
+		// der edge_count ist die anzahl der edges,
+		// die Graph* g hat
 		unsigned int edge_count;
+
+		// der shortcut count ist die anzahl aller shortcuts,
+		// die der graph bisher bekommen hat
 		unsigned int shortcut_count;
 
+		//wird gebraucht beim einfügen von shortcuts
 		unsigned int current_edge_arrays_size;
 
 		N* nodes_in_offs;
@@ -196,6 +199,7 @@ class SCGraph {
 		ND* node_data;
 		ED* edge_data;
 	
+		// zum merken der übergebenen shortcuts während der CH-runden
 		struct ShortcutArray {
 			ShortcutArray() : array(0), size(0) {}
 			ShortcutArray(Shortcut* a, unsigned int s) :
@@ -204,52 +208,82 @@ class SCGraph {
 			Shortcut* array;
 			unsigned int size;
 		};
-
 		SList<ShortcutArray> shortcutlist;
 
 		std::list<Shortcut> round_shortcutlist;
 		std::list<unsigned int> round_node_blacklist;
 
+		// für temporäre daten während der CH-runden
+		// evtl ist dies redundant
 		unsigned int* node_in_edges_count;
 		unsigned int* node_out_edges_count;
 
+		// während der CH-runden soll gemerkt werden, welche knoten
+		// noch nicht kontrahiert wurden
 		unsigned int* goodNodes;
 		unsigned int goodNodesSize;
 
+		// es wird stehts ein Graph* g gebraucht
 		SCGraph(){ std::cout << "Error: -41" << std::endl; }
 
-		void clearEverything();
+		void clearAlmostEverything();
 
 	public:
 		SCGraph(Graph* gr);
 		~SCGraph();
 		
+		// geben dem graph einzelne shortcuts/nodes, 
+		// die später gemerged/entfernt werden sollen
+		// stellt sich raus, dies brauchen wir nicht aktiv
 		void addShortcut(S sc);
-		
 		void blacklistNode(unsigned int node_id);
 
-		bool mergeRoundNegative(unsigned int lvl);
+		// fügt über eine Runde übergebenen Shortcuts in den graph ein,
+		// entfernt übergebene blacklisted-nodes aus dem graph
+		bool mergeRound(unsigned int lvl);
 
+		// vereint alle in den runden übergebenen shortcuts mit Graph* g
+		// hiernach sind EdgeData verfügbar
 		bool mergeShortcutsAndGraph(unsigned int lvl);
 
 		bool isShortcut(unsigned int edge_id);
 
+		// gibt die runde aus, in der ein knoten kontrahiert, 
+		// bzw aus dem graph entfernt wurde
+		// falls 0 zurück gegeben wird, befindet sich der graph noch
+		// in der CH oder es wurden teilweise lvl-ids als 0 übergeben
+		// (was man vermeiden sollte, wenn das funktionieren soll)
 		unsigned int getNodeLVL(unsigned int node_id);
 
 		unsigned int getNodeCount();
 		unsigned int getEdgeCount();
+
+		//manchmal will man sich freihalten,
+		//ob das verhalten des graphen in runden anders abgefragt
+		//wird als im endgraphen
 		unsigned int getEdgeCount(unsigned int node_id);
 		unsigned int getEdgeCount_Round(unsigned int node_id);
+
 		unsigned int getShortcutCount();
+		
+		// dies ist die schnittstelle zur
+		// CHConstruction
 		std::list<Shortcut>* getShortcutListPointer(){ 
-			return &round_shortcutlist; }
+			return &round_shortcutlist; 
+		}
 		std::list<unsigned int>* getBlackNodesListPointer(){ 
-			return &round_node_blacklist; }
+			return &round_node_blacklist; 
+		}
+		unsigned int* getGoodNodes();
+		unsigned int getGoodNodesSize();
 
 		ND getNodeData(unsigned int node_id);
 		ND* getNodeDataPointer(){ return node_data; }
 		ED getEdgeData(unsigned int edge_id);
 
+		// Edges-Iteratoren wie im anderen Graph,
+		// auch hier möchte man während der runden ein
+		// evtl. anderes verhalten der funktionen haben
 		EdgesIterator getOutEdgesIt(unsigned int node){
 			unsigned int nofs = nodes_out_offs[node] ;
 			unsigned int c = nodes_out_offs[node+1] - nofs ;
@@ -271,9 +305,6 @@ class SCGraph {
 			unsigned int c = node_in_edges_count[node] ;
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
-
-		unsigned int* getGoodNodes();
-		unsigned int getGoodNodesSize();
 
 };
 
