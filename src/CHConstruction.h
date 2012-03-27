@@ -8,6 +8,17 @@
 #include <map>
 #include <thread>
 #include <mutex>
+
+#ifdef _WIN32
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo( &sysinfo );
+	#define numThreads sysinfo.dwNumberOfProcessors
+#elif __linux__
+	#define numThreads sysconf(_SC_NPROCESSORS_ONLN)
+#else
+	#error "Can't get the number of processors for your platform."
+#endif
+
 using namespace std;
 
 struct DijkstraData;
@@ -184,6 +195,7 @@ CHConstruction<G>::CHConstruction(G* g):
 	this->g = g;
 	allsclist = 0;
 	conodelist = 0;
+	cout << "Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
 }
 
 template <typename G>
@@ -201,12 +213,11 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 	nodes = independent_set();
 	int len = nodes->size();
    list<thread> threadlist;
-   int numProc = 4;
 	// Threads erstellen, die auf den jeweiligen Prozessoren laufen sollen.
-   for(int i=0; i<numProc; i++){
+   for(int i=0; i<numThreads; i++){
       threadlist.push_back(thread(&run<G>, this));
    }
-   for(int i=0; i<numProc; i++){
+   for(int i=0; i<numThreads; i++){
       threadlist.front().join();
       threadlist.pop_front();
    }
