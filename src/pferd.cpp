@@ -70,10 +70,10 @@ int main(int argc, char *argv[]){
 	}
 
 	CH hy(&g, &scg);
-	hy.calcCHverbose();
+	//hy.calcCHverbose();
+	hy.calcCH();
 
-	vis anzeige(&scg);
-	anzeige.start();
+	// vis anzeige(&scg); anzeige.start();
 
 	return 0;
 }

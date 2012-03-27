@@ -6,6 +6,7 @@
 #include "parser.h"
 #include <vector>
 #include <list>
+#include <queue>
 
 typedef unsigned int N;
 //typedef Node N2;
@@ -220,8 +221,9 @@ class SCGraph {
 
 		// während der CH-runden soll gemerkt werden, welche knoten
 		// noch nicht kontrahiert wurden
-		unsigned int* goodNodes;
-		unsigned int goodNodesSize;
+		std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodes;
+		//unsigned int* goodNodes;
+		//unsigned int goodNodesSize;
 
 		// es wird stehts ein Graph* g gebraucht
 		SCGraph(){ std::cout << "Error: -41" << std::endl; }
@@ -274,8 +276,10 @@ class SCGraph {
 		std::list<unsigned int>* getBlackNodesListPointer(){ 
 			return &round_node_blacklist; 
 		}
-		unsigned int* getGoodNodes();
-		unsigned int getGoodNodesSize();
+		std::priority_queue
+			<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes();
+		//unsigned int* getGoodNodes();
+		//unsigned int getGoodNodesSize();
 
 		ND getNodeData(unsigned int node_id);
 		ND* getNodeDataPointer(){ return node_data; }

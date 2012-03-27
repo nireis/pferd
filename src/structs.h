@@ -449,4 +449,19 @@ class uintvec {
 		}
 
 };
+
+struct uint_pair {
+	uint_pair() : id(0), key(0) {}
+	uint_pair(unsigned int i, unsigned int k) : id(i), key(k) {}
+
+	unsigned int id;
+	unsigned int key;
+};
+class compare_uint_pair{
+	public:
+		bool operator()(uint_pair& one, uint_pair& two){
+			return one.key > two.key;
+		}
+};
+
 #endif

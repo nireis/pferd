@@ -234,16 +234,28 @@ template <typename G>
 list<unsigned int>* CHConstruction<G>::independent_set(){
    list<unsigned int>* solution = new list<unsigned int>;
 
-	if( g->getGoodNodesSize() == 0 )
+	// hole goodNodes beim Graphen ab
+	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
+
+	// frühzeitiges abbrechen; sinnvoll ?
+	if( goodNodes->size() == 0 )
 		return solution;
 
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
    // Random Nummer für den Startknoten
    srand((unsigned)time(0));
-   
-	unsigned int r = rand() % g->getGoodNodesSize();
-	unsigned int* goodNodes = g->getGoodNodes();
+	unsigned int r = rand() % goodNodes->size();
+	
+	// testweise einfach mal alles ausgeben TODO
+	std::cout << r << " " << "indepset" << endl;
+	while( ! goodNodes->empty() ){
+		uint_pair tmp = goodNodes->top();
+		std::cout << tmp.key << " " << tmp.id << std::endl;
+		goodNodes->pop();
+	}
+
+/* TODO ab hier läuft der alte ansatz nicht mehr TODO
 
 	// Abwechselnd rauf und runter zählen. 
 	if(numRounds % 2){
@@ -324,6 +336,9 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 			}
 		}
 	}
+*/
+	// goodNodes sauber verlassen
+	goodNodes = 0;
    return solution;
 }
 
