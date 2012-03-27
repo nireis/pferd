@@ -16,8 +16,6 @@
 
 * Vectors statt Lists
 
-* dist[] nicht auf maxzeug setzen
-
 * Möglicherweise CH selbst testen
 
 * CHDijkstra implementieren

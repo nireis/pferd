@@ -70,7 +70,6 @@ class CHConstruction{
 		struct DijkstraData{
 			// Standarddaten
 			vector<bool> found;
-			vector<unsigned int> dist;
 			priority_queue<U_element, vector<U_element>, Compare_U_element> U;
 			// Attribute um mehrere kürzeste Pfade festzustellen.
 			unsigned int lastDist;
@@ -82,8 +81,7 @@ class CHConstruction{
 			int tmpArithMean;
 
 			DijkstraData(unsigned int nr_of_nodes):
-				found(nr_of_nodes,false),
-				dist(nr_of_nodes,numeric_limits<unsigned int>::max()){
+				found(nr_of_nodes,false){
 			}
 		};
 
@@ -359,7 +357,6 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	Edge* currentEdge;
 	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
 	dd->lastDist = 0;
-	dd->dist[scnode] = 0;
 	dd->found[scnode] = true;
 	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
@@ -413,7 +410,7 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 	// fügt werden, das dies auch schon gemacht wurde, für den Fall, dass er nichtmehr
 	// abgearbeitet werden muss.
 	if((tmpid = dd->U.top().targetedge->other_node) != targetnode){
-		dd->dist[tmpid] = dd->U.top().distance;
+		unsigned int tmpdist = dd->U.top().distance;
 		dd->found[tmpid] = true;
 		it = g->getOutEdgesIt_Round(tmpid);
 		while(it.hasNext()){
@@ -422,10 +419,10 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 			if(!dd->found[currentEdge->other_node]){
 				// ...tu sie in U
 				dd->U.push(U_element(
-							tmpid,currentEdge,currentEdge->value+dd->dist[tmpid]));
+							tmpid,currentEdge,currentEdge->value+tmpdist));
 			}   
 		}
-		dd->lastDist = dd->dist[tmpid];
+		dd->lastDist = tmpdist;
 		dd->U.pop();
 
 		// Die restlichen Knoten abarbeiten.
@@ -442,7 +439,7 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 				dd->sameDist.clear();
 			}
 			if(!dd->found[tmpid]){
-				dd->dist[tmpid] = dd->U.top().distance;
+				tmpdist = dd->U.top().distance;
 				dd->found[tmpid] = true;
 				dd->resetlist.push_front(tmpid);
 				if(dd->U.top().sourceid == conode){
@@ -457,11 +454,11 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 					if(!dd->found[currentEdge->other_node]){
 						// ...tu sie in U
 						dd->U.push(U_element(
-								tmpid,currentEdge,currentEdge->value+dd->dist[tmpid]));
+								tmpid,currentEdge,currentEdge->value+tmpdist));
 					}   
 				}
 			}
-			dd->lastDist = dd->dist[tmpid];
+			dd->lastDist = tmpdist;
 			dd->U.pop();
 		}
 		dd->resetlist.push_front(targetnode);
@@ -482,7 +479,6 @@ void CHConstruction<G>::resetDij(DijkstraData* dd){
 	while(!dd->resetlist.empty()){
 		current = dd->resetlist.front();
 		dd->found[current] = false;
-		dd->dist[current] = numeric_limits<unsigned int>::max();
 		dd->resetlist.pop_front();
 	}
 	dd->U = priority_queue<U_element, vector<U_element>, Compare_U_element>();
