@@ -231,112 +231,33 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 template <typename G>
 list<unsigned int>* CHConstruction<G>::independent_set(){
    list<unsigned int>* solution = new list<unsigned int>;
-
 	// hole goodNodes beim Graphen ab
 	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
-
 	// frühzeitiges abbrechen; sinnvoll ?
-	if( goodNodes->size() == 0 )
+	if( goodNodes->size() == 0 ){
 		return solution;
-
+	}
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
-   // Random Nummer für den Startknoten
-   srand((unsigned)time(0));
-	unsigned int r = rand() % goodNodes->size();
-	
+
 	// testweise einfach mal alles ausgeben TODO
-	std::cout << r << " " << "indepset" << endl;
-	while( ! goodNodes->empty() ){
+	while(!goodNodes->empty()){
 		uint_pair tmp = goodNodes->top();
-		std::cout << tmp.key << " " << tmp.id << std::endl;
+		if(!marked[tmp.id]){
+			solution->push_front(tmp.id);
+			// Alle ausgehenden Kanten verfolgen
+			it = g->getOutEdgesIt_Round(tmp.id);
+			while(it.hasNext()){
+				marked[it.getNext()->other_node] = true;
+			}
+			// Alle eingehenden Kanten verfolgen
+			it = g->getInEdgesIt_Round(tmp.id);
+			while(it.hasNext()){
+				marked[it.getNext()->other_node] = true;
+			}
+		}
 		goodNodes->pop();
 	}
-
-/* TODO ab hier läuft der alte ansatz nicht mehr TODO
-
-	// Abwechselnd rauf und runter zählen. 
-	if(numRounds % 2){
-		// Erster Part der Knoten (wegen der Randomisierung)
-		for(unsigned int* gn= goodNodes + r; gn< g->getGoodNodesSize() + goodNodes; gn++){
-			// Prüfen ob der Knoten aufgenommen werden kann
-			unsigned int i = *gn;
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-		// Zweiter Part der Knoten
-		for(unsigned int* gn= goodNodes; gn< r + goodNodes; gn++){
-			// Prüfen ob der Knoten aufgenommen werden kann
-			unsigned int i = *gn;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-	}
-	else{
-		// Erster Part der Knoten (wegen der Randomisierung)
-		for(unsigned int* gn= g->getGoodNodesSize()+goodNodes-1; gn>= goodNodes + r; gn--){
-			// Prüfen ob der Knoten aufgenommen werden kann
-			unsigned int i = *gn;
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-		// Zweiter Part der Knoten
-		for(unsigned int* gn= r+goodNodes-1; gn>= goodNodes; gn--){
-			// Prüfen ob der Knoten aufgenommen werden kann
-			unsigned int i = *gn;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-	}
-*/
-	// goodNodes sauber verlassen
-	goodNodes = 0;
    return solution;
 }
 
