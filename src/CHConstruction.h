@@ -10,9 +10,7 @@
 #include <mutex>
 
 #ifdef _WIN32
-	SYSTEM_INFO sysinfo;
-	GetSystemInfo( &sysinfo );
-	#define numThreads sysinfo.dwNumberOfProcessors
+	#define numThreads std::thread::hardware_concurrency()
 #elif __linux__
 	#define numThreads sysconf(_SC_NPROCESSORS_ONLN)
 #else
