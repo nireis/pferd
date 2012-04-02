@@ -64,5 +64,9 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
 void independent_set_test(Graph* g, list<unsigned int> solution);
 list<unsigned int> independent_set(Graph* g);
 
+/*
+ * One to one Dijkstra auf der CH.
+ */
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
 
 #endif

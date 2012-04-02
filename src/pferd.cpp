@@ -74,6 +74,13 @@ int main(int argc, char *argv[]){
 	hy.calcCH();
 
 	// vis anzeige(&scg); anzeige.start();
+	for(int i=1; i<=1000; i++){
+		start = clock();
+		CHDijkstra(&scg, 0, i);
+		finish = clock();
+		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+		cout << "Zeit für Dijkstra mit SCGraph von " << i << " aus: "<< time << endl;
+	}
 
 	return 0;
 }

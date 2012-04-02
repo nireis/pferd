@@ -234,13 +234,12 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 	// hole goodNodes beim Graphen ab
 	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
 	// frühzeitiges abbrechen; sinnvoll ?
-	if( goodNodes->size() == 0 ){
+	if(goodNodes->empty()){
 		return solution;
 	}
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
 
-	// testweise einfach mal alles ausgeben TODO
 	while(!goodNodes->empty()){
 		uint_pair tmp = goodNodes->top();
 		if(!marked[tmp.id]){

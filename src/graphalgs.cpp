@@ -536,3 +536,96 @@ list<unsigned int> independent_set(Graph* g){
 	// independent_set_test(g, solution); //TEST
 	return solution;
 }
+
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
+	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
+	EdgesIterator itout = g->getOutEdgesIt(node_id0);
+	EdgesIterator itin = g->getInEdgesIt(node_id1);
+
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	unsigned int current_min_path = numeric_limits<unsigned int>::max();
+	unsigned int min_edge_id;
+	unsigned int prob_min_val;
+	unsigned int tmpid;
+	unsigned int tmptgtsrc;
+	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+
+	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
+
+	Edge* currentEdge;
+
+	// Die ersten Knoten abarbeiten
+	if(node_id0 == node_id1){
+		return 0;
+	}
+	else{
+		U.push(U_element_bi(0,node_id0,0,0));
+		U.push(U_element_bi(0,node_id1,0,1));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	while(current_min_path > U.top().distance && !U.empty()){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		tmpid = U.top().id;
+		if(!(found[0][tmpid] || found[1][tmpid])){
+			dist[tmpid] = U.top().distance;
+			if(!U.top().found_by){
+				found[0][tmpid] = true;
+				itout = g->getOutEdgesIt(tmpid);
+				while(itout.hasNext()){
+					currentEdge = itout.getNext();
+					// Wenn sie noch nicht gefunden wurde...
+					if(currentEdge->other_lvl > g->getNodeLVL(tmpid) && !found[0][currentEdge->other_node]){
+						tmptgtsrc = currentEdge->other_node;
+						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
+						if(found[1][tmptgtsrc]){
+							// ...neues Minimum zuweisen wenn nötig, sonst...
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
+							if(prob_min_val < current_min_path){
+								current_min_path = prob_min_val;
+								min_edge_id = currentEdge->id;
+							}
+						}
+						else{
+							// ...tu sie in U
+							U.push(U_element_bi(
+										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,0));
+						}
+					}
+				}
+			}
+			else{
+				found[1][tmpid] = true;
+				itin = g->getInEdgesIt(tmpid);
+				while(itin.hasNext()){
+					currentEdge = itin.getNext();
+					// Wenn sie noch nicht gefunden wurde...
+					if(currentEdge->other_lvl > g->getNodeLVL(tmpid) && !found[1][currentEdge->other_node]){
+						tmptgtsrc = currentEdge->other_node;
+						// ...und der nächste Knoten schon vom anderen Dijkstra gefunden wurde...
+						if(found[0][tmptgtsrc]){
+							// ...neues Minimum zuweisen wenn nötig, sonst...
+							prob_min_val = dist[tmpid] + dist[tmptgtsrc] + currentEdge->value;
+							if(prob_min_val < current_min_path){
+								current_min_path = prob_min_val;
+								min_edge_id = currentEdge->id;
+							}
+						}
+						else{
+							// ...tu sie in U
+							U.push(U_element_bi(
+										currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,1));
+						}
+					}
+				}
+			}
+		}
+		U.pop();
+	}
+	// damit compilerwarnung weg geht
+	min_edge_id = 0;
+	return current_min_path + min_edge_id;
+}
