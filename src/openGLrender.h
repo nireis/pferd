@@ -25,7 +25,7 @@
 //	(Linux)
 //	Link glew and SOIL Libs.
 //	Put the shader files (.glsl) in the directory of your binaries.
-//	For testing the latest build: Put textures files in the directory of your binaries.
+//	For testing the latest build: Put textures files in the data directory.
 */
 
 #ifndef openGLrender_h
@@ -84,8 +84,10 @@ private:
 	//local reference of the data in the system memory
 	unsigned int nodeCount;
 	unsigned int edgeCount;
+	unsigned int shortcutCount;
 	openGL_Node_3d *nodeArray;
 	openGL_Node_3d *edgeArray;
+	openGL_Node_3d *shortcutArray;
 
 	//stuff needed for openGL
 	bool showNodes;
@@ -151,8 +153,10 @@ public:
 	//set methods
 	void setNodeCount(int);
 	void setEdgeCount(int);
+	void setShortcutEdgeCount(int);
 	void setNodeArray(openGL_Node_3d*);
 	void setEdgeArray(openGL_Node_3d*);
+	void setShortcutEdgeArray(openGL_Node_3d*);
 	void setCamera(float,float,float);
 
 };

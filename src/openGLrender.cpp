@@ -15,14 +15,20 @@ openGLrender::~openGLrender()
 
 void openGLrender::setNodeArray(openGL_Node_3d *in_Nodes)
 {
-	nodeArray = new openGL_Node_3d[nodeCount];
+	//nodeArray = new openGL_Node_3d[nodeCount];
 	nodeArray = in_Nodes;
 }
 
 void openGLrender::setEdgeArray(openGL_Node_3d *in_Edges)
 {
-	edgeArray = new openGL_Node_3d[edgeCount];
+	//edgeArray = new openGL_Node_3d[edgeCount];
 	edgeArray = in_Edges;
+}
+
+void openGLrender::setShortcutEdgeArray(openGL_Node_3d *in_Edges)
+{
+	//shortcutArray = new openGL_Node_3d[edgeCount];
+	shortcutArray = in_Edges;
 }
 
 void openGLrender::setNodeCount(int count)
@@ -33,6 +39,11 @@ void openGLrender::setNodeCount(int count)
 void openGLrender::setEdgeCount(int count)
 {
 	this->edgeCount = count;
+}
+
+void openGLrender::setShortcutEdgeCount(int count)
+{
+	this->shortcutCount = count;
 }
 
 void openGLrender::setCamera(float x,float y,float z)

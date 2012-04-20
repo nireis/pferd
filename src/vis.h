@@ -17,6 +17,7 @@ class vis {
 		openGLrender render;
 		openGL_Node_3d* nodes;
 		openGL_Node_3d* edges;
+		openGL_Node_3d* shortcut_edges;
 
 	public: 
 		vis(Graph* g);

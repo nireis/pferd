@@ -8,7 +8,8 @@ vis::vis(Graph* g) : render() {
 
 vis::vis(SCGraph* g) : render() {
 	nodes = new openGL_Node_3d[g->getNodeCount()];
-	edges = new openGL_Node_3d[2 * ( g->getEdgeCount() + g->getShortcutCount() )];
+	edges = new openGL_Node_3d[2 * ( g->getEdgeCount() )];
+	shortcut_edges = new openGL_Node_3d[2 * ( g->getShortcutCount() )];
 
 	NodeData* node_data = g->getNodeDataPointer();
 
@@ -17,23 +18,35 @@ vis::vis(SCGraph* g) : render() {
 	}
 
 	unsigned int index = 0;
+	unsigned int s_index = 0;
 	for(unsigned int i = 0; i < g->getNodeCount() ; i++){
 		EdgesIterator it = g->getOutEdgesIt(i);
 		while( it.hasNext() ){
 			Edge e = * it.getNext();
-			edges[index] = 
-				openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (float) g->isShortcut( e.id) );
-			index++;
-			edges[index] = 
-				openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (float) g->isShortcut( e.id) );
-			index++;
+			if( g->isShortcut( e.id )){
+				shortcut_edges[s_index] = 
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, 0.0 );
+				s_index++;
+				shortcut_edges[s_index] = 
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, 0.0 );
+				s_index++;
+			} else {
+				edges[index] = 
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, 0.0 );
+				index++;
+				edges[index] = 
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, 0.0 );
+				index++;
+			}
 		}
 	}
 
 	render.setNodeCount(g->getNodeCount());
 	render.setNodeArray(nodes);
-	render.setEdgeCount((g->getEdgeCount() + g->getShortcutCount()) *2);
+	render.setEdgeCount((g->getEdgeCount()) *2);
 	render.setEdgeArray(edges);
+	render.setShortcutEdgeCount((g->getShortcutCount()) *2);
+	render.setShortcutEdgeArray(shortcut_edges);
 	render.setCamera((float) node_data[0].lon, (float)node_data[0].lat, 2.0);
 
 	node_data = 0;
@@ -42,6 +55,7 @@ vis::vis(SCGraph* g) : render() {
 vis::~vis(){
 	delete[] nodes; nodes = 0;
 	delete[] edges; edges = 0;
+	delete[] shortcut_edges; shortcut_edges = 0;
 }
 
 bool vis::start(){
