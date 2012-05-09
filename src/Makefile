@@ -15,6 +15,11 @@ all: $(BIN)
 rlparser.cpp: rlparser.rl
 	ragel -G2 -o $@ $<
 
+marble: $(BIN)
+	g++ pferd_marble.cpp -c -o pferd_marble.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui  -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
+	g++ marble_vis.cpp -c -o marble_vis.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui  -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
+	g++  graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o marble_vis.o pferd_marble.o -o pferd_marble -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
+
 $(BIN): $(OBJ)
 	$(CC) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
 
