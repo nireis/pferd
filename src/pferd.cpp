@@ -74,7 +74,7 @@ int main(int argc, char *argv[]){
 	hy.calcCH();
 
 	//vis anzeige(&scg); anzeige.start();
-	CHDijkstraTest(&g, &scg, 1000);
+	CHDijkstraTest(&g, &scg, 15000);
 
 	return 0;
 }
