@@ -69,4 +69,9 @@ list<unsigned int> independent_set(Graph* g);
  */
 unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
 
+/*
+ * Test für den CHDijkstra.
+ */
+bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxnode);
+
 #endif
