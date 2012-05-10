@@ -10,14 +10,6 @@
 #include <mutex>
 
 #define numThreads std::thread::hardware_concurrency()
-//#ifdef _WIN32
-//	#define numThreads std::thread::hardware_concurrency()
-//#elif __linux__
-//	#include <unistd.h>
-//	#define numThreads sysconf(_SC_NPROCESSORS_ONLN)
-//#else
-//	#error "Can't get the number of processors for your platform."
-//#endif
 
 using namespace std;
 

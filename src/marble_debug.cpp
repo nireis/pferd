@@ -32,6 +32,9 @@ void berechneVis(vector<marble_vis::text>* txt, vector<marble_vis::textsc>* txts
 					sstr << tmpedge->value ;
 					if(tmpedge -> id >= g->getEdgeCount())
 						sstr << " (SC)";
+					/*
+					 * Edge IDs angeben?
+					 */
 					//sstr << "(id: " << tmpedge->id << ")" ;
 					val = sstr.str();
 					lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
@@ -68,18 +71,25 @@ void berechneVis(vector<marble_vis::text>* txt, vector<marble_vis::textsc>* txts
 	for(unsigned int i = 0; i < g->getNodeCount(); i++){
 		EdgesIterator ei = g->getOutEdgesIt(i);
 		while(ei.hasNext()){
-			// Die Kante einfügen
-			nds = g->getNodeData(i);
-			ndt = g->getNodeData(ei.getNext()->other_node);
-			lnsc->push_back(marble_vis::linesc(GeoDataCoordinates(nds.lon,nds.lat,0.0,GeoDataCoordinates::Degree),
-						GeoDataCoordinates(ndt.lon,ndt.lat,0.0,GeoDataCoordinates::Degree)));
-			// Die Werte einfügen
-			lon = (nds.lon+ndt.lon)/2;
-			lat = (nds.lat+ndt.lat)/2;
-			stringstream sstr;
-			sstr << sc.value;
-			val = sstr.str();
-			txtsc->push_back(marble_vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
+			Edge* e = ei.getNext();
+			/* 
+			 * einstellen, ob 
+			 * Shortcut angezeigt werden
+			 */
+			if(1 || (! g->isShortcut(e->id))){
+				// Die Kante einfügen
+				nds = g->getNodeData(i);
+				ndt = g->getNodeData(e->other_node);
+				lnsc->push_back(marble_vis::linesc(GeoDataCoordinates(nds.lon,nds.lat,0.0,GeoDataCoordinates::Degree),
+							GeoDataCoordinates(ndt.lon,ndt.lat,0.0,GeoDataCoordinates::Degree)));
+				// Die Werte einfügen
+				lon = (nds.lon+ndt.lon)/2;
+				lat = (nds.lat+ndt.lat)/2;
+				stringstream sstr;
+				sstr << sc.value;
+				val = sstr.str();
+				txtsc->push_back(marble_vis::textsc(GeoDataCoordinates(lon,lat,0.0,GeoDataCoordinates::Degree),val));
+			}
 		}
 	}
 }
@@ -153,14 +163,6 @@ int main(int argc, char *argv[]){
 
 	// vis test
 	list<Shortcut> drawSClist = list<Shortcut>();
-	/*for(unsigned int i = 0; i < scg.getNodeCount(); i++){
-		EdgesIterator ei = scg.getOutEdgesIt(i);
-		while(ei.hasNext()){
-			Edge* e = ei.getNext();
-			if(scg.isShortcut(e->id))
-				drawSClist.push_front(Shortcut(e->value, i, e->other_node, 0, 0));
-		}
-	}*/
 	vector<marble_vis::text>* txt = new vector<marble_vis::text>;
 	vector<marble_vis::textsc>* txtsc = new vector<marble_vis::textsc>;
 	vector<marble_vis::linesc>* lnsc = new vector<marble_vis::linesc>;
@@ -169,7 +171,8 @@ int main(int argc, char *argv[]){
 	marble_vis *mapWidget = new marble_vis(&scg, txt, txtsc, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
-	mapWidget->centerOn(GeoDataCoordinates(9.07, 48.45, 0.0, GeoDataCoordinates::Degree));
+	mapWidget->centerOn(GeoDataCoordinates(scg.getNodeData(0).lon , scg.getNodeData(0).lat , 0.0, GeoDataCoordinates::Degree));
+	mapWidget->setDistance(0.75);
 	mapWidget->show();
 	app.exec();
 	delete mapWidget;

@@ -37,10 +37,10 @@ class marble_vis: public MarbleWidget
 		SCGraph* g;
 		vector<text>* txt;
 		vector<textsc>* txtsc;
-		list<unsigned int>* blackn;
+		//list<unsigned int>* blackn;
 		vector<linesc>* lnsc;
 	public:
-		marble_vis(SCGraph* g, vector<text>* txt, vector<textsc>* txtsc, list<unsigned int>* blackn,
+		marble_vis(SCGraph* g, vector<text>* txt, vector<textsc>* txtsc, /* list<unsigned int>* blackn, */
 				vector<linesc>* lnsc);
 		virtual void customPaint(GeoPainter* painter);
 };

@@ -16,9 +16,14 @@ rlparser.cpp: rlparser.rl
 	ragel -G2 -o $@ $<
 
 marble: $(BIN)
-	g++ pferd_marble.cpp -c -o pferd_marble.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui  -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
-	g++ marble_vis.cpp -c -o marble_vis.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui  -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
-	g++  graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o marble_vis.o pferd_marble.o -o pferd_marble -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
+	g++ marble_debug.cpp -c -o marble_debug.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui 
+	g++ marble_vis.cpp -c -o marble_vis.o -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui  
+	g++  graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o marble_vis.o marble_debug.o -o marble_debug -Wall -g -std=c++0x -lglut -lGL -pthread -O3 -lmarblewidget -lQtGui -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
+
+marble_noOpt: $(BIN)
+	g++ marble_debug.cpp -c -o marble_debug.o -Wall -g -std=c++0x -lglut -lGL -pthread -lmarblewidget -lQtGui 
+	g++ marble_vis.cpp -c -o marble_vis.o -Wall -g -std=c++0x -lglut -lGL -pthread -lmarblewidget -lQtGui  
+	g++  graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o marble_vis.o marble_debug.o -o marble_debug -Wall -g -std=c++0x -lglut -lGL -pthread -lmarblewidget -lQtGui -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
 
 $(BIN): $(OBJ)
 	$(CC) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
@@ -27,7 +32,7 @@ $(BIN): $(OBJ)
 $(OBJ): $(wildcard *.h) $(wildcard *.hpp)
 
 clean:
-	rm -f $(BIN) $(OBJ)
+	rm -f $(BIN) $(OBJ) marble_debug.o marble_vis.o marble_debug
 
 #fucking...
 .PHONY: all clean
