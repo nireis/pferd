@@ -391,7 +391,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 	for(int i = 0; i < 10; i++)
 	{
 		textPos = glm::vec4(nodeArray[i].lon,nodeArray[i].lat,0.0,1.0);
-		itoa(i,text,10);
+		//itoa(i,text,10);
 		
 		pos_radian = (pi/180.0)*textPos.y;
 		y_mercator = log((1.0 + sin(pos_radian))/cos(pos_radian));

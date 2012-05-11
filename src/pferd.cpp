@@ -224,8 +224,30 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	//vis anzeige(&scg); anzeige.start();
-	CHDijkstraTest(&g, &scg, 15000);
+
+
+	/*
+	 * ein paar kanten einfärben, 
+	 * indem man ihnen ein load von mindestens 1 gibt
+	 * und diese dann in der vis anzeigen lassen
+	 */
+	unsigned int* colors = 
+		new unsigned int[scg.getEdgeCount() + scg.getShortcutCount() ];
+	for(unsigned int i = 0; i < scg.getEdgeCount() 
+			+ scg.getShortcutCount(); i++){
+		if(0 == i%4 ){ 
+			colors[i] = 1;
+		} else {
+			colors[i] = 0;
+		}
+	}
+	scg.updateEdgeLoads(colors, scg.getEdgeCount() + scg.getShortcutCount());
+	// scg.shareShortcutLoads(); // shortcut loads verteilen
+
+	vis anzeige(&scg); anzeige.start();
+
+
+//	CHDijkstraTest(&g, &scg, 15000);
 
 	return 0;
 }
