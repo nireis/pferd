@@ -537,8 +537,11 @@ list<unsigned int> independent_set(Graph* g){
 	return solution;
 }
 
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
+		list<unsigned int>* path){
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
+	// TODO Iterator je nach Art über Parameter 1 und 0 bekommen, so dass die
+	// beiden großen if-Schleifen (*gnihihi*) verschwinden können.
 	EdgesIterator itout = g->getOutEdgesIt(node_id0);
 	EdgesIterator itin = g->getInEdgesIt(node_id1);
 
@@ -672,6 +675,23 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		}
 		U.pop();
 	}
+	// Backtracing.
+	unsigned int takenedge;
+	if(current_min_path != numeric_limits<unsigned int>::max()){
+		tmpid = min_node_id;
+		while(tmpid != node_id0){
+			takenedge = found_by[0][tmpid];
+			path->push_front(takenedge);
+			// TODO EdgeData by reference?
+			tmpid = g->getInEdge(g->getEdgeData(takenedge).in_index)->other_node;
+		}
+		tmpid = min_node_id;
+		while(tmpid != node_id1){
+			takenedge = found_by[1][tmpid];
+			path->push_front(takenedge);
+			tmpid = g->getOutEdge(g->getEdgeData(takenedge).out_index)->other_node;
+		}
+	}
 	return current_min_path;
 }
 
@@ -679,8 +699,9 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
 	for(unsigned int i=0; i<=maxid; i++){
+		list<unsigned int> path;
 		dist0 = Dijkstra(g, 0, i);
-		dist1 = CHDijkstra(scg, 0, i);
+		dist1 = CHDijkstra(scg, 0, i, &path);
 		cout << "Dijkstra dist für Knoten " << i << ": " << dist0 << ", CHDijkstra dist: " << dist1 << endl;
 		if(dist0 != dist1){
 			return false;

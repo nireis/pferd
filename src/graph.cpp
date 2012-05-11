@@ -252,7 +252,7 @@ E* Graph::getOutEdge(unsigned int id){
 }
 E* Graph::getInEdge(unsigned int id){
 //	if(id < edge_count)
-		return in_edges + id; //edge_data[id].in_index;
+		return in_edges + id; // edge_data[id].in_index;
 //	E* e=0;
 //	return e;
 }
@@ -761,6 +761,20 @@ std::priority_queue
 	SCGraph::getGoodNodes(){
 		return &goodNodes;
 }
+
+E* SCGraph::getOutEdge(unsigned int id){
+//	if(id < edge_count)
+		return out_edges + id; //edge_data[id].out_index ;
+//	E* e=0;
+//	return e;
+}
+E* SCGraph::getInEdge(unsigned int id){
+//	if(id < edge_count)
+		return in_edges + id; //edge_data[id].in_index;
+//	E* e=0;
+//	return e;
+}
+
 //unsigned int* SCGraph::getGoodNodes(){
 //	return goodNodes;
 //}

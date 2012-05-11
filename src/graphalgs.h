@@ -67,7 +67,8 @@ list<unsigned int> independent_set(Graph* g);
 /*
  * One to one Dijkstra auf der CH.
  */
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
+		list<unsigned int>* path);
 
 /*
  * Test für den CHDijkstra.

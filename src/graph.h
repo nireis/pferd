@@ -310,6 +310,8 @@ class SCGraph {
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
 
+		E* getOutEdge(unsigned int id);
+		E* getInEdge(unsigned int id);
 };
 
 
