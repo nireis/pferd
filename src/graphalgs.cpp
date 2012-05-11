@@ -188,6 +188,9 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	vector<unsigned int> in_edge_id(nr_of_nodes);
 
 	// Den ersten Knoten abarbeiten
+	if(node_id0 == node_id1){
+		return 0;
+	}
 	U.push(U_element(0,node_id0,0));
 
 	// Die restlichen Knoten abarbeiten
@@ -198,11 +201,11 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 		if(!found[tmpid]){
 			dist[tmpid] = U.top().distance;
 			// Testen ob das unser Zielknoten ist
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
 			if(tmpid == node_id1){
 				break;
 			}
-			found[tmpid] = true;
-			in_edge_id[tmpid] = U.top().eid;
 			// Die ausgehenden Kanten durchgehen und in U werfen
 			it = g->getOutEdgesIt(tmpid);
 			while(it.hasNext()){
@@ -217,6 +220,15 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 		}
 		U.pop();
 	}
+	// Backtracing des kürzesten Pfades und prüfen, ob er über over_node_id geht.
+	if(found[node_id1]){
+		tmpid = node_id1;
+		while(tmpid != node_id0){
+			cout << tmpid << endl;
+			tmpid = g->getInEdge(g->getEdgeData(in_edge_id[tmpid]).in_index)->other_node;
+		}
+	}
+	cout << "=============" << endl;
 	return dist[node_id1];
 }
 
@@ -680,6 +692,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	if(current_min_path != numeric_limits<unsigned int>::max()){
 		tmpid = min_node_id;
 		while(tmpid != node_id0){
+			cout << tmpid << endl;
 			takenedge = found_by[0][tmpid];
 			path->push_front(takenedge);
 			// TODO EdgeData by reference?
@@ -687,6 +700,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		}
 		tmpid = min_node_id;
 		while(tmpid != node_id1){
+			cout << tmpid << endl;
 			takenedge = found_by[1][tmpid];
 			path->push_front(takenedge);
 			tmpid = g->getOutEdge(g->getEdgeData(takenedge).out_index)->other_node;
@@ -698,7 +712,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
-	for(unsigned int i=0; i<=maxid; i++){
+	for(unsigned int i=1056; i<=maxid; i++){
 		list<unsigned int> path;
 		dist0 = Dijkstra(g, 0, i);
 		dist1 = CHDijkstra(scg, 0, i, &path);
