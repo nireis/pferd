@@ -101,6 +101,19 @@ struct openGL_Node_3d_uv {
 	float v_coord;
 };
 
+//Nodetype 4 for openGL Vis
+struct openGL_Edge_Node {
+	openGL_Edge_Node() : lon(0), lat(0), extra(0), normal_x(0), normal_y(0), normal_z(0) {}
+	openGL_Edge_Node(float lo, float la, float e, float nx, float ny, float nz) : 
+		lon(lo), lat(la), extra(e), normal_x(nx), normal_y(ny), normal_z(nz) {}
+	float lon;
+	float lat;
+	float extra;
+	float normal_x;
+	float normal_y;
+	float normal_z;
+};
+
 //Map-tiles
 struct openGL_quad {
 	openGL_quad() : vert1(), vert2(), vert3(), vert4() {}
