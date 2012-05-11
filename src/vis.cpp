@@ -8,7 +8,7 @@ vis::vis(Graph* g) : render() {
 
 vis::vis(SCGraph* g) : render() {
 	nodes = new openGL_Node_3d[g->getNodeCount()];
-	edges = new openGL_Node_3d[2 * ( g->getEdgeCount() )];
+	edges = new openGL_Edge_Node[2 * ( g->getEdgeCount() )];
 	shortcut_edges = new openGL_Node_3d[2 * ( g->getShortcutCount() )];
 
 	NodeData* node_data = g->getNodeDataPointer();
@@ -25,17 +25,18 @@ vis::vis(SCGraph* g) : render() {
 			Edge e = * it.getNext();
 			if( g->isShortcut( e.id )){
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, 0.0 );
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.5 + 0.5*(1.0-0.0)) );
 				s_index++;
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, 0.0 );
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.5 + 0.5*(1.0-0.0)) );
 				s_index++;
 			} else {
+
 				edges[index] = 
-					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, 0.0 );
+					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.33*(1.0-0.0)), (float)(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) -(node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
 				index++;
 				edges[index] = 
-					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, 0.0 );
+					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.33*(1.0-0.0)), (float)(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) -(node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
 				index++;
 			}
 		}

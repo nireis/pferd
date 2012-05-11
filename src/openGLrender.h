@@ -12,6 +12,7 @@
 //	Pferd's lightweigth openGL visualization!
 //	Version 0.75 (advanced texture testing)
 //	TODO for 0.8: complete texture loading & displaying
+//	TODO for 0.85: edge coloring, edge offset along normal vector
 //	TODO for 0.9: add labels for nodes/edges
 //	TODO for 1.0: optimize version 0.9
 //	TODO for 1.1: add mouse support
@@ -50,7 +51,7 @@
 //library for easy texture loading
 //chek http://www.lonesock.net/soil.html for more information
 #ifdef _WIN32
-	#include "soil/include/SOIL.h"
+	#include "SOIL.h"
 #else
 	#include <SOIL.h>
 #endif
@@ -86,12 +87,13 @@ private:
 	unsigned int edgeCount;
 	unsigned int shortcutCount;
 	openGL_Node_3d *nodeArray;
-	openGL_Node_3d *edgeArray;
+	openGL_Edge_Node *edgeArray;
 	openGL_Node_3d *shortcutArray;
 
 	//stuff needed for openGL
 	bool showNodes;
 	bool showEdges;
+	bool showShortcuts;
 	bool showMap;
 	int wWidth;
 	int wHeight;
@@ -104,6 +106,7 @@ private:
 	GLuint vbo_map;
 	GLuint vbo_nodes;
 	GLuint vbo_edges;
+	GLuint vbo_shortcuts;
 
 	//openGL textures
 	GLuint *map_textures;
@@ -111,7 +114,9 @@ private:
 
 	//shader program
 	GLuint program;
+	GLuint program1;
 	GLuint program2;
+	GLuint program3;
 
 	//used to read the shader source code - needs to be replaced
 	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
@@ -126,10 +131,14 @@ private:
 	bool initNodes();
 	//loads all edge geometry
 	bool initEdges();
+	//loads all shortcut geometry
+	bool initShortcuts();
 	//loads map geometry
 	bool initMap();
 	//loads map textures and actually heavily relies on SOIL to do all the nasty stuff
 	bool initTextures();
+	//draw node label
+	bool drawText(glm::mat4);
 	//clean up
 	void uninit();
 	
@@ -155,7 +164,7 @@ public:
 	void setEdgeCount(int);
 	void setShortcutEdgeCount(int);
 	void setNodeArray(openGL_Node_3d*);
-	void setEdgeArray(openGL_Node_3d*);
+	void setEdgeArray(openGL_Edge_Node*);
 	void setShortcutEdgeArray(openGL_Node_3d*);
 	void setCamera(float,float,float);
 
