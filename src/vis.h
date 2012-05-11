@@ -16,7 +16,7 @@ class vis {
 	private:
 		openGLrender render;
 		openGL_Node_3d* nodes;
-		openGL_Node_3d* edges;
+		openGL_Edge_Node* edges;
 		openGL_Node_3d* shortcut_edges;
 
 	public: 
