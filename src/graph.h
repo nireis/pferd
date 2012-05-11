@@ -21,6 +21,8 @@ typedef ShortcutData SD;
 
 typedef Andrenator_P<E> EdgesIterator;
 
+class SCGraph;
+
 class Dijkstra_Interface {
 	public:
 		typedef Andrenator_P<E> EdgesIterator;
@@ -134,11 +136,20 @@ class Graph {
 		unsigned int getLowerInEdgeBound(unsigned int id);
 		unsigned int getUpperInEdgeBound(unsigned int id); 
 		
-		E* getOutEdge(unsigned int id);
-		E* getInEdge(unsigned int id);
+		E* getOutEdge(unsigned int edge_id);
+		E* getInEdge(unsigned int edge_id);
 		
-		E* copyOutEdge(unsigned int id);
-		E* copyInEdge(unsigned int id);
+		E* copyOutEdge(unsigned int edge_id);
+		E* copyInEdge(unsigned int edge_id);
+
+		/*
+		 * zum Updaten von Kantenbelastungen
+		 * übernimmt Belastungen eines SCGraph
+		 * ignoriert die Belastungen der Shortcuts vom 
+		 * SCGraph, diese muss er vorher selbst
+		 * verteilt haben.
+		 */
+		void getEdgeLoads(SCGraph* g);
 
 		/*
 		 * hier werden Iteratoren über Kanten nach Aussen gegeben
@@ -288,6 +299,22 @@ class SCGraph {
 		ND* getNodeDataPointer(){ return node_data; }
 		ED getEdgeData(unsigned int edge_id);
 
+		// gibt jeweiliges Ende einer Kante
+		// zu der Kanten-ID raus
+		E* getOutEdge(unsigned int edge_id);
+		E* getInEdge(unsigned int edge_id);
+
+		// zum aktualisieren der Loads der
+		// Kanten/Shortcuts
+		//
+		// uint_pair: siehe struct.h
+		void updateEdgeLoads(std::list< uint_pair >* edge_load_values);
+		// das array enthält für edge_load[i] die belastung für
+		// die kante i 
+		void updateEdgeLoads(unsigned int* edge_loads, unsigned int array_length);
+		// verteilt Belastungen der Shortcuts auf deren Eltern
+		void shareShortcutLoads();
+
 		// Edges-Iteratoren wie im anderen Graph,
 		// auch hier möchte man während der runden ein
 		// evtl. anderes verhalten der funktionen haben
@@ -312,7 +339,6 @@ class SCGraph {
 			unsigned int c = node_in_edges_count[node] ;
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
-
 };
 
 

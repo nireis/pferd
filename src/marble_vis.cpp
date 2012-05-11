@@ -21,7 +21,7 @@ void marble_vis::customPaint(GeoPainter* painter)
 		painter->drawEllipse(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), 5, 5);
 		stringstream sstr;
 		sstr << /* nd.elevation << */ " ("<< nd.id << ") " ;
-		if(nd.id == 0)
+		if(nd.id == 0 || nd.id == 8 || nd.id == 3)
 			sstr << " ================================================";
 		painter->drawText(GeoDataCoordinates(nd.lon, nd.lat, nd.elevation, GeoDataCoordinates::Degree), sstr.str().c_str());
 		/*stringstream sstr;

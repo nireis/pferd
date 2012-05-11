@@ -39,7 +39,7 @@ void berechneVis(vector<marble_vis::text>* txt, vector<marble_vis::textsc>* txts
 					/*
 					 * Edge IDs angeben?
 					 */
-					//sstr << "(id: " << tmpedge->id << ")" ;
+					sstr << "(" << tmpedge->id << ")" ;
 					val = sstr.str();
 					lon = (g->getNodeData(i).lon+g->getNodeData(tmpedge->other_node).lon)/2;
 					lat = (g->getNodeData(i).lat+g->getNodeData(tmpedge->other_node).lat)/2;
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]){
 	marble_vis *mapWidget = new marble_vis(&scg, txt, txtsc, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
-	mapWidget->centerOn(GeoDataCoordinates(scg.getNodeData(0).lon , scg.getNodeData(0).lat , 0.0, GeoDataCoordinates::Degree));
+	mapWidget->centerOn(GeoDataCoordinates(scg.getNodeData(8).lon , scg.getNodeData(8).lat , 0.0, GeoDataCoordinates::Degree));
 	mapWidget->setDistance(0.75);
 	mapWidget->show();
 	app.exec();
