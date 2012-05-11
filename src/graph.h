@@ -136,6 +136,9 @@ class Graph {
 		
 		E* getOutEdge(unsigned int id);
 		E* getInEdge(unsigned int id);
+		
+		E* copyOutEdge(unsigned int id);
+		E* copyInEdge(unsigned int id);
 
 		/*
 		 * hier werden Iteratoren über Kanten nach Aussen gegeben

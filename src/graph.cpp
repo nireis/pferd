@@ -252,7 +252,19 @@ E* Graph::getOutEdge(unsigned int id){
 }
 E* Graph::getInEdge(unsigned int id){
 //	if(id < edge_count)
-		return in_edges + id; //edge_data[id].in_index;
+		return in_edges + edge_data[id].in_index;
+//	E* e=0;
+//	return e;
+}
+E* Graph::copyOutEdge(unsigned int id){
+//	if(id < edge_count)
+		return out_edges + id; //edge_data[id].out_index ;
+//	E* e=0;
+//	return e;
+}
+E* Graph::copyInEdge(unsigned int id){
+//	if(id < edge_count)
+		return in_edges + id;
 //	E* e=0;
 //	return e;
 }
@@ -335,12 +347,12 @@ SCGraph::SCGraph(Graph* gr) :
 	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
-		in_edges[i] = * (gr->getInEdge(i));
+		in_edges[i] = * (gr->copyInEdge(i));
 		in_edges[i].other_lvl = edge_data[ in_edges[i].id ].out_index ;
 	}
 
 	for(unsigned int i = 0; i < edge_count; i++){
-		out_edges[i] = * (gr->getOutEdge(i));
+		out_edges[i] = * (gr->copyOutEdge(i));
 		out_edges[i].other_lvl = edge_data[ out_edges[i].id ].in_index ;
 	}
 	for(unsigned int i = 0; i < node_count; i++){

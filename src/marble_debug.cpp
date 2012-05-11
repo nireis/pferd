@@ -27,6 +27,10 @@ void berechneVis(vector<marble_vis::text>* txt, vector<marble_vis::textsc>* txts
 		it = g->getOutEdgesIt(i);
 		while(it.hasNext()){
 			tmpedge = it.getNext();
+			/*
+			 * Edges doppelt anzeigen? dann immer in das if gehen:
+			 * if( 1 || ... )
+			 */
 			if(edgeSeen[tmpedge->id] == 0){
 					stringstream sstr;
 					sstr << tmpedge->value ;
