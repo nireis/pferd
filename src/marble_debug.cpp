@@ -175,7 +175,7 @@ int main(int argc, char *argv[]){
 	marble_vis *mapWidget = new marble_vis(&scg, txt, txtsc, lnsc);
 	mapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
 	mapWidget->setProjection(Mercator);
-	mapWidget->centerOn(GeoDataCoordinates(scg.getNodeData(8).lon , scg.getNodeData(8).lat , 0.0, GeoDataCoordinates::Degree));
+	mapWidget->centerOn(GeoDataCoordinates(scg.getNodeData(0).lon , scg.getNodeData(0).lat , 0.0, GeoDataCoordinates::Degree));
 	mapWidget->setDistance(0.75);
 	mapWidget->show();
 	app.exec();
