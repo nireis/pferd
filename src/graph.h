@@ -169,6 +169,23 @@ class Graph {
 			unsigned int c = nodes_in_offs[node+1] - nifs ;
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
+		/*
+		 * out0_in1 == false == 0 => gebe OutEdges-Iterator
+		 * out0_in1 == true == 1 => gebe InEdges-Iterator
+		 */
+		EdgesIterator getEdgesIt(bool out0_in1, unsigned int node_id){
+			unsigned int nfs;
+			unsigned int c;
+			if( out0_in1 ){
+				nfs = nodes_in_offs[node_id] ;
+				c = nodes_in_offs[node_id+1] - nfs ;
+				return EdgesIterator(in_edges + nfs , c ); 
+			} else {
+				nfs = nodes_out_offs[node_id] ;
+				c = nodes_out_offs[node_id+1] - nfs ;
+				return EdgesIterator(out_edges + nfs , c ); 
+			}
+		}
 
 };
 
@@ -341,6 +358,23 @@ class SCGraph {
 			unsigned int nifs = nodes_in_offs[node] ;
 			unsigned int c = node_in_edges_count[node] ;
 			return EdgesIterator(in_edges + nifs , c ); 
+		}
+		/*
+		 * out0_in1 == false == 0 => gebe OutEdges-Iterator
+		 * out0_in1 == true == 1 => gebe InEdges-Iterator
+		 */
+		EdgesIterator getEdgesIt(bool out0_in1, unsigned int node_id){
+			unsigned int nfs;
+			unsigned int c;
+			if( out0_in1 ){
+				nfs = nodes_in_offs[node_id] ;
+				c = nodes_in_offs[node_id+1] - nfs ;
+				return EdgesIterator(in_edges + nfs , c ); 
+			} else {
+				nfs = nodes_out_offs[node_id] ;
+				c = nodes_out_offs[node_id+1] - nfs ;
+				return EdgesIterator(out_edges + nfs , c ); 
+			}
 		}
 };
 
