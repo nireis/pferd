@@ -283,7 +283,6 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
 	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
-	dd->lastDist = 0;
 	dd->found[scnode] = true;
 	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
@@ -307,20 +306,6 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 			shortDijkstra(dd, tmpnode, conode, sclist, firstSCE);
 		}
 	}
-	// Prüfen ob noch ein weiterer Pfad mit gleicher Distanz für die
-	// letzten gesichteten Shortcuts mit gleicher Länge existiert.
-	// Mögliche Kanten der Länge 0 werden im Moment NICHT berücksichtigt! TODO??
-	dd->lastDist = dd->U.top().distance;
-	dd->U.pop();
-	while(dd->U.top().distance == dd->lastDist && !dd->U.empty()){
-		dd->sameDist.erase(dd->U.top().targetedge->other_node);
-		dd->U.pop();
-	}
-	// Die letzten Shortcuts einfügen.
-	for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
-		sclist->push_front(it->second);
-	}
-	dd->sameDist.clear();
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
 	resetDij(dd);
 }
@@ -349,38 +334,17 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 							tmpid,currentEdge,currentEdge->value+tmpdist));
 			}   
 		}
-		dd->lastDist = tmpdist;
 		dd->U.pop();
-
-		// Falls sofort wieder ein richtiger Pfad gefunden wird, müssen noch die letzten Shortcuts eingefügt werden.
-		if(dd->lastDist != dd->U.top().distance){
-			for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
-				sclist->push_front(it->second);
-			}
-			dd->sameDist.clear();
-		}
 
 		// Die restlichen Knoten abarbeiten.
 		while((tmpid = dd->U.top().targetedge->other_node) != targetnode){
-			// Prüfen ob noch uneindeutige kürzeste Wege gefunden werden können.
-			if(dd->lastDist == dd->U.top().distance){
-				// Löschen, wenn einer existiert.
-				dd->sameDist.erase(tmpid);
-			}
-			else{
-				for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
-					sclist->push_front(it->second);
-				}
-				dd->sameDist.clear();
-			}
 			if(!dd->found[tmpid]){
 				tmpdist = dd->U.top().distance;
 				dd->found[tmpid] = true;
 				dd->resetlist.push_front(tmpid);
 				if(dd->U.top().sourceid == conode){
-					dd->sameDist.insert(pair<unsigned int, Shortcut>(tmpid,
-							Shortcut(dd->U.top().targetedge->value+firstSCE->value,
-								firstSCE->other_node, tmpid, firstSCE->id, dd->U.top().targetedge->id)));
+					sclist->push_front(Shortcut(dd->U.top().targetedge->value+firstSCE->value,
+						firstSCE->other_node, tmpid, firstSCE->id, dd->U.top().targetedge->id));
 				}
 				it = g->getOutEdgesIt_Round(tmpid);
 				while(it.hasNext()){
@@ -393,7 +357,6 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 					}   
 				}
 			}
-			dd->lastDist = tmpdist;
 			dd->U.pop();
 		}
 		dd->resetlist.push_front(targetnode);
@@ -402,9 +365,8 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 	// falls es der letzte Knoten war, der zu bearbeiten war in dieser Dijkstra
 	// Runde.
 	if(dd->U.top().sourceid == conode){
-		dd->sameDist.insert(pair<unsigned int, Shortcut>(targetnode,
-				Shortcut(dd->U.top().targetedge->value+firstSCE->value, firstSCE->other_node, targetnode,
-					firstSCE->id, dd->U.top().targetedge->id)));
+		sclist->push_front(Shortcut(dd->U.top().targetedge->value+firstSCE->value,
+			firstSCE->other_node, tmpid, firstSCE->id, dd->U.top().targetedge->id));
 	}
 }
 

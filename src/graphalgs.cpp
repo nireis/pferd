@@ -729,7 +729,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
-	for(unsigned int i=8255; i<=maxid; i++){
+	for(unsigned int i=0; i<=maxid; i++){
 		list<unsigned int> path;
 //		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);
