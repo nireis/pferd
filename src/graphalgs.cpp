@@ -563,7 +563,6 @@ list<unsigned int> independent_set(Graph* g){
 
 unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
 		list<unsigned int>* path){
-	EdgesIterator it;
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -572,16 +571,12 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
 	unsigned int nr_of_nodes = g->getNodeCount();
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
-	unsigned int tmp_min_path_length;
 	unsigned int min_path_center;
-	unsigned int tmpid;
-	unsigned int currentEdgeTarget;
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
 	// TODO Möglicherweise found und found_by mergen, je nach Geschwindigkeitsänderung.
 	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
 	// Gibt an ob von Dijkstra 0/1 ein bestimmter Knoten schon gefunden wurde.
-	vector< vector<unsigned int> > found_by(2,vector<unsigned int> (nr_of_nodes,/* damit ursprünglich nicht besuchte kanten fehler geben */ numeric_limits<unsigned int>::max() ));
-	Edge* currentEdge;
+	vector< vector<unsigned int> > found_by(2,vector<unsigned int> (nr_of_nodes,));
 
 	// Die ersten Knoten abarbeiten
 	if(node_id0 == node_id1){
@@ -593,11 +588,11 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		// U hinzufügen, wenn das Level größer ist.
 		for(int i=0; i<2; i++){
 			found[i][node_id[i]] = true;
-			it = g->getEdgesIt(i, node_id[i]);
+			EdgesIterator it = g->getEdgesIt(i, node_id[i]);
 			while(it.hasNext()){
-				currentEdge = it.getNext();
+				Edge* currentEdge = it.getNext();
 				if(currentEdge->other_lvl > g->getNodeLVL(node_id[i])){
-					currentEdgeTarget = currentEdge->other_node;
+					unsigned int currentEdgeTarget = currentEdge->other_node;
 					// Wenn wir schon den anderen Knoten gefunden haben...
 					if(currentEdgeTarget == node_id[(i+1)%2]){
 						min_path_length = currentEdge->value;
@@ -618,26 +613,23 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	dist[node_id1] = 0;
 
 	// Die restlichen Knoten abarbeiten
-	while(min_path_length >= U.top().distance && !U.empty()){
+	while(min_path_length > U.top().distance && !U.empty()){
 		int i = U.top().found_by;
-		tmpid = U.top().id;
+		unsigned int tmpid = U.top().id;
 		if(!found[i][tmpid]){
 			found[i][tmpid] = true;
 			found_by[i][tmpid] = U.top().eid;
-			// Wir prüfen ob sich die Dijkstras treffen...
-			if(found[i][tmpid]){
-				tmp_min_path_length = dist[tmpid] + U.top().distance;
-				// ...und weisen ein Minimum zu wenn nötig.
-				if(tmp_min_path_length < min_path_length){
-					min_path_length = tmp_min_path_length;
-					min_path_center = tmpid;
-				}
+			// Wir prüfen ob ein minimaler Pfad gefunden wurde.
+			if(found[i][tmpid] &&
+					(unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance) < min_path_length){
+				min_path_length = tmp_min_path_length;
+				min_path_center = tmpid;
 			}
 			dist[tmpid] = U.top().distance;
-			it = g->getEdgesIt(i, tmpid);
+			EdgesIterator it = g->getEdgesIt(i, tmpid);
 			while(it.hasNext()){
-				currentEdge = it.getNext();
-				currentEdgeTarget = currentEdge->other_node;
+				Edge* currentEdge = it.getNext();
+				unsigned int currentEdgeTarget = currentEdge->other_node;
 				// Wir laufen nur bergauf...
 				if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
 					// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
@@ -654,10 +646,10 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	unsigned int takenedge;
 	// Nur, wenn ein Pfad existiert...
 	if(min_path_length != numeric_limits<unsigned int>::max()){
-		tmpid = min_path_center;
 		// ...gehe von dem Treffpunkt jeweils zurück zum Anfangsknoten
 		// und speichere die Kanten-IDs.
 		for(int i=0; i<2; i++){
+			unsigned int tmpid = min_path_center;
 			while(tmpid != node_id[i]){
 //					cout << tmpid << endl;
 					takenedge = found_by[i][tmpid];
