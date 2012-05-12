@@ -204,10 +204,10 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 	int len = nodes->size();
    list<thread> threadlist;
 	// Threads erstellen, die auf den jeweiligen Prozessoren laufen sollen.
-   for(unsigned int i=0; i<numThreads; i++){
+   for(unsigned int i=0; i<1 /*numThreads*/; i++){
       threadlist.push_back(thread(&run<G>, this));
    }
-   for(unsigned int i=0; i<numThreads; i++){
+   for(unsigned int i=0; i<1 /*numThreads*/; i++){
       threadlist.front().join();
       threadlist.pop_front();
    }
@@ -351,6 +351,14 @@ void CHConstruction<G>::shortDijkstra(DijkstraData* dd, unsigned int targetnode,
 		}
 		dd->lastDist = tmpdist;
 		dd->U.pop();
+
+		// Falls sofort wieder ein richtiger Pfad gefunden wird, müssen noch die letzten Shortcuts eingefügt werden.
+		if(dd->lastDist != dd->U.top().distance){
+			for(map<unsigned int, Shortcut>::iterator it=dd->sameDist.begin(); it!=dd->sameDist.end(); it++){
+				sclist->push_front(it->second);
+			}
+			dd->sameDist.clear();
+		}
 
 		// Die restlichen Knoten abarbeiten.
 		while((tmpid = dd->U.top().targetedge->other_node) != targetnode){
