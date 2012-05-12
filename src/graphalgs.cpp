@@ -649,6 +649,8 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			while(tmpid != node_id[i]){
 //				cout << tmpid << endl;
 				int takenedge = found_by[i][tmpid];
+				if( takenedge < 0 )
+					cout << "takenedge < 0 => (unsigned int) konvertierung doof!)" << endl;
 				// path->push_front(takenedge);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
@@ -661,6 +663,11 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
 	for(unsigned int i=18000; i<=maxid; i++){
+		if(i >= g->getNodeCount()){
+			cout << "Zielknoten nicht existent!"<<endl;
+		} else {
+			cout << "Zielknoten existent."<<endl;
+		}
 		list<unsigned int> path;
 //		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);
