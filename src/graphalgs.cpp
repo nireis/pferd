@@ -236,7 +236,7 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	if(found[node_id1]){
 		tmpid = node_id1;
 		while(tmpid != node_id0){
-//			cout << tmpid ;
+//			cout << tmpid << endl;
 			tmpid = g->getInEdge( in_edge_id[tmpid] )->other_node;
 		}
 	}
@@ -708,7 +708,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		// ...gehe von dem Treffpunkt jeweils zurück zum Anfangsknoten
 		// und speichere die Kanten-IDs.
 		while(tmpid != node_id0){
-		///**/	cout << tmpid ;
+//				cout << tmpid << endl;
 				takenedge = found_by[0][tmpid];
 				path->push_front(takenedge);
 				// TODO EdgeData by reference?
@@ -717,7 +717,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		}
 		tmpid = min_path_center;
 		while(tmpid != node_id1){
-		///**/	cout << tmpid ;
+//				cout << tmpid << endl;
 				takenedge = found_by[1][tmpid];
 				path->push_front(takenedge);
 				tmpid = g->getOutEdge(takenedge)->other_node;
@@ -729,11 +729,11 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
-	for(unsigned int i=0; i<=maxid; i++){
+	for(unsigned int i=8255; i<=maxid; i++){
 		list<unsigned int> path;
-		cout << "starte Dijkstra " << endl;
+//		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);
-		cout << "starte CHDijkstra " << endl;
+//		cout << "starte CHDijkstra " << endl;
 		dist1 = CHDijkstra(scg, 0, i, &path);
 		cout << "Dijkstra dist für Knoten " << i << ": " << dist0 << ", CHDijkstra dist: " << dist1 << endl;
 		if(dist0 != dist1){
