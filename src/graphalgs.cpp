@@ -573,38 +573,35 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
 	unsigned int min_path_center;
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
-	// TODO Möglicherweise found und found_by mergen, je nach Geschwindigkeitsänderung.
-	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
-	// Gibt an ob von Dijkstra 0/1 ein bestimmter Knoten schon gefunden wurde.
-	vector< vector<unsigned int> > found_by(2,vector<unsigned int> (nr_of_nodes,));
+	// Gibt an mit welcher Kante Dijkstra 0/1 einen bestimmten Knoten schon gefunden hat.
+	// Wenn nicht ist der Wert -1.
+	vector< vector<int> > found_by(2,vector<int> (nr_of_nodes,-1));
 
 	// Die ersten Knoten abarbeiten
 	if(node_id0 == node_id1){
 		min_path_center = node_id0;
 		return 0;
 	}
-	else{
-		// Die Kanten der ersten beiden Knoten anschauen und die targets zu
-		// U hinzufügen, wenn das Level größer ist.
-		for(int i=0; i<2; i++){
-			found[i][node_id[i]] = true;
-			EdgesIterator it = g->getEdgesIt(i, node_id[i]);
-			while(it.hasNext()){
-				Edge* currentEdge = it.getNext();
-				if(currentEdge->other_lvl > g->getNodeLVL(node_id[i])){
-					unsigned int currentEdgeTarget = currentEdge->other_node;
-					// Wenn wir schon den anderen Knoten gefunden haben...
-					if(currentEdgeTarget == node_id[(i+1)%2]){
-						min_path_length = currentEdge->value;
-						// Die Werte für das Backtracing setzen.
-						min_path_center = node_id[(i+1)%2];
-						found_by[i][node_id[(i+1)%2]] = currentEdge->id;
-					}
-					else{
-						// ...sonst tu sie in U
-						U.push(U_element_bi(
-							currentEdge->value,currentEdge->other_node,currentEdge->id,i));
-					}
+	// Die Kanten der ersten beiden Knoten anschauen und die targets zu
+	// U hinzufügen, wenn das Level größer ist.
+	for(int i=0; i<2; i++){
+		found_by[i][node_id[i]] = (int)node_id[i];
+		EdgesIterator it = g->getEdgesIt(i, node_id[i]);
+		while(it.hasNext()){
+			Edge* currentEdge = it.getNext();
+			if(currentEdge->other_lvl > g->getNodeLVL(node_id[i])){
+				unsigned int currentEdgeTarget = currentEdge->other_node;
+				// Wenn wir schon den anderen Knoten gefunden haben...
+				if(currentEdgeTarget == node_id[(i+1)%2]){
+					min_path_length = currentEdge->value;
+					// Die Werte für das Backtracing setzen.
+					min_path_center = node_id[(i+1)%2];
+					found_by[i][node_id[(i+1)%2]] = (int)currentEdge->id;
+				}
+				else{
+					// ...sonst tu sie in U
+					U.push(U_element_bi(
+						currentEdge->value,currentEdge->other_node,currentEdge->id,i));
 				}
 			}
 		}
@@ -613,15 +610,14 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	dist[node_id1] = 0;
 
 	// Die restlichen Knoten abarbeiten
-	while(min_path_length > U.top().distance && !U.empty()){
+	while(!U.empty() && min_path_length > U.top().distance){
 		int i = U.top().found_by;
 		unsigned int tmpid = U.top().id;
-		if(!found[i][tmpid]){
-			found[i][tmpid] = true;
-			found_by[i][tmpid] = U.top().eid;
+		if(found_by[i][tmpid] == -1){
+			found_by[i][tmpid] = (int)U.top().eid;
+			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
 			// Wir prüfen ob ein minimaler Pfad gefunden wurde.
-			if(found[i][tmpid] &&
-					(unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance) < min_path_length){
+			if(found_by[i][tmpid] != (-1) && tmp_min_path_length < min_path_length){
 				min_path_length = tmp_min_path_length;
 				min_path_center = tmpid;
 			}
@@ -633,7 +629,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 				// Wir laufen nur bergauf...
 				if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
 					// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
-					if(!found[i][currentEdgeTarget]){
+					if(found_by[i][currentEdgeTarget] == -1){
 						U.push(U_element_bi(
 							currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
 					}
@@ -642,8 +638,8 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		}
 		U.pop();
 	}
+
 	// Backtracing.
-	unsigned int takenedge;
 	// Nur, wenn ein Pfad existiert...
 	if(min_path_length != numeric_limits<unsigned int>::max()){
 		// ...gehe von dem Treffpunkt jeweils zurück zum Anfangsknoten
@@ -651,10 +647,10 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		for(int i=0; i<2; i++){
 			unsigned int tmpid = min_path_center;
 			while(tmpid != node_id[i]){
-//					cout << tmpid << endl;
-					takenedge = found_by[i][tmpid];
-					// path->push_front(takenedge);
-					tmpid = g->getEdge(i, takenedge)->other_node;
+//				cout << tmpid << endl;
+				int takenedge = found_by[i][tmpid];
+				// path->push_front(takenedge);
+				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}
 	}
