@@ -303,6 +303,9 @@ class SCGraph {
 		// zu der Kanten-ID raus
 		E* getOutEdge(unsigned int edge_id);
 		E* getInEdge(unsigned int edge_id);
+		
+		E* copyOutEdge(unsigned int edge_id);
+		E* copyInEdge(unsigned int edge_id);
 
 		// zum aktualisieren der Loads der
 		// Kanten/Shortcuts

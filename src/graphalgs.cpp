@@ -202,8 +202,19 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 			dist[tmpid] = U.top().distance;
 			// Testen ob das unser Zielknoten ist
 			found[tmpid] = true;
-			in_edge_id[tmpid] = U.top().eid;
+			// TODO
+			// tmpid muss node-id des zielknotens sein, 
+			// wenn über in_edge_id die kante wiederbesorgt
+			// werden soll
+			//
+			//=> verschoben nach unten in die if abfrage
+			//
+			///**/ in_edge_id[tmpid] = U.top().eid;
 			if(tmpid == node_id1){
+				// TODO U komplett leeren, 
+				// damit weitere kanten knoten, die noch
+				// in u liegen, nicht weiter
+				// betrachtet werden ?
 				break;
 			}
 			// Die ausgehenden Kanten durchgehen und in U werfen
@@ -212,6 +223,7 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 				currentEdge = it.getNext();
 				// Wenn sie noch nicht gefunden wurde...
 				if(!found[currentEdge->other_node]){
+					in_edge_id[currentEdge->other_node] = currentEdge->id; // => u_element.eid redudant
 					// ...tu sie in U
 					U.push(U_element(
 								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id));
@@ -224,11 +236,11 @@ unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	if(found[node_id1]){
 		tmpid = node_id1;
 		while(tmpid != node_id0){
-			cout << tmpid << endl;
-			tmpid = g->getInEdge(g->getEdgeData(in_edge_id[tmpid]).in_index)->other_node;
+//			cout << tmpid ;
+			tmpid = g->getInEdge( in_edge_id[tmpid] )->other_node;
 		}
 	}
-	cout << "=============" << endl;
+//	cout << "=============" << endl;
 	return dist[node_id1];
 }
 
@@ -696,47 +708,19 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		// ...gehe von dem Treffpunkt jeweils zurück zum Anfangsknoten
 		// und speichere die Kanten-IDs.
 		while(tmpid != node_id0){
-		/**/	cout << tmpid ;
+		///**/	cout << tmpid ;
 				takenedge = found_by[0][tmpid];
-		/**/	cout << " found by edge " << takenedge;
-		/**/	if( g->isShortcut( takenedge ))
-		/**/			cout << " (sc)" ;
 				path->push_front(takenedge);
 				// TODO EdgeData by reference?
-				tmpid = g->getInEdge(g->getEdgeData(takenedge).in_index)->other_node;
-		/**/	cout << " returns node " << tmpid << endl; 
-		/**/	cout << "--- in edges of " << tmpid << ": " << endl;
-		/**/	EdgesIterator sei = g->getInEdgesIt(tmpid);
-		/**/	while(sei.hasNext()){
-		/**/		Edge* se = sei.getNext();
-		/**/		cout << "   > id: " << se->id ;
-		/**/		if( g->isShortcut( se->id ))
-		/**/			cout << " (sc) " ;
-		/**/		cout <<", coming from: " << se->other_node << endl;
-		/**/	}
-		/**/	cout <<" -=-" << endl;
+				/* => EdgeData nicht mehr nötig */
+				tmpid = g->getInEdge(takenedge)->other_node;
 		}
-		/**/cout << " - switch - " << endl;
 		tmpid = min_path_center;
 		while(tmpid != node_id1){
-		/**/	cout << tmpid ;
+		///**/	cout << tmpid ;
 				takenedge = found_by[1][tmpid];
-		/**/	cout << " found by edge " << takenedge ;
-		/**/	if( g->isShortcut( takenedge ))
-		/**/			cout << " (sc)" ;
 				path->push_front(takenedge);
-				tmpid = g->getOutEdge(g->getEdgeData(takenedge).out_index)->other_node;
-		/**/	cout << " returns node " << tmpid << endl; 
-		/**/	cout << "--- out edges of " << tmpid << ": " << endl;
-		/**/	EdgesIterator sei = g->getOutEdgesIt(tmpid);
-		/**/	while(sei.hasNext()){
-		/**/		Edge* se = sei.getNext();
-		/**/		cout << "   > id: " << se->id ;
-		/**/		if( g->isShortcut( se->id ))
-		/**/			cout << " (sc) " ;
-		/**/		cout <<", going to: " << se->other_node << endl;
-		/**/	}
-		/**/	cout <<" -=-" << endl;
+				tmpid = g->getOutEdge(takenedge)->other_node;
 		}
 	}
 	return min_path_length;
@@ -747,7 +731,9 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist1;
 	for(unsigned int i=1; i<=maxid; i++){
 		list<unsigned int> path;
+		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);
+		cout << "starte CHDijkstra " << endl;
 		dist1 = CHDijkstra(scg, 0, i, &path);
 		cout << "Dijkstra dist für Knoten " << i << ": " << dist0 << ", CHDijkstra dist: " << dist1 << endl;
 		if(dist0 != dist1){

@@ -208,6 +208,8 @@ bool Graph::parseTextGraphFile(std::string graphdata){
 		}
 		in_edges[index] = E( i, edges[i].distance, edges[i].source );
 		edge_data[i].in_index = index;
+
+		// cout << "id: " << i << " ,out id: " << out_edges[edge_data[i].out_index].id << " , in id: " << in_edges[edge_data[i].in_index].id << endl; 
 	}
 
 	delete[] nodes; nodes = 0;
@@ -802,4 +804,11 @@ void SCGraph::shareShortcutLoads(){
 			cout << ">>>> ERROR: Shortcut Load ungleich null nach verteilen! " << endl;
 	}
 }
+E* SCGraph::copyOutEdge(unsigned int edge_id){
+    	return out_edges + edge_id;
+}
+E* SCGraph::copyInEdge(unsigned int edge_id){
+		return in_edges + edge_id;
+}
+
 
