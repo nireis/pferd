@@ -777,6 +777,14 @@ E* SCGraph::getOutEdge(unsigned int edge_id){
 E* SCGraph::getInEdge(unsigned int edge_id){
 		return in_edges+edge_data[edge_id].in_index;
 }
+E* SCGraph::getEdge(bool out0_in1, unsigned int edge_id){
+	if(out0_in1){
+		return out_edges+edge_data[edge_id].out_index;
+	}
+	else{
+		return in_edges+edge_data[edge_id].in_index;
+	}
+}
 void SCGraph::updateEdgeLoads(list< uint_pair >* edge_load_values){
 	while( ! edge_load_values->empty() ){
 		edge_data[ edge_load_values->front().id ].load = 

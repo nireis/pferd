@@ -563,15 +563,13 @@ list<unsigned int> independent_set(Graph* g){
 
 unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
 		list<unsigned int>* path){
-	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
-	// TODO Iterator je nach Art über Parameter 1 und 0 bekommen, so dass die
-	// beiden großen if-Schleifen (*gnihihi*) verschwinden können.
-	EdgesIterator itout = g->getOutEdgesIt(node_id0);
-	EdgesIterator itin = g->getInEdgesIt(node_id1);
-
+	EdgesIterator it;
+	// Wegen Codeschönheit: Array für Source und Target anlegen.
+	vector<unsigned int> node_id(2);
+	node_id[0] = node_id0;
+	node_id[1] = node_id1;
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
-
 	unsigned int nr_of_nodes = g->getNodeCount();
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
 	unsigned int tmp_min_path_length;
@@ -593,43 +591,25 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	else{
 		// Die Kanten der ersten beiden Knoten anschauen und die targets zu
 		// U hinzufügen, wenn das Level größer ist.
-		found[0][node_id0] = true;
-		itout = g->getOutEdgesIt(node_id0);
-		while(itout.hasNext()){
-			currentEdge = itout.getNext();
-			if(currentEdge->other_lvl > g->getNodeLVL(node_id0)){
-				currentEdgeTarget = currentEdge->other_node;
-				// Wenn wir schon den anderen Knoten gefunden haben...
-				if(currentEdgeTarget == node_id1){
-					min_path_length = currentEdge->value;
-					// Die Werte für das Backtracing setzen.
-					min_path_center = node_id1;
-					found_by[0][node_id1] = currentEdge->id;
-				}
-				else{
-					// ...sonst tu sie in U
-					U.push(U_element_bi(
-						currentEdge->value,currentEdge->other_node,currentEdge->id,0));
-				}
-			}
-		}
-		found[1][node_id1] = true;
-		itin = g->getInEdgesIt(node_id1);
-		while(itin.hasNext()){
-			currentEdge = itin.getNext();
-			if(currentEdge->other_lvl > g->getNodeLVL(node_id1)){
-				currentEdgeTarget = currentEdge->other_node;
-				// Wenn wir schon den anderen Knoten gefunden haben...
-				if(currentEdgeTarget == node_id0){
-					min_path_length = currentEdge->value;
-					// Die Werte für das Backtracing setzen.
-					min_path_center = node_id0;
-					found_by[1][node_id0] = currentEdge->id;
-				}
-				else{
-					// ...sonst tu sie in U
-					U.push(U_element_bi(
-						currentEdge->value,currentEdge->other_node,currentEdge->id,1));
+		for(int i=0; i<2; i++){
+			found[i][node_id[i]] = true;
+			it = g->getEdgesIt(i, node_id[i]);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				if(currentEdge->other_lvl > g->getNodeLVL(node_id[i])){
+					currentEdgeTarget = currentEdge->other_node;
+					// Wenn wir schon den anderen Knoten gefunden haben...
+					if(currentEdgeTarget == node_id[(i+1)%2]){
+						min_path_length = currentEdge->value;
+						// Die Werte für das Backtracing setzen.
+						min_path_center = node_id[(i+1)%2];
+						found_by[i][node_id[(i+1)%2]] = currentEdge->id;
+					}
+					else{
+						// ...sonst tu sie in U
+						U.push(U_element_bi(
+							currentEdge->value,currentEdge->other_node,currentEdge->id,i));
+					}
 				}
 			}
 		}
@@ -639,61 +619,31 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 
 	// Die restlichen Knoten abarbeiten
 	while(min_path_length >= U.top().distance && !U.empty()){
+		int i = U.top().found_by;
 		tmpid = U.top().id;
-		if(!U.top().found_by){
-			if(!found[0][tmpid]){
-				found[0][tmpid] = true;
-				found_by[0][tmpid] = U.top().eid;
-				// Wir prüfen ob sich die Dijkstras treffen...
-				if(found[1][tmpid]){
-					tmp_min_path_length = dist[tmpid] + U.top().distance;
-					// ...und weisen ein Minimum zu wenn nötig.
-					if(tmp_min_path_length < min_path_length){
-						min_path_length = tmp_min_path_length;
-						min_path_center = tmpid;
-					}
-				}
-				dist[tmpid] = U.top().distance;
-				itout = g->getOutEdgesIt(tmpid);
-				while(itout.hasNext()){
-					currentEdge = itout.getNext();
-					currentEdgeTarget = currentEdge->other_node;
-					// Wir laufen nur bergauf...
-					if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
-						// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
-						if(!found[0][currentEdgeTarget]){
-							U.push(U_element_bi(
-								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,0));
-						}
-					}
+		if(!found[i][tmpid]){
+			found[i][tmpid] = true;
+			found_by[i][tmpid] = U.top().eid;
+			// Wir prüfen ob sich die Dijkstras treffen...
+			if(found[i][tmpid]){
+				tmp_min_path_length = dist[tmpid] + U.top().distance;
+				// ...und weisen ein Minimum zu wenn nötig.
+				if(tmp_min_path_length < min_path_length){
+					min_path_length = tmp_min_path_length;
+					min_path_center = tmpid;
 				}
 			}
-		}
-		else{
-			if(!found[1][tmpid]){
-				found[1][tmpid] = true;
-				found_by[1][tmpid] = U.top().eid;
-				// Wir prüfen ob sich die Dijkstras treffen...
-				if(found[0][tmpid]){
-					tmp_min_path_length = dist[tmpid] + U.top().distance;
-					// ...und weisen ein Minimum zu wenn nötig.
-					if(tmp_min_path_length < min_path_length){
-						min_path_length = tmp_min_path_length;
-						min_path_center = tmpid;
-					}
-				}
-				dist[tmpid] = U.top().distance;
-				itin = g->getInEdgesIt(tmpid);
-				while(itin.hasNext()){
-					currentEdge = itin.getNext();
-					currentEdgeTarget = currentEdge->other_node;
-					// Wir laufen nur bergauf...
-					if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
-						// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
-						if(!found[1][currentEdgeTarget]){
-							U.push(U_element_bi(
-								currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,1));
-						}
+			dist[tmpid] = U.top().distance;
+			it = g->getEdgesIt(i, tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				currentEdgeTarget = currentEdge->other_node;
+				// Wir laufen nur bergauf...
+				if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
+					// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
+					if(!found[i][currentEdgeTarget]){
+						U.push(U_element_bi(
+							currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
 					}
 				}
 			}
@@ -707,20 +657,13 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		tmpid = min_path_center;
 		// ...gehe von dem Treffpunkt jeweils zurück zum Anfangsknoten
 		// und speichere die Kanten-IDs.
-		while(tmpid != node_id0){
-//				cout << tmpid << endl;
-				takenedge = found_by[0][tmpid];
-				path->push_front(takenedge);
-				// TODO EdgeData by reference?
-				/* => EdgeData nicht mehr nötig */
-				tmpid = g->getInEdge(takenedge)->other_node;
-		}
-		tmpid = min_path_center;
-		while(tmpid != node_id1){
-//				cout << tmpid << endl;
-				takenedge = found_by[1][tmpid];
-				path->push_front(takenedge);
-				tmpid = g->getOutEdge(takenedge)->other_node;
+		for(int i=0; i<2; i++){
+			while(tmpid != node_id[i]){
+//					cout << tmpid << endl;
+					takenedge = found_by[i][tmpid];
+					// path->push_front(takenedge);
+					tmpid = g->getEdge(i, takenedge)->other_node;
+			}
 		}
 	}
 	return min_path_length;
@@ -729,7 +672,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
-	for(unsigned int i=0; i<=maxid; i++){
+	for(unsigned int i=18000; i<=maxid; i++){
 		list<unsigned int> path;
 //		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);

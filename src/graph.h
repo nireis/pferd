@@ -320,6 +320,7 @@ class SCGraph {
 		// zu der Kanten-ID raus
 		E* getOutEdge(unsigned int edge_id);
 		E* getInEdge(unsigned int edge_id);
+		E* getEdge(bool out0_in1, unsigned int edge_id);
 		
 		E* copyOutEdge(unsigned int edge_id);
 		E* copyInEdge(unsigned int edge_id);
