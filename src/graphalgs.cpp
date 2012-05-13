@@ -615,6 +615,9 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		unsigned int tmpid = U.top().id;
 		if(found_by[i][tmpid] == -1){
 			found_by[i][tmpid] = (int)U.top().eid;
+			if(found_by[i][tmpid] < 0){
+				cout << "AAaaaah" << endl;
+			}
 			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
 			// Wir prüfen ob ein minimaler Pfad gefunden wurde.
 			if(found_by[i][tmpid] != (-1) && tmp_min_path_length < min_path_length){
@@ -649,6 +652,9 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			while(tmpid != node_id[i]){
 //				cout << tmpid << endl;
 				int takenedge = found_by[i][tmpid];
+				if(((unsigned int) takenedge) < 0){
+					cout << "Iiiihhh" << endl;
+				}
 				// path->push_front(takenedge);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
@@ -660,7 +666,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int dist0;
 	unsigned int dist1;
-	for(unsigned int i=18000; i<=maxid; i++){
+	for(unsigned int i=0; i<=maxid; i++){
 		list<unsigned int> path;
 //		cout << "starte Dijkstra " << endl;
 		dist0 = Dijkstra(g, 0, i);

@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
 //	vis anzeige(&scg); anzeige.start();
 
 
-	CHDijkstraTest(&g, &scg, 149909);
+	CHDijkstraTest(&g, &scg, 15045);
 
 	return 0;
 }
