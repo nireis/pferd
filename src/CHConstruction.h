@@ -204,10 +204,10 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 	int len = nodes->size();
    list<thread> threadlist;
 	// Threads erstellen, die auf den jeweiligen Prozessoren laufen sollen.
-   for(unsigned int i=0; i<1 /*numThreads*/; i++){
+   for(unsigned int i=0; i<numThreads; i++){
       threadlist.push_back(thread(&run<G>, this));
    }
-   for(unsigned int i=0; i<1 /*numThreads*/; i++){
+   for(unsigned int i=0; i<numThreads; i++){
       threadlist.front().join();
       threadlist.pop_front();
    }

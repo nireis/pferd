@@ -620,7 +620,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			}
 			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
 			// Wir prüfen ob ein minimaler Pfad gefunden wurde.
-			if(found_by[i][tmpid] != (-1) && tmp_min_path_length < min_path_length){
+			if(found_by[(i+1)%2][tmpid] != (-1) && tmp_min_path_length < min_path_length){
 				min_path_length = tmp_min_path_length;
 				min_path_center = tmpid;
 			}
@@ -652,7 +652,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			while(tmpid != node_id[i]){
 //				cout << tmpid << endl;
 				int takenedge = found_by[i][tmpid];
-				if(((unsigned int) takenedge) < 0){
+				if(takenedge < 0){
 					cout << "Iiiihhh" << endl;
 				}
 				// path->push_front(takenedge);
