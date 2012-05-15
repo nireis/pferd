@@ -710,9 +710,8 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 			(*targets)[i] = dist[target];
 		}
 		else{
-			if(U.top().id == target){
+			if(!U.empty() && U.top().id == target){
 				//...erst gerade gefunden wurde...
-				dist[target] = U.top().distance;
 				(*targets)[i] = U.top().distance;
 			}
 			else{
@@ -721,6 +720,7 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 			}
 		}
 		// TODO Backtracing des aktuellen Knotens.
+		// Achtung! Beim letzten Wert wird im Moment dist und found_b nicht gesetzt!
 	}
 }
 
@@ -738,7 +738,7 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 		while(it.hasNext()){
 			Edge* tmpedge = it.getNext();
 			// Wenn wir nicht schon hier waren und es nach oben geht.
-			if(!(*marked)[tmpedge->id] && tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
+			if(!((*marked)[tmpedge->id]) && tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
 				(*marked)[tmpedge->id] = true;
 				todo.push_back(tmpedge->other_node);
 			}
@@ -748,11 +748,11 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	vector<unsigned int> targets;
-	for(unsigned int i=0; i<100; i++){
+	for(unsigned int i=0; i<1000; i++){
 		targets.push_back(i);
 	}
 	CHDijkstra(scg, 0, &targets);
-	for(unsigned int i=0; i<100; i++){
+	for(unsigned int i=0; i<1000; i++){
 		cout << "Für Knoten " << i << ": " << targets[i] << " und " << CHDijkstra(scg, 0, i) << endl;
 	}
 	return true;
