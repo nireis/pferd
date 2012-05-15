@@ -67,8 +67,18 @@ list<unsigned int> independent_set(Graph* g);
 /*
  * One to one Dijkstra auf der CH.
  */
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
-		list<unsigned int>* path);
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
+
+/*
+ * One to many Dijkstra auf der CH. Die Distanzen werden in den targets-vector geschrieben
+ * and die entsprechende Stelle.
+ */
+void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets);
+
+/*
+ * Markiert alle aufsteigenden Kanten von nodes aus.
+ */
+void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>* marked);
 
 /*
  * Test für den CHDijkstra.

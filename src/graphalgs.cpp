@@ -561,8 +561,7 @@ list<unsigned int> independent_set(Graph* g){
 	return solution;
 }
 
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1,
-		list<unsigned int>* path){
+unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -572,7 +571,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	unsigned int nr_of_nodes = g->getNodeCount();
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
 	unsigned int min_path_center;
-	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
+	vector<unsigned int> dist(nr_of_nodes);
 	// Gibt an mit welcher Kante Dijkstra 0/1 einen bestimmten Knoten schon gefunden hat.
 	// Wenn nicht ist der Wert -1.
 	vector< vector<int> > found_by(2,vector<int> (nr_of_nodes,-1));
@@ -657,19 +656,104 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	return min_path_length;
 }
 
-bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
-	unsigned int dist0;
-	unsigned int dist1;
-	for(unsigned int i=0; i<=maxid; i++){
-		list<unsigned int> path;
-//		cout << "starte Dijkstra " << endl;
-		dist0 = Dijkstra(g, 0, i);
-//		cout << "starte CHDijkstra " << endl;
-		dist1 = CHDijkstra(scg, 0, i, &path);
-		cout << "Dijkstra dist für Knoten " << i << ": " << dist0 << ", CHDijkstra dist: " << dist1 << endl;
-		if(dist0 != dist1){
-			return false;
+void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets){
+	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
+	vector<unsigned int> marked(g->getEdgeCount(), false);
+	markAscEdges(g, targets, &marked);
+
+	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
+	// und markierte Kanten benutzen. Sobald wir alle targets gefunden haben
+	// brechen wir ab.
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+	unsigned int nr_of_nodes = g->getNodeCount();
+	unsigned int tmpnode;
+	// Ist -1 wenn der Knoten noch nicht gefunden wurde, sonst steht die
+	// id des Knotens drin, von dem er gefunden wurde.
+	vector<int> found_by(nr_of_nodes,-1);
+	// TODO zum Testen ist hier noch ein dist-vector drin.
+	vector<unsigned int> dist(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	U.push(U_element(0,node_id0,0));
+
+	// Die restlichen Knoten abarbeiten
+	for(unsigned int i=0; i<targets->size(); i++){
+		unsigned int target = (*targets)[i];
+		if(found_by[target] == -1){
+			while(!U.empty() && U.top().id != target){
+				// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+				tmpnode = U.top().id;
+				if(found_by[tmpnode] == -1){
+					dist[tmpnode] = U.top().distance;
+					found_by[tmpnode] = (int)U.top().eid;
+					// Die ausgehenden Kanten durchgehen und wenn sie aufwärts gehen oder
+					// markiert sind auf ihnen weitersuchen.
+					EdgesIterator it = g->getOutEdgesIt(tmpnode);
+					while(it.hasNext()){
+						Edge* tmpedge = it.getNext();
+						// Wenn der Knoten noch nicht gefunden wurde UND (sein Level größer ist
+						// ODER die Kante markiert ist).
+						if(found_by[tmpedge->other_node] == -1
+								&& (tmpedge->other_lvl > g->getNodeLVL(tmpnode) || marked[tmpedge->id])){
+							// ...tu sie in U
+							U.push(U_element(
+										tmpedge->value+U.top().distance,tmpedge->other_node,tmpedge->id));
+						}
+					}
+				}
+				U.pop();
+			}
 		}
+		// Die Distanz des Knotens setzen, je nachdem ob er...
+		if(found_by[target] != -1){
+			//...schon gefunden wurde...
+			(*targets)[i] = dist[target];
+		}
+		else{
+			if(U.top().id == target){
+				//...erst gerade gefunden wurde...
+				dist[target] = U.top().distance;
+				(*targets)[i] = U.top().distance;
+			}
+			else{
+				//...oder garnicht gefunden wurde.
+				(*targets)[i] = numeric_limits<unsigned int>::max();
+			}
+		}
+		// TODO Backtracing des aktuellen Knotens.
+	}
+}
+
+void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>* marked){
+	vector<unsigned int> todo;
+	// Erstmal alle Startknoten einfürgen. TODO man könnte auch
+	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
+	// des Rests.
+	// TODO Der marked Vektor muss im Moment noch komplett mit false initialisiert
+	// übergeben werden.
+	todo.assign(nodes->begin(), nodes->end());
+	while(!todo.empty()){
+		unsigned int tmpnode = todo.back();todo.pop_back();
+		EdgesIterator it = g->getInEdgesIt(tmpnode);
+		while(it.hasNext()){
+			Edge* tmpedge = it.getNext();
+			// Wenn wir nicht schon hier waren und es nach oben geht.
+			if(!(*marked)[tmpedge->id] && tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
+				(*marked)[tmpedge->id] = true;
+				todo.push_back(tmpedge->other_node);
+			}
+		}
+	}
+}
+
+bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
+	vector<unsigned int> targets;
+	for(unsigned int i=0; i<100; i++){
+		targets.push_back(i);
+	}
+	CHDijkstra(scg, 0, &targets);
+	for(unsigned int i=0; i<100; i++){
+		cout << "Für Knoten " << i << ": " << targets[i] << " und " << CHDijkstra(scg, 0, i) << endl;
 	}
 	return true;
 }
