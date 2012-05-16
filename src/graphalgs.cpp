@@ -711,16 +711,29 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
-				//...erst gerade gefunden wurde...
 				(*targets)[i] = U.top().distance;
+				//...erst gerade gefunden wurde...
+				if(target == targets->back()){
+					dist[target] = U.top().distance;
+					found_by[target] = (int)U.top().eid;
+				}
 			}
 			else{
 				//...oder garnicht gefunden wurde.
 				(*targets)[i] = numeric_limits<unsigned int>::max();
+				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
-		// TODO Backtracing des aktuellen Knotens.
-		// Achtung! Beim letzten Wert wird im Moment dist und found_b nicht gesetzt!
+		// Backtracing des aktuellen Knotens.
+		if(dist[target] != numeric_limits<unsigned int>::max()){
+			tmpnode = target;
+			while(tmpnode != node_id0){
+				cout << tmpnode << endl;
+				int takenedge = found_by[tmpnode];
+				// path->push_front(takenedge);
+				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
+			}
+		}
 	}
 }
 
