@@ -290,7 +290,8 @@ SCGraph::SCGraph(Graph* gr) :
 	shortcutlist(),
 	round_shortcutlist(),
 	round_node_blacklist(),
-	goodNodes()
+	goodNodes(),
+	EdgeLoads(0)
 {
 	// init-daten aus übegebenem Graph übernehmen
 	node_count = gr->getNodeCount();
@@ -358,6 +359,7 @@ SCGraph::SCGraph(Graph* gr) :
 
 SCGraph::~SCGraph(){
 	g = 0;
+	delete[] EdgeLoads; EdgeLoads = 0;
 	delete[] node_data; node_data = 0;
 	delete[] node_lvl; node_lvl = 0;
 
@@ -626,12 +628,16 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 
 	// die jüngeren shortcuts stehen hiernach
 	// am anfang des arrays
-	unsigned int sindex = 0;
+	unsigned int sindex = shortcut_count-1;
 	while(  !shortcutlist.empty() ){
 		ShortcutArray sa = shortcutlist.pop();
-		for(unsigned int j = 0; j < sa.size; j++){
-			shortcuts[sindex] = sa.array[j];
-			sindex++;
+		if( sa.size > 0 ){ // da size unsigned int 
+			for(unsigned int j = sa.size-1; j > 0; j--){
+				shortcuts[sindex] = sa.array[j];
+				sindex--;
+			}
+			shortcuts[sindex] = sa.array[0];
+			sindex--;
 		}
 		delete[] sa.array; sa.array = 0;
 	}
@@ -727,6 +733,11 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 		in_edges[i].other_lvl = node_lvl[ in_edges[i].other_node ];
 	}
 
+	EdgeLoads = new unsigned int[edge_count + shortcut_count];
+	for(unsigned int i = 0; i < edge_count + shortcut_count; i++){
+		EdgeLoads[i] = 0;
+	}
+
 	return true;
 }
 
@@ -777,8 +788,13 @@ E* SCGraph::getOutEdge(unsigned int edge_id){
 E* SCGraph::getInEdge(unsigned int edge_id){
 		return in_edges+edge_data[edge_id].in_index;
 }
-E* SCGraph::getEdge(bool out0_in1, unsigned int edge_id){
-	if(out0_in1){
+/*
+ * hier out1_in0 semantik 
+ * genau umgekehrt im vgl. zu getEdgesIt
+ * wegen backtracing im dijkstra (?)
+ */
+E* SCGraph::getEdge(bool out1_in0, unsigned int edge_id){
+	if(out1_in0){
 		return out_edges+edge_data[edge_id].out_index;
 	}
 	else{
@@ -798,20 +814,36 @@ void SCGraph::updateEdgeLoads(unsigned int* edge_loads, unsigned int array_lengt
 	}
 }
 void SCGraph::shareShortcutLoads(){
-	// die jungen shortcuts stehen vorne in edge_data
-	for(unsigned int i = edge_count; i < edge_count+shortcut_count; i++){
+	// die jungen shortcuts stehen hinten in edge_data
+	// jeder junge shortcut hat höchstens zwei ältere 
+	// shortcuts als eltern
+	for(unsigned int i = edge_count+shortcut_count-1; i >= edge_count; i--){
 		edge_data[edge_data[i].distance /* papa */].load 
 			+= edge_data[i].load;
 		edge_data[edge_data[i].type /* mama */].load 
 			+= edge_data[i].load; 
-		edge_data[i].load = 0; 
+		// edge_data[i].load = 0; 
 	}
 	// TODO wenn keine bugs festellbar
-	for(unsigned int i = edge_count; i < edge_count+shortcut_count; i++){
+/*	for(unsigned int i = edge_count; i < edge_count+shortcut_count; i++){
 		if(edge_data[i].load != 0)
 			cout << ">>>> ERROR: Shortcut Load ungleich null nach verteilen! " << endl;
-	}
+	} */
 }
+void SCGraph::updateEdgeLoads(){
+	for(unsigned int i = 0; i < edge_count+shortcut_count; i++){
+		edge_data[i].load += EdgeLoads[i];
+		EdgeLoads[i] = 0; 
+	}
+	//shareShortcutLoads();
+}
+void SCGraph::addEdgeLoad(unsigned int edge_id){
+	EdgeLoads[edge_id]++;
+}
+void SCGraph::addEdgeLoad(unsigned int edge_id, unsigned int times){
+	EdgeLoads[edge_id] += times;
+}
+
 E* SCGraph::copyOutEdge(unsigned int edge_id){
     	return out_edges + edge_id;
 }
