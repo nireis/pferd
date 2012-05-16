@@ -658,7 +658,13 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 
 void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets){
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
-	vector<unsigned int> marked(g->getEdgeCount(), false);
+	/* !TODO! wenn die CH fertig ist, gibt es
+	 *
+	 * g->getEdgeCount() + g->getShortcutCount()
+	 * viele Kanten insgesammt, die maximale Edge-ID ist
+	 * (g->getEdgeCount() + g->getShortcutCount()) -1
+	 */
+	vector<unsigned int> marked(g->getEdgeCount() + g->getShortcutCount(), false);
 	markAscEdges(g, targets, &marked);
 
 	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
@@ -765,8 +771,14 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		targets.push_back(i);
 	}
 	CHDijkstra(scg, 0, &targets);
+	unsigned int tmpUI;
 	for(unsigned int i=0; i<1000; i++){
-		cout << "Für Knoten " << i << ": " << targets[i] << " und " << CHDijkstra(scg, 0, i) << endl;
+		tmpUI = CHDijkstra(scg, 0, i);
+		cout << "Für Knoten " << i << ": " << targets[i] << " und " << tmpUI << endl;
+		if( targets[i] != tmpUI){
+			cout << ">> ERROR: " << targets[i] << " ungleich " << tmpUI << " für i=" << i << endl;
+			break;
+		}
 	}
 	return true;
 }

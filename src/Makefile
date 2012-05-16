@@ -25,6 +25,9 @@ marble_noOpt: $(BIN)
 	g++ marble_vis.cpp -c -o marble_vis.o -Wall -g -std=c++0x -lglut -lGL -pthread -lmarblewidget -lQtGui  
 	g++  graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o marble_vis.o marble_debug.o -o marble_debug -Wall -g -std=c++0x -lglut -lGL -pthread -lmarblewidget -lQtGui -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a /usr/lib/libQtCore.so.4
 
+sparser: sparser.cpp sparser.h
+	g++ -o sparser -O3 sparser.cpp
+
 $(BIN): $(OBJ)
 	$(CC) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
 
