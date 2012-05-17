@@ -710,14 +710,17 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 				U.pop();
 			}
 		}
+		int tmpfoundby;
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(found_by[target] != -1){
 			//...schon gefunden wurde...
 			(*targets)[i] = dist[target];
+			tmpfoundby = found_by[target];
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
 				(*targets)[i] = U.top().distance;
+				tmpfoundby = (int)U.top().eid;
 				//...erst gerade gefunden wurde...
 				if(target == targets->back()){
 					dist[target] = U.top().distance;
@@ -730,9 +733,18 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
-		// Backtracing des aktuellen Knotens.
-		if(dist[target] != numeric_limits<unsigned int>::max()){
+		// Backtracing der Knoten.
+		if((*targets)[i] != numeric_limits<unsigned int>::max()){
+			cout << "=== Node " << target << " ===" << endl;
+			// ersten Knoten
 			tmpnode = target;
+			if(tmpnode != node_id0){
+				cout << tmpnode << endl;
+				int takenedge = tmpfoundby;
+				// path->push_front(takenedge);
+				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
+			}
+			// restlichen Knoten
 			while(tmpnode != node_id0){
 				cout << tmpnode << endl;
 				int takenedge = found_by[tmpnode];
