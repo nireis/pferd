@@ -77,6 +77,8 @@ private:
 	static openGLrender* currentInstance;
 	static void setInstance(openGLrender*);
 	static void displayCallback();
+	static void mouseCallback(int, int);
+	static void mouseClickCallback(int button, int state, int x, int y);
 	static void keyboardCallback(unsigned char, int, int);
 	static void keyboardArrowsCallback(int, int, int);
 	static void idleCallback();
@@ -98,6 +100,12 @@ private:
 	int wWidth;
 	int wHeight;
 	glm::vec3 cameraPos;
+	int mouse_delta_x0;
+	int mouse_delta_x1;
+	int mouse_delta_y0;
+	int mouse_delta_y1;
+	bool swap;
+	bool mouse_mode;
 
 	//transformation matrixes
 	glm::mat4 projMX, modelMX, viewMX;
@@ -142,6 +150,9 @@ private:
 	//clean up
 	void uninit();
 	
+	//manages mouse input
+	void mouse(int, int);
+	void mouseClick(int, int, int, int);
 	//manages keyboard input
 	void keyboard(unsigned char, int, int);
 	void keyboardArrows(int, int, int);

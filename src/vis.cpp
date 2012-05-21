@@ -43,10 +43,10 @@ vis::vis(SCGraph* g) : render() {
 			} else {
 
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.33*(1.0-LOAD)), (float)(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) -(node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
+					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.33*(1.0-LOAD)), (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
 				index++;
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.33*(1.0-LOAD)), (float)(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) -(node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
+					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.33*(1.0-LOAD)), (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
 				index++;
 			}
 		}

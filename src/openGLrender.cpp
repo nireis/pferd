@@ -391,7 +391,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 	for(int i = 0; i < 10; i++)
 	{
 		textPos = glm::vec4(nodeArray[i].lon,nodeArray[i].lat,0.0,1.0);
-		//itoa(i,text,10);
+		itoa(i,text,10);
 		
 		pos_radian = (pi/180.0)*textPos.y;
 		y_mercator = log((1.0 + sin(pos_radian))/cos(pos_radian));
@@ -422,6 +422,99 @@ void openGLrender::uninit()
 	glDeleteVertexArrays(1, &vbo_map);
 	glDeleteTextures(1, map_textures);
 }
+
+void openGLrender::mouse(int x, int y)
+{
+	if(mouse_mode)
+	{
+		if(swap)
+		{
+			mouse_delta_x1 = x;
+			mouse_delta_y1 = y;
+			
+			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/900.0)*cameraPos.z, cameraPos.y + ((float)(y-mouse_delta_y0)/900.0)*cameraPos.z, cameraPos.z);
+
+			swap = false;
+			glutPostRedisplay();
+		}
+		else
+		{
+			mouse_delta_x0 = x;
+			mouse_delta_y0 = y;
+			
+			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/900.0)*cameraPos.z, cameraPos.y + ((float)(y-mouse_delta_y1)/900.0)*cameraPos.z, cameraPos.z);
+
+			swap = true;
+			glutPostRedisplay();
+		}
+	}
+	else
+	{
+		if(swap)
+		{
+			mouse_delta_y1 = y;
+			
+			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + ((float)(y-mouse_delta_y0)/150.0)*cameraPos.z);
+
+			swap = false;
+			glutPostRedisplay();
+		}
+		else
+		{
+			mouse_delta_y0 = y;
+			
+			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + ((float)(y-mouse_delta_y1)/150.0)*cameraPos.z);
+
+			swap = true;
+			glutPostRedisplay();
+		}
+	}
+
+}
+
+void openGLrender::mouseCallback(int x, int y)
+{
+	currentInstance->mouse(x, y);
+}
+
+void openGLrender::mouseClick(int button, int state, int x, int y)
+{
+	if(state== GLUT_DOWN)
+	{
+		if(button == GLUT_LEFT_BUTTON)
+		{
+			if(swap)
+			{
+				mouse_delta_x0 = x;
+				mouse_delta_y0 = y;
+			}
+			else
+			{
+				mouse_delta_x1 = x;
+				mouse_delta_y1 = y;
+			}
+			mouse_mode = true;
+		}
+		if(button == GLUT_RIGHT_BUTTON)
+		{
+			if(swap)
+			{
+				mouse_delta_y0 = y;
+			}
+			else
+			{
+				mouse_delta_y1 = y;
+			}
+			mouse_mode = false;
+		}
+	}
+}
+
+void openGLrender::mouseClickCallback(int button, int state, int x, int y)
+{
+	currentInstance->mouseClick(button, state, x, y);
+}
+
 
 void openGLrender::keyboard (unsigned char key, int x, int y)
 {
@@ -659,7 +752,7 @@ bool openGLrender::start(int argc, char* argv[])
 	{
 		fprintf(stderr, "Shortcuts geometry initialized...\n");
 	}
-	
+	/*
 	if (!initMap())
 	{
 		fprintf(stderr, "Couldn't initialize map geometry");
@@ -678,13 +771,15 @@ bool openGLrender::start(int argc, char* argv[])
 	else
 	{
 		fprintf(stderr, "Map textures initialized...\n");
-	}
+	}*/
 
 
 	setInstance(this);
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
 	glutReshapeFunc(resizeCallback);
+	glutMotionFunc(mouseCallback);
+	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(keyboardArrowsCallback);
 	glEnable(GL_BLEND);
