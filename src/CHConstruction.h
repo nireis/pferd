@@ -267,7 +267,7 @@ void CHConstruction<G>::contract_node(DijkstraData* dd, unsigned int conode){
 	}
 	// Wenn die edgediff kleiner als das arith Mittel der letzten Runde ist
 	// wird der Knoten kontrahiert.
-	int tmpEdgeDiff = (int)(sclist->size() - g->getEdgeCount(conode));
+	int tmpEdgeDiff = (int)(sclist->size() - g->getEdgeCount_Round(conode));
 	dd->tmpArithMean += tmpEdgeDiff;
 	if(tmpEdgeDiff <= lastArithMean){
 		blackenNode(conode);
