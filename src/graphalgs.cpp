@@ -649,6 +649,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 //				cout << tmpid << endl;
 				int takenedge = found_by[i][tmpid];
 				// path->push_front(takenedge);
+				g->addEdgeLoad(takenedge);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}

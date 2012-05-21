@@ -255,6 +255,8 @@ class SCGraph {
 		std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodes;
 		//unsigned int* goodNodes;
 		//unsigned int goodNodesSize;
+		
+		unsigned int* EdgeLoads;
 
 		// es wird stehts ein Graph* g gebraucht
 		SCGraph(){ std::cout << "Error: -41" << std::endl; }
@@ -335,6 +337,14 @@ class SCGraph {
 		void updateEdgeLoads(unsigned int* edge_loads, unsigned int array_length);
 		// verteilt Belastungen der Shortcuts auf deren Eltern
 		void shareShortcutLoads();
+
+		// verteilt die Loads des internen
+		// EdgeLoads Arrayas, inklusive Shortcuts
+		void updateEdgeLoads();
+		// erhöht Load der übergebenen Edge um 1
+		void addEdgeLoad(unsigned int edge_id);
+		// erhöht Load der angegebenen Edge um times
+		void addEdgeLoad(unsigned int edge_id, unsigned int times);
 
 		// Edges-Iteratoren wie im anderen Graph,
 		// auch hier möchte man während der runden ein

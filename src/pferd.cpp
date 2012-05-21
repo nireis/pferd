@@ -78,23 +78,31 @@ int main(int argc, char *argv[]){
 	 * indem man ihnen ein load von mindestens 1 gibt
 	 * und diese dann in der vis anzeigen lassen
 	 */
-//	unsigned int* colors = 
-//		new unsigned int[scg.getEdgeCount() + scg.getShortcutCount() ];
-//	for(unsigned int i = 0; i < scg.getEdgeCount() 
-//			+ scg.getShortcutCount(); i++){
-//		if(0 == i%4 ){ 
-//			colors[i] = 1;
-//		} else {
-//			colors[i] = 0;
-//		}
-//	}
-//	scg.updateEdgeLoads(colors, scg.getEdgeCount() + scg.getShortcutCount());
-//	// scg.shareShortcutLoads(); // shortcut loads verteilen
-//
-//	vis anzeige(&scg); anzeige.start();
+	//unsigned int* colors = 
+	//	new unsigned int[scg.getEdgeCount() + scg.getShortcutCount() ];
+	//for(unsigned int i = 0; i < scg.getEdgeCount() 
+	//		+ scg.getShortcutCount(); i++){
+	//	if( scg.isShortcut(i) ){ 
+	//		colors[i] = 1;
+	//	} else {
+	//		colors[i] = 0;
+	//	}
+	//}
+	//scg.updateEdgeLoads(colors, scg.getEdgeCount() + scg.getShortcutCount());
+	//scg.shareShortcutLoads(); // shortcut loads verteilen
 
+	// Markiere einen Weg im Graph
+	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
+	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
+	 * auf 15K Graph
+	 */
+	CHDijkstra(&scg, 2271, 252); 
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
 
-	CHDijkstraTest(&g, &scg, 149909);
+	vis anzeige(&scg); anzeige.start();
+
+	//CHDijkstraTest(&g, &scg, 149909);
 
 	return 0;
 }

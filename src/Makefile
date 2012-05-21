@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -Wall -g -std=c++0x -lglut -lGL -pthread# -O3
+CXXFLAGS = -Wall -g -std=c++0x -lglut -lGL -pthread -O3
 LDFLAGS = -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a
 BIN =pferd
 
