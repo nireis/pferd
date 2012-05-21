@@ -380,7 +380,7 @@ bool openGLrender::initTextures()
 
 bool openGLrender::drawText(glm::mat4 mvp)
 {
-	glm::vec4 textPos;
+	/*glm::vec4 textPos;
 	glColor3f(0.5f, 0.5f, 0.5f);
 	float pi = 3.141592;
 	float pos_radian;
@@ -402,7 +402,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 		glRasterPos2f((textPos.x/textPos.w),(textPos.y/textPos.w));
 		glutBitmapString(GLUT_BITMAP_HELVETICA_12, (unsigned char*)text);
-	}
+	}*/
 
 	return true;
 }

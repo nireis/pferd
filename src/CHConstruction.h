@@ -265,8 +265,9 @@ void CHConstruction<G>::contract_node(DijkstraData* dd, unsigned int conode){
 		c_edge = it.getNext();
 		addShortcuts(dd, sclist, conode, c_edge);
 	}
-	// Wenn die edgediff negativ ist, wird der Knoten kontrahiert.
-	int tmpEdgeDiff = sclist->size() - (g->getEdgeCount(conode));
+	// Wenn die edgediff kleiner als das arith Mittel der letzten Runde ist
+	// wird der Knoten kontrahiert.
+	int tmpEdgeDiff = (int)(sclist->size() - g->getEdgeCount(conode));
 	dd->tmpArithMean += tmpEdgeDiff;
 	if(tmpEdgeDiff <= lastArithMean){
 		blackenNode(conode);
@@ -282,11 +283,13 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	unsigned int scnode = firstSCE->other_node;
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
+	vector<unsigned int> nextNodes;
 	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
 	dd->found[scnode] = true;
 	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
 		currentEdge = it.getNext();
+		nextNodes.push_back(currentEdge->other_node);
 		dd->U.push(U_element(scnode,currentEdge,currentEdge->value));
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
@@ -301,10 +304,17 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	it = g->getOutEdgesIt_Round(conode);
 	while(it.hasNext()){
 		tmpnode = it.getNext()->other_node;
+		// Schauen ob schon ein Shortcut exisitert.
+		for(unsigned int i=0; i<nextNodes.size(); i++){
+			if(nextNodes[i] == tmpnode){
+				goto skip;
+			}
+		}
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
 		if(!dd->found[tmpnode]){
 			shortDijkstra(dd, tmpnode, conode, sclist, firstSCE);
 		}
+		skip:;
 	}
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
 	resetDij(dd);

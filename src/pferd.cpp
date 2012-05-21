@@ -100,9 +100,9 @@ int main(int argc, char *argv[]){
 	scg.updateEdgeLoads();
 	scg.shareShortcutLoads();
 
-	vis anzeige(&scg); anzeige.start();
+	CHDijkstraTest(&g, &scg, 149909);
 
-	//CHDijkstraTest(&g, &scg, 149909);
+	vis anzeige(&scg); anzeige.start();
 
 	return 0;
 }

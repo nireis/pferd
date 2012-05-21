@@ -784,10 +784,15 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int numDij = g->getNodeCount();
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	for(unsigned int i=0; i<numDij; i++){
-		start = clock();
+		/*start = clock();
 		CHDijkstra(scg, 0, i);
 		finish = clock();
-		time += (double(finish)-double(start))/CLOCKS_PER_SEC;
+		time += (double(finish)-double(start))/CLOCKS_PER_SEC;*/
+		if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
+			cout << "ERROR!" << endl;
+			cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " <<
+				Dijkstra(g, 0, i) << endl;
+		}
 	}
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time << endl;
 	cout << "Zeit pro Dijkstra im Schnitt: " << time/numDij << endl;
