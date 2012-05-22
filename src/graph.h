@@ -252,7 +252,8 @@ class SCGraph {
 
 		// während der CH-runden soll gemerkt werden, welche knoten
 		// noch nicht kontrahiert wurden
-		std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodes;
+		// std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodes;
+		std::vector<uint_pair> goodNodes;
 		//unsigned int* goodNodes;
 		//unsigned int goodNodesSize;
 		
@@ -309,8 +310,9 @@ class SCGraph {
 		std::list<unsigned int>* getBlackNodesListPointer(){ 
 			return &round_node_blacklist; 
 		}
-		std::priority_queue
-			<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes();
+	//	std::priority_queue
+	//		<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes();
+		std::vector<uint_pair>* getGoodNodes();
 		//unsigned int* getGoodNodes();
 		//unsigned int getGoodNodesSize();
 

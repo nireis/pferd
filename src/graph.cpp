@@ -352,7 +352,7 @@ SCGraph::SCGraph(Graph* gr) :
 		out_edges[i].other_lvl = edge_data[ out_edges[i].id ].in_index ;
 	}
 	for(unsigned int i = 0; i < node_count; i++){
-		goodNodes.push(uint_pair(i, 
+		goodNodes.push_back(uint_pair(i, 
 					node_in_edges_count[i]*node_out_edges_count[i]));
 	}
 }
@@ -592,14 +592,14 @@ bool SCGraph::mergeRound(unsigned int lvl){
 	}
 	for(unsigned int i = 0; i < node_count; i++){
 		if( node_lvl[i] == 0 ){
-			goodNodes.push(uint_pair(i, 
+			goodNodes.push_back(uint_pair(i, 
 						node_in_edges_count[i]*node_out_edges_count[i]));
 		}
 	}
 
 
-//	cout << "übrige Graphknoten: " << goodNodesSize << " ( " << (((double) goodNodesSize)/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
-//	cout << "aktuelle Anzahl Kanten: " << ( (double)current_edge_arrays_size / (double)edge_count ) * 100.0 << "% der urspr. Kanten" << endl; // TODO
+	cout << "übrige Graphknoten: " << goodNodes.size() << " ( " << (((double) goodNodes.size())/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
+	cout << "aktuelle Anzahl Kanten: " << ( (double)current_edge_arrays_size / (double)edge_count ) * 100.0 << "% der urspr. Kanten" << endl; // TODO
 
 	return true;
 }
@@ -776,8 +776,9 @@ ED SCGraph::getEdgeData(unsigned int edge_id){
 	return edge_data[ edge_id ];
 }
 
-std::priority_queue
-	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* 
+// std::priority_queue
+// 	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* 
+std::vector<uint_pair>* 
 	SCGraph::getGoodNodes(){
 		return &goodNodes;
 }
