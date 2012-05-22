@@ -253,7 +253,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 	}
    return solution;*/
 	list<unsigned int>* solution = new list<unsigned int>;
-	vector<unsigned int>* goodNodes = g->getGoodNodes();
+	vector<uint_pair>* goodNodes = g->getGoodNodes();
 	unsigned int r = rand() % goodNodes->size();
 
 	if( goodNodes->size() == 0 )
@@ -267,7 +267,8 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 	// Abwechselnd rauf und runter zählen.
 	if(numRounds % 2){
 		// Erster Part der Knoten (wegen der Randomisierung)
-		for(int i=r; i<goodNodes->size(); i++){
+		for(unsigned int j=r; j<goodNodes->size(); j++){
+			unsigned int i = (*goodNodes)[j].id;
 			// Prüfen ob der Knoten aufgenommen werden kann
 			if( !marked[i]){
 				solution->push_front(i);
@@ -284,7 +285,8 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 			}
 		}
 		// Zweiter Part der Knoten
-		for(int i=0; i<r; i++){
+		for(unsigned int j=0; j<r; j++){
+			unsigned int i = (*goodNodes)[j].id;
 			// Prüfen ob der Knoten aufgenommen werden kann
 			if( !marked[i]){
 				solution->push_front(i);
@@ -303,7 +305,9 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 	}
 	else{
 		// Erster Part der Knoten (wegen der Randomisierung)
-		for(int i=r; i>=0; i--){
+		for(int j=r; j>=0; j--){
+			// cout << j << endl;
+			unsigned int i = (*goodNodes)[j].id;
 			// Prüfen ob der Knoten aufgenommen werden kann
 			if( !marked[i]){
 				solution->push_front(i);
@@ -320,9 +324,8 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 			}
 		}
 		// Zweiter Part der Knoten
-		for(int i=goodNodes->size()-1; i>r; i--){
-			// Prüfen ob der Knoten aufgenommen werden kann
-			unsigned int i = *gn;
+		for(unsigned int j=goodNodes->size()-1; j>r; j--){
+			unsigned int i = (*goodNodes)[j].id;
 			// Prüfen ob der Knoten aufgenommen werden kann
 			if( !marked[i]){
 				solution->push_front(i);
@@ -339,6 +342,7 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 			}
 		}
 	}
+	goodNodes->clear();
 	return solution;
 }
 
