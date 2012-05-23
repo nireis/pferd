@@ -509,7 +509,24 @@ void CHConstruction<G>::blackenNode(unsigned int id){
 template <typename G>
 void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 	unique_lock<mutex> lock(mInsertSC);
-	allsclist->splice(allsclist->end(), *sclist);
+	// Die Shortcuts einfügen und dabei sicherstellen, dass keine doppelten
+	// Shortcuts eingefügt werden.
+	while(!sclist->empty()){
+		bool exists = false;
+		Shortcut tmpsc = sclist->front();
+		sclist->pop_front();
+		list<Shortcut>* tmplst = &allsclist[tmpsc.source];
+		// Für alle Elemente in der Liste prüfen ob schon ein solcher
+		// Shortcut existiert.
+		for(list<Shortcut>::iterator it=tmplst->begin(); it != tmplst->end(); it++){
+			if(tmpsc.target == it->target){
+				exists = true;
+			}
+		}
+		if(!exists){
+			tmplst->push_back(tmpsc);
+		}
+	}
 }
 
 #endif
