@@ -288,7 +288,6 @@ SCGraph::SCGraph(Graph* gr) :
 	g(gr),
 	shortcut_count( 0 ), 
 	shortcutlist(),
-	round_shortcutlist(),
 	round_node_blacklist(),
 	goodNodes(),
 	EdgeLoads(0)
@@ -312,6 +311,11 @@ SCGraph::SCGraph(Graph* gr) :
 	//for(unsigned int i = 0; i < node_count; i++){
 	//	goodNodes[i] = i;
 	//}
+	
+	round_shortcutlist = new list<Shortcut>[node_count];
+	for(unsigned int i = 0; i < node_count; i++){
+		round_shortcutlist[i] = list<Shortcut>();
+	}
 
 	for(unsigned int i = 0; i < node_count; i++){
 		node_lvl[i] = 0;
@@ -370,12 +374,15 @@ SCGraph::~SCGraph(){
 		ShortcutArray a = shortcutlist.pop();
 		delete[] a.array; a.array = 0;
 	}
-	round_shortcutlist.clear();
+	for(unsigned int i = 0; i < node_count; i++){
+		round_shortcutlist[i].clear();
+	}
+	delete[] round_shortcutlist; round_shortcutlist = 0;
 	round_node_blacklist.clear();
 }
 
-void SCGraph::addShortcut(S sc){
-	round_shortcutlist.push_front(sc);
+void SCGraph::addShortcut(unsigned int source_node_id, S sc){
+	round_shortcutlist[source_node_id].push_front(sc);
 }
 
 void SCGraph::blacklistNode(unsigned int node_id){
@@ -443,7 +450,10 @@ bool SCGraph::mergeRound(unsigned int lvl){
 		edgesum = edgesum + node_in_edges_count[i];
 	}
 
-	unsigned int roundshortcutssize = round_shortcutlist.size();
+	unsigned int roundshortcutssize = 0;
+	for(unsigned int i = 0; i < node_count; i++){
+		roundshortcutssize += round_shortcutlist[i].size();
+	}
 
 	unsigned int old_edge_arrays_size = current_edge_arrays_size;
 
@@ -463,12 +473,21 @@ bool SCGraph::mergeRound(unsigned int lvl){
 	// shortcuts umlagern und offsets um shortcuts erweitern
 	S* roundshortcuts = new S[ roundshortcutssize ];
 
+	// splicen der listen in erste array-liste
+	for(unsigned int i = 1; i < node_count; i++){
+		round_shortcutlist[0].splice( round_shortcutlist[0].end(), 
+												round_shortcutlist[i] );
+	}
+
 	for(unsigned int i = 0; i < roundshortcutssize; i++){
-		S stmp = round_shortcutlist.front();
-		round_shortcutlist.pop_front();
+		S stmp = round_shortcutlist[0].front();
+		round_shortcutlist[0].pop_front();
 		roundshortcuts[i] = stmp; // TODO evtl ausseinander ziehen
 		nodes_out_offs[ stmp.source +1]++;
 		nodes_in_offs[ stmp.target +1]++;
+	}
+	if( ! round_shortcutlist[0].empty() ){
+		cout << ">>>> GREAT ERROR ! - Graph Merge hat Shortcuts übrig." << endl;
 	}
 
 	// merke shortcuts

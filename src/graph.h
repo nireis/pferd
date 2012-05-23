@@ -242,7 +242,7 @@ class SCGraph {
 		};
 		SList<ShortcutArray> shortcutlist;
 
-		std::list<Shortcut> round_shortcutlist;
+		std::list<Shortcut>* round_shortcutlist;
 		std::list<unsigned int> round_node_blacklist;
 
 		// für temporäre daten während der CH-runden
@@ -271,7 +271,7 @@ class SCGraph {
 		// geben dem graph einzelne shortcuts/nodes, 
 		// die später gemerged/entfernt werden sollen
 		// stellt sich raus, dies brauchen wir nicht aktiv
-		void addShortcut(S sc);
+		void addShortcut(unsigned int source_node_id, S sc);
 		void blacklistNode(unsigned int node_id);
 
 		// fügt über eine Runde übergebenen Shortcuts in den graph ein,
@@ -305,7 +305,7 @@ class SCGraph {
 		// dies ist die schnittstelle zur
 		// CHConstruction
 		std::list<Shortcut>* getShortcutListPointer(){ 
-			return &round_shortcutlist; 
+			return round_shortcutlist; 
 		}
 		std::list<unsigned int>* getBlackNodesListPointer(){ 
 			return &round_node_blacklist; 
