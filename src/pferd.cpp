@@ -100,6 +100,41 @@ int main(int argc, char *argv[]){
 	scg.updateEdgeLoads();
 	scg.shareShortcutLoads();
 
+	for(unsigned int i=0; i<scg.getNodeCount(); i++){
+		EdgesIterator it = scg.getOutEdgesIt(i);
+		while(it.hasNext()){
+			EdgesIterator it1 = scg.getOutEdgesIt(i);
+			int count = 0;
+			unsigned int id1 = it.getNext()->other_node;
+			while(it1.hasNext()){
+				if(id1 == it1.getNext()->other_node){
+					count++;
+				}
+			}
+			if(count > 1){
+				cout << i << endl;
+				cout << "Fuck you!" << endl;
+			}
+		}
+	}
+
+	for(unsigned int i=0; i<g.getNodeCount(); i++){
+		EdgesIterator it = g.getOutEdgesIt(i);
+		while(it.hasNext()){
+			EdgesIterator it1 = g.getOutEdgesIt(i);
+			int count = 0;
+			unsigned int id1 = it.getNext()->other_node;
+			while(it1.hasNext()){
+				if(id1 == it1.getNext()->other_node){
+					count++;
+				}
+			}
+			if(count > 1){
+				cout << "Penis!" << endl;
+			}
+		}
+	}
+
 	CHDijkstraTest(&g, &scg, 149909);
 
 	vis anzeige(&scg); anzeige.start();
