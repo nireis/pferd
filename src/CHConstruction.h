@@ -381,8 +381,10 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
 		currentEdge = it.getNext();
-		nextNodes.push_back(currentEdge->other_node);
 		dd->U.push(U_element(scnode,currentEdge,currentEdge->value));
+		if(g->isShortcut(currentEdge->id)){
+			nextNodes.push_back(currentEdge->other_node);
+		}
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
 	// in shortDijkstra.
@@ -395,18 +397,19 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	// Alle zu erreichenden Knoten durchgehen.
 	it = g->getOutEdgesIt_Round(conode);
 	while(it.hasNext()){
+		bool scExists = false;
 		tmpnode = it.getNext()->other_node;
 		// Schauen ob schon ein Shortcut exisitert.
 		for(unsigned int i=0; i<nextNodes.size(); i++){
 			if(nextNodes[i] == tmpnode){
-				goto skip;
+				// cout << "Shortcut existiert schon -> skippe" << endl;
+				scExists = true;
 			}
 		}
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
-		if(!dd->found[tmpnode]){
+		if(!dd->found[tmpnode] && !scExists){
 			shortDijkstra(dd, tmpnode, conode, sclist, firstSCE);
 		}
-		skip:;
 	}
 	// Die Dijkstraarrays für den nächsten Knoten benutzbar machen.
 	resetDij(dd);
@@ -520,6 +523,7 @@ void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 		// Shortcut existiert.
 		for(list<Shortcut>::iterator it=tmplst->begin(); it != tmplst->end(); it++){
 			if(tmpsc.target == it->target){
+//				cout << "Den gibt's schon!" << endl;
 				exists = true;
 			}
 		}
