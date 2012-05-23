@@ -356,7 +356,7 @@ SCGraph::SCGraph(Graph* gr) :
 		out_edges[i].other_lvl = edge_data[ out_edges[i].id ].in_index ;
 	}
 	for(unsigned int i = 0; i < node_count; i++){
-		goodNodes.push_back(uint_pair(i, 
+		goodNodes.push(uint_pair(i, 
 					node_in_edges_count[i]*node_out_edges_count[i]));
 	}
 }
@@ -611,7 +611,7 @@ bool SCGraph::mergeRound(unsigned int lvl){
 	}
 	for(unsigned int i = 0; i < node_count; i++){
 		if( node_lvl[i] == 0 ){
-			goodNodes.push_back(uint_pair(i, 
+			goodNodes.push(uint_pair(i, 
 						node_in_edges_count[i]*node_out_edges_count[i]));
 		}
 	}
@@ -795,9 +795,9 @@ ED SCGraph::getEdgeData(unsigned int edge_id){
 	return edge_data[ edge_id ];
 }
 
-// std::priority_queue
-// 	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* 
-std::vector<uint_pair>* 
+ std::priority_queue
+ 	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* 
+//std::vector<uint_pair>* 
 	SCGraph::getGoodNodes(){
 		return &goodNodes;
 }

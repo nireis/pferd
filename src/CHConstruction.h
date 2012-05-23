@@ -224,7 +224,7 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 
 template <typename G>
 list<unsigned int>* CHConstruction<G>::independent_set(){
-   /*list<unsigned int>* solution = new list<unsigned int>;
+   list<unsigned int>* solution = new list<unsigned int>;
 	// hole goodNodes beim Graphen ab
 	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
 	// frühzeitiges abbrechen; sinnvoll ?
@@ -251,99 +251,99 @@ list<unsigned int>* CHConstruction<G>::independent_set(){
 		}
 		goodNodes->pop();
 	}
-   return solution;*/
-	list<unsigned int>* solution = new list<unsigned int>;
-	vector<uint_pair>* goodNodes = g->getGoodNodes();
-	unsigned int r = rand() % goodNodes->size();
-
-	if( goodNodes->size() == 0 )
-		return solution;
-
-   vector<bool> marked(nr_of_nodes,false);
-   EdgesIterator it;
-   // Random Nummer für den Startknoten
-   srand((unsigned)time(0));
-
-	// Abwechselnd rauf und runter zählen.
-	if(numRounds % 2){
-		// Erster Part der Knoten (wegen der Randomisierung)
-		for(unsigned int j=r; j<goodNodes->size(); j++){
-			unsigned int i = (*goodNodes)[j].id;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-		// Zweiter Part der Knoten
-		for(unsigned int j=0; j<r; j++){
-			unsigned int i = (*goodNodes)[j].id;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-	}
-	else{
-		// Erster Part der Knoten (wegen der Randomisierung)
-		for(int j=r; j>=0; j--){
-			// cout << j << endl;
-			unsigned int i = (*goodNodes)[j].id;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-		// Zweiter Part der Knoten
-		for(unsigned int j=goodNodes->size()-1; j>r; j--){
-			unsigned int i = (*goodNodes)[j].id;
-			// Prüfen ob der Knoten aufgenommen werden kann
-			if( !marked[i]){
-				solution->push_front(i);
-				// Alle ausgehenden Kanten verfolgen
-				it = g->getOutEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-				// Alle eingehenden Kanten verfolgen
-				it = g->getInEdgesIt_Round(i);
-				while(it.hasNext()){
-					marked[it.getNext()->other_node] = true;
-				}
-			}
-		}
-	}
-	goodNodes->clear();
-	return solution;
+   return solution;
+//	list<unsigned int>* solution = new list<unsigned int>;
+//	vector<uint_pair>* goodNodes = g->getGoodNodes();
+//	unsigned int r = rand() % goodNodes->size();
+//
+//	if( goodNodes->size() == 0 )
+//		return solution;
+//
+//   vector<bool> marked(nr_of_nodes,false);
+//   EdgesIterator it;
+//   // Random Nummer für den Startknoten
+//   srand((unsigned)time(0));
+//
+//	// Abwechselnd rauf und runter zählen.
+//	if(numRounds % 2){
+//		// Erster Part der Knoten (wegen der Randomisierung)
+//		for(unsigned int j=r; j<goodNodes->size(); j++){
+//			unsigned int i = (*goodNodes)[j].id;
+//			// Prüfen ob der Knoten aufgenommen werden kann
+//			if( !marked[i]){
+//				solution->push_front(i);
+//				// Alle ausgehenden Kanten verfolgen
+//				it = g->getOutEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//				// Alle eingehenden Kanten verfolgen
+//				it = g->getInEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//			}
+//		}
+//		// Zweiter Part der Knoten
+//		for(unsigned int j=0; j<r; j++){
+//			unsigned int i = (*goodNodes)[j].id;
+//			// Prüfen ob der Knoten aufgenommen werden kann
+//			if( !marked[i]){
+//				solution->push_front(i);
+//				// Alle ausgehenden Kanten verfolgen
+//				it = g->getOutEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//				// Alle eingehenden Kanten verfolgen
+//				it = g->getInEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//			}
+//		}
+//	}
+//	else{
+//		// Erster Part der Knoten (wegen der Randomisierung)
+//		for(int j=r; j>=0; j--){
+//			// cout << j << endl;
+//			unsigned int i = (*goodNodes)[j].id;
+//			// Prüfen ob der Knoten aufgenommen werden kann
+//			if( !marked[i]){
+//				solution->push_front(i);
+//				// Alle ausgehenden Kanten verfolgen
+//				it = g->getOutEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//				// Alle eingehenden Kanten verfolgen
+//				it = g->getInEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//			}
+//		}
+//		// Zweiter Part der Knoten
+//		for(unsigned int j=goodNodes->size()-1; j>r; j--){
+//			unsigned int i = (*goodNodes)[j].id;
+//			// Prüfen ob der Knoten aufgenommen werden kann
+//			if( !marked[i]){
+//				solution->push_front(i);
+//				// Alle ausgehenden Kanten verfolgen
+//				it = g->getOutEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//				// Alle eingehenden Kanten verfolgen
+//				it = g->getInEdgesIt_Round(i);
+//				while(it.hasNext()){
+//					marked[it.getNext()->other_node] = true;
+//				}
+//			}
+//		}
+//	}
+//	goodNodes->clear();
+//	return solution;
 }
 
 

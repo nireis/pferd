@@ -781,18 +781,20 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	clock_t start,finish;
 	double time = 0;
-	unsigned int numDij = g->getNodeCount();
+	unsigned int numDij = 0;//g->getNodeCount();
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
-	for(unsigned int i=0; i<numDij; i++){
-		/*start = clock();
+	for(unsigned int i=0; i< g->getNodeCount(); i += 10000){
+		start = clock();
 		CHDijkstra(scg, 0, i);
 		finish = clock();
-		time += (double(finish)-double(start))/CLOCKS_PER_SEC;*/
-		if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
-			cout << "ERROR!" << endl;
-			cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " <<
-				Dijkstra(g, 0, i) << endl;
-		}
+		time += (double(finish)-double(start))/CLOCKS_PER_SEC;
+		//if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
+		//	cout << "ERROR!" << endl;
+		//	cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " << endl;
+				//Dijkstra(g, 0, i) << endl;
+		CHDijkstra(scg, 0, i);
+	//	}
+		numDij++;
 	}
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time << endl;
 	cout << "Zeit pro Dijkstra im Schnitt: " << time/numDij << endl;
