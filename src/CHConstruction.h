@@ -375,16 +375,14 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	unsigned int scnode = firstSCE->other_node;
 	// Den ersten Knoten des Dijkstra abarbeiten.
 	Edge* currentEdge;
-	vector<unsigned int> nextNodes;
+	//vector<unsigned int> nextNodes;
 	EdgesIterator it = g->getOutEdgesIt_Round(scnode);
 	dd->found[scnode] = true;
 	dd->resetlist.push_front(scnode);
 	while(it.hasNext()){
 		currentEdge = it.getNext();
 		dd->U.push(U_element(scnode,currentEdge,currentEdge->value));
-		if(g->isShortcut(currentEdge->id)){
-			nextNodes.push_back(currentEdge->other_node);
-		}
+		//nextNodes.push_back(currentEdge->other_node);
 	}
 	// Den ersten Knoten schon zur Reset Liste hinzufügen. Grund: siehe langes Kommentar
 	// in shortDijkstra.
@@ -399,13 +397,13 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 	while(it.hasNext()){
 		bool scExists = false;
 		tmpnode = it.getNext()->other_node;
-		// Schauen ob schon ein Shortcut exisitert.
-		for(unsigned int i=0; i<nextNodes.size(); i++){
+		// Schauen ob schon ein Shortcut exisitert. TODO
+		/*for(unsigned int i=0; i<nextNodes.size(); i++){
 			if(nextNodes[i] == tmpnode){
 				// cout << "Shortcut existiert schon -> skippe" << endl;
 				scExists = true;
 			}
-		}
+		}*/
 		// Schauen ob wir noch den kürzesten Pfad für den Knoten suchen müssen.
 		if(!dd->found[tmpnode] && !scExists){
 			shortDijkstra(dd, tmpnode, conode, sclist, firstSCE);
@@ -514,6 +512,7 @@ void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 	unique_lock<mutex> lock(mInsertSC);
 	// Die Shortcuts einfügen und dabei sicherstellen, dass keine doppelten
 	// Shortcuts eingefügt werden.
+	// TODO das alles vllt an den Graphen auslagern.
 	while(!sclist->empty()){
 		bool exists = false;
 		Shortcut tmpsc = sclist->front();
@@ -524,6 +523,14 @@ void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 		for(list<Shortcut>::iterator it=tmplst->begin(); it != tmplst->end(); it++){
 			if(tmpsc.target == it->target){
 //				cout << "Den gibt's schon!" << endl;
+				exists = true;
+			}
+		}
+		EdgesIterator it = g->getOutEdgesIt_Round(tmpsc.source);
+		while(it.hasNext()){
+			Edge* tmpedge = it.getNext();
+			if(tmpedge->other_node == tmpsc.target && tmpedge->value == tmpsc.value){
+				cout << "Den gibt's schon!" << endl;
 				exists = true;
 			}
 		}
