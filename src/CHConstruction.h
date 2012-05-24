@@ -530,7 +530,6 @@ void CHConstruction<G>::insertShortcuts(list<Shortcut>* sclist){
 		while(it.hasNext()){
 			Edge* tmpedge = it.getNext();
 			if(tmpedge->other_node == tmpsc.target && tmpedge->value == tmpsc.value){
-				cout << "Den gibt's schon!" << endl;
 				exists = true;
 			}
 		}
