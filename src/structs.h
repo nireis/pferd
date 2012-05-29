@@ -35,10 +35,22 @@ struct ParserEdge {
  * aufruft, interessiert nur der "andere Knoten"
  * die ID verweist auf die zugehörige Stelle im Daten-Array
  */
-struct Edge {
-	Edge() : id(0), value(0), other_node(0), other_lvl(0) {}
-	Edge(unsigned int i, unsigned int v, unsigned int o) : 
+struct LVLEdge {
+	LVLEdge() : id(0), value(0), other_node(0), other_lvl(0) {}
+	LVLEdge(unsigned int i, unsigned int v, unsigned int o) : 
 		id(i), value(v), other_node(o), other_lvl(0) {}
+	LVLEdge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
+		id(i), value(v), other_node(o), other_lvl(ol) {}
+	
+	unsigned int id;
+	unsigned int value;
+	unsigned int other_node;
+	unsigned int other_lvl; 
+};
+struct Edge {
+	Edge() : id(0), value(0), other_node(0) {}
+	Edge(unsigned int i, unsigned int v, unsigned int o) : 
+		id(i), value(v), other_node(o) {}
 	Edge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
 		id(i), value(v), other_node(o), other_lvl(ol) {}
 	
@@ -136,12 +148,13 @@ struct Shortcut {
 	unsigned int target;
 	unsigned int papa_edge;
 	unsigned int mama_edge;
+	unsigned int id;
 
 	Shortcut()
-		:value(0),source(0),target(0),papa_edge(0),mama_edge(0){}
+		:value(0),source(0),target(0),papa_edge(0),mama_edge(0),id(0){}
 
 	Shortcut(unsigned int v, unsigned int s, unsigned int t, unsigned int p, unsigned int m)
-		:value(v),source(s),target(t),papa_edge(p),mama_edge(m){}
+		:value(v),source(s),target(t),papa_edge(p),mama_edge(m),id(0){}
 
 	Shortcut& operator=(Shortcut const& sc){
 		value = sc.value;
@@ -149,11 +162,12 @@ struct Shortcut {
 		target = sc.target;
 		papa_edge = sc.papa_edge;
 		mama_edge = sc.mama_edge;
+		id = sc.id;
 		return *this;
 	}
 
 	Shortcut(const Shortcut& sc) : 
-		value(sc.value), source(sc.source), target(sc.target), papa_edge(sc.papa_edge), mama_edge(sc.mama_edge) {}
+		value(sc.value), source(sc.source), target(sc.target), papa_edge(sc.papa_edge), mama_edge(sc.mama_edge),id(0) {}
 };
 
 /*

@@ -597,7 +597,9 @@ void openGLrender::display()
 	//set model matrix
 	modelMX = glm::mat4(1.0f);
 	//set model_view_projection matrix
-	glm::mat4 mvpMX = projMX * viewMX * modelMX;
+	
+	/* TODO wird nicht verwendet */ 
+	//glm::mat4 mvpMX = projMX * viewMX * modelMX;
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));

@@ -711,7 +711,7 @@ void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets
 				U.pop();
 			}
 		}
-		int tmpfoundby;
+		int tmpfoundby = -1;
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(found_by[target] != -1){
 			//...schon gefunden wurde...

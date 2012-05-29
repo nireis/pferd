@@ -20,6 +20,7 @@ typedef Shortcut S;
 typedef ShortcutData SD;
 
 typedef Andrenator_P<E> EdgesIterator;
+typedef Andrenator_P<LVLEdge> LVLEdgesIterator;
 
 class SCGraph;
 
@@ -391,5 +392,150 @@ class SCGraph {
 		}
 };
 
+
+class CHGraph {
+	private:
+		Graph* g;
+
+		unsigned int* node_lvl;
+		
+		unsigned int node_count;
+		unsigned int edge_count;
+		unsigned int shortcut_count;
+
+		unsigned int* goodNodes;
+		unsigned int* goodNodesIndex;
+		unsigned int goodNodesSize;
+		unsigned int current_edge_arrays_size;
+
+		struct AdjEdges {
+			Edge* start;
+			unsigned int count;
+
+			AdjEdges() : start(0), count(0) {}
+			AdjEdges(Edge* s, unsigned int c) : start(s), count(c) {}
+		};
+
+		AdjEdges* nodes_out_edges;
+		AdjEdges* nodes_in_edges;
+
+		N* nodes_in_offs;
+		E* in_edges; 
+		N* nodes_out_offs;
+		E* out_edges;
+
+		ND* node_data;
+		ED* edge_data;
+	
+		/* sortiert nach Source-Edges */
+		std::list<Shortcut>* shortcutlist;
+
+		std::list<Shortcut>* round_shortcutlist;
+		std::list<unsigned int> round_node_blacklist;
+
+		std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodesHeap;
+		
+		unsigned int* EdgeLoads;
+
+		CHGraph(){ std::cout << "Error: -41" << std::endl; }
+
+		void prepareNodes(unsigned int lvl);
+		unsigned int sortShortcuts();
+		void buildGraph();
+		void fillGoodNodes();
+		void buildGraphFinal();
+
+	public:
+		CHGraph(Graph* gr);
+		~CHGraph();
+		
+		void addShortcut(unsigned int source_node_id, S sc);
+		void blacklistNode(unsigned int node_id);
+
+		bool mergeRound(unsigned int lvl);
+
+		bool mergeShortcutsAndGraph(unsigned int lvl);
+
+		bool isShortcut(unsigned int edge_id);
+
+		unsigned int getNodeLVL(unsigned int node_id);
+
+		unsigned int getNodeCount();
+		unsigned int getEdgeCount();
+
+		unsigned int getEdgeCount(unsigned int node_id);
+		unsigned int getEdgeCount_Round(unsigned int node_id);
+
+		unsigned int getShortcutCount();
+		
+		std::list<Shortcut>* getShortcutListPointer(){ 
+			return round_shortcutlist; 
+		}
+		std::list<unsigned int>* getBlackNodesListPointer(){ 
+			return &round_node_blacklist; 
+		}
+		std::priority_queue
+			<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes(){
+				return &goodNodesHeap;
+			}
+
+		ND getNodeData(unsigned int node_id);
+		ND* getNodeDataPointer(){ return node_data; }
+		ED getEdgeData(unsigned int edge_id);
+
+		E* getOutEdge(unsigned int edge_id);
+		E* getInEdge(unsigned int edge_id);
+		E* getEdge(bool out1_in0, unsigned int edge_id);
+		
+		E* copyOutEdge(unsigned int edge_id);
+		E* copyInEdge(unsigned int edge_id);
+
+		void updateEdgeLoads(std::list< uint_pair >* edge_load_values);
+		void updateEdgeLoads(unsigned int* edge_loads, unsigned int array_length);
+		void shareShortcutLoads();
+
+		void updateEdgeLoads();
+		void addEdgeLoad(unsigned int edge_id);
+		void addEdgeLoad(unsigned int edge_id, unsigned int times);
+
+		EdgesIterator getOutEdgesIt(unsigned int node){
+			unsigned int nofs = nodes_out_offs[node] ;
+			unsigned int c = nodes_out_offs[node+1] - nofs ;
+			return EdgesIterator(out_edges + nofs , c ); 
+		}
+		EdgesIterator getInEdgesIt(unsigned int node){
+			unsigned int nifs = nodes_in_offs[node] ;
+			unsigned int c = nodes_in_offs[node+1] - nifs ;
+			return EdgesIterator(in_edges + nifs , c ); 
+		}
+
+		EdgesIterator getOutEdgesIt_Round(unsigned int node){
+			Edge* s = nodes_out_edges[node].start ;
+			unsigned int c = nodes_out_edges[node].count ;
+			return EdgesIterator(s, c ); 
+		}
+		EdgesIterator getInEdgesIt_Round(unsigned int node){
+			Edge* s = nodes_in_edges[node].start ;
+			unsigned int c = nodes_in_edges[node].count ;
+			return EdgesIterator(s , c ); 
+		}
+		/*
+		 * out0_in1 == false == 0 => gebe OutEdges-Iterator
+		 * out0_in1 == true == 1 => gebe InEdges-Iterator
+		 */
+		EdgesIterator getEdgesIt(bool out0_in1, unsigned int node_id){
+			unsigned int nfs;
+			unsigned int c;
+			if( out0_in1 ){
+				nfs = nodes_in_offs[node_id] ;
+				c = nodes_in_offs[node_id+1] - nfs ;
+				return EdgesIterator(in_edges + nfs , c ); 
+			} else {
+				nfs = nodes_out_offs[node_id] ;
+				c = nodes_out_offs[node_id+1] - nfs ;
+				return EdgesIterator(out_edges + nfs , c ); 
+			}
+		}
+};
 
 #endif

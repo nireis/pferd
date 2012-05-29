@@ -55,22 +55,31 @@ int main(int argc, char *argv[]){
 
 	cout << "Erstelle neuen Graph: " << endl;
 	start = clock();
-	SCGraph scg = SCGraph(&g);
+	CHGraph chg = CHGraph(&g);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "SCGraph erstellt in zeit: : " << time << endl;
+	cout << "CHGraph erstellt in zeit: : " << time << endl;
 	
-	for(int i=0; i<1; i++){
-		start = clock();
-		TDijkstra<SCGraph>(&scg, i);
-		finish = clock();
-		time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-		cout << "Zeit für Template-Dijkstra mit SCGraph von " << i << " aus: "<< time << endl;
-	}
+	//for(int i=0; i<1; i++){
+	//	start = clock();
+	//	TDijkstra<CHGraph>(&chg, i);
+	//	finish = clock();
+	//	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	//	cout << "Zeit für Template-Dijkstra mit SCGraph von " << i << " aus: "<< time << endl;
+	//}
 
-	CH hy(&g, &scg);
+	unsigned int rounds = 1;
+	CHConstruction<CHGraph> algos(&chg);
+	while(
+		algos.calcOneRound(chg.getShortcutListPointer(), chg.getBlackNodesListPointer())){
+		chg.mergeRound(rounds);
+		rounds++;
+	}
+	chg.mergeShortcutsAndGraph(rounds);
+
+	//CH hy(&g, &scg);
 	//hy.calcCHverbose();
-	hy.calcCH();
+	//hy.calcCH();
 
 
 	/*
@@ -96,48 +105,48 @@ int main(int argc, char *argv[]){
 	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
 	 * auf 15K Graph
 	 */
-	CHDijkstra(&scg, 2271, 252); 
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
+	//CHDijkstra(&scg, 2271, 252); 
+	//scg.updateEdgeLoads();
+	//scg.shareShortcutLoads();
 
-	for(unsigned int i=0; i<scg.getNodeCount(); i++){
-		EdgesIterator it = scg.getOutEdgesIt(i);
-		while(it.hasNext()){
-			EdgesIterator it1 = scg.getOutEdgesIt(i);
-			int count = 0;
-			unsigned int id1 = it.getNext()->other_node;
-			while(it1.hasNext()){
-				if(id1 == it1.getNext()->other_node){
-					count++;
-				}
-			}
-			if(count > 1){
-				cout << i << endl;
-				cout << "Fuck you!" << endl;
-			}
-		}
-	}
+	//for(unsigned int i=0; i<scg.getNodeCount(); i++){
+	//	EdgesIterator it = scg.getOutEdgesIt(i);
+	//	while(it.hasNext()){
+	//		EdgesIterator it1 = scg.getOutEdgesIt(i);
+	//		int count = 0;
+	//		unsigned int id1 = it.getNext()->other_node;
+	//		while(it1.hasNext()){
+	//			if(id1 == it1.getNext()->other_node){
+	//				count++;
+	//			}
+	//		}
+	//		if(count > 1){
+	//			cout << i << endl;
+	//			cout << "Fuck you!" << endl;
+	//		}
+	//	}
+	//}
 
-	for(unsigned int i=0; i<g.getNodeCount(); i++){
-		EdgesIterator it = g.getOutEdgesIt(i);
-		while(it.hasNext()){
-			EdgesIterator it1 = g.getOutEdgesIt(i);
-			int count = 0;
-			unsigned int id1 = it.getNext()->other_node;
-			while(it1.hasNext()){
-				if(id1 == it1.getNext()->other_node){
-					count++;
-				}
-			}
-			if(count > 1){
-				cout << "Penis!" << endl;
-			}
-		}
-	}
+	//for(unsigned int i=0; i<g.getNodeCount(); i++){
+	//	EdgesIterator it = g.getOutEdgesIt(i);
+	//	while(it.hasNext()){
+	//		EdgesIterator it1 = g.getOutEdgesIt(i);
+	//		int count = 0;
+	//		unsigned int id1 = it.getNext()->other_node;
+	//		while(it1.hasNext()){
+	//			if(id1 == it1.getNext()->other_node){
+	//				count++;
+	//			}
+	//		}
+	//		if(count > 1){
+	//			cout << "Penis!" << endl;
+	//		}
+	//	}
+	//}
 
-	CHDijkstraTest(&g, &scg, 149909);
+	//CHDijkstraTest(&g, &scg, 149909);
 
-	//vis anzeige(&scg); anzeige.start();
+	//vis anzeige(&chg); anzeige.start();
 
 	return 0;
 }
