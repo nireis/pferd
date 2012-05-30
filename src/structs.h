@@ -48,7 +48,7 @@ struct LVLEdge {
 	unsigned int other_lvl; 
 };
 struct Edge {
-	Edge() : id(0), value(0), other_node(0) {}
+	Edge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
 	Edge(unsigned int i, unsigned int v, unsigned int o) : 
 		id(i), value(v), other_node(o) {}
 	Edge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
@@ -58,6 +58,17 @@ struct Edge {
 	unsigned int value;
 	unsigned int other_node;
 	unsigned int other_lvl; 
+
+	Edge& operator=(Edge const& e){
+		id = e.id;
+		value = e.value;
+		other_node = e.other_node;
+		other_lvl = e.other_lvl;
+		return *this;
+	}
+
+	Edge(const Edge& e) : 
+		id(e.id), value(e.value), other_node(e.other_node), other_lvl(e.other_lvl) {}
 };
 struct EdgeData {
 	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
@@ -151,23 +162,23 @@ struct Shortcut {
 	unsigned int id;
 
 	Shortcut()
-		:value(0),source(0),target(0),papa_edge(0),mama_edge(0),id(0){}
+		:value(0),source(0),target(0),papa_edge(0),mama_edge(0),id(((unsigned int)0)-1){}
 
 	Shortcut(unsigned int v, unsigned int s, unsigned int t, unsigned int p, unsigned int m)
-		:value(v),source(s),target(t),papa_edge(p),mama_edge(m),id(0){}
+		:value(v),source(s),target(t),papa_edge(p),mama_edge(m),id(((unsigned int)0)-1){}
 
-	Shortcut& operator=(Shortcut const& sc){
-		value = sc.value;
-		source = sc.source;
-		target = sc.target;
-		papa_edge = sc.papa_edge;
-		mama_edge = sc.mama_edge;
-		id = sc.id;
-		return *this;
-	}
-
+//	Shortcut& operator=(Shortcut const& sc){
+//		value = sc.value;
+//		source = sc.source;
+//		target = sc.target;
+//		papa_edge = sc.papa_edge;
+//		mama_edge = sc.mama_edge;
+//		id = sc.id;
+//		return *this;
+//	}
+//
 	Shortcut(const Shortcut& sc) : 
-		value(sc.value), source(sc.source), target(sc.target), papa_edge(sc.papa_edge), mama_edge(sc.mama_edge),id(0) {}
+		value(sc.value), source(sc.source), target(sc.target), papa_edge(sc.papa_edge), mama_edge(sc.mama_edge),id(sc.id) {}
 };
 
 /*
