@@ -15,7 +15,7 @@ Graph::Graph() :
 	node_data(0),
 	edge_data(0) {
 }
-const int Graph::BinID = 47;
+const int Graph::BinID = 48;
 const std::string Graph::dateiendung = "grp";
 
 
@@ -175,6 +175,52 @@ bool Graph::parseTextGraphFile(std::string graphdata){
 	ParserEdge* edges = new ParserEdge[edge_count];
 
 	p.getNodesAndEdges(nodes, edges);
+
+	/* vorausgesetzt, die parser edges sind aufsteigend
+	 * nach source-node und aufsteigend nach target-nodes
+	 * sortiert, funktioniert das entfernen doppelter kanten,
+	 * indem die kante mit der niedrigsten distanz behalten wird
+	 */
+	unsigned int old_edge_count = edge_count;
+	unsigned int slow = 0;
+	unsigned int fast = 1;
+	while( fast < old_edge_count){
+		if( edges[slow].source == edges[fast].source 
+				&& edges[slow].target == edges[fast].target ){
+			if(edges[slow].distance <= edges[fast].distance){
+				/* slow nach vorne kopieren, altes slow killen */
+				cout << "Killing ParserEdge Nr. " << fast << ", killed Type: " << edges[fast].type << ", keeping Type " << edges[slow].type << endl; /*TODO*/
+				edges[fast] = edges[slow];
+				edges[slow].source = node_count;
+				fast++;
+				slow++;
+				
+			} else {
+				/* slow killen */
+				cout << "Killing ParserEdge Nr. " << slow << ", killed Type: " << edges[slow].type << ", keeping Type " << edges[fast].type << endl; /*TODO*/
+				edges[slow].source = node_count;
+				fast++;
+				slow++;
+			}
+		} else {
+			slow++;
+			fast++;
+		}
+	}
+	slow = 0;
+	fast = 0;
+	while(fast < old_edge_count){
+		if( edges[fast].source == node_count ){
+			edge_count--;
+			fast++;
+		} else {
+			edges[slow] = edges[fast];
+			fast++;
+			slow++;
+		}
+	}
+	if(old_edge_count != edge_count)
+		cout << "Graph: " << old_edge_count-edge_count << " doppelte Kanten entfernt." << endl;
 
 	// nodes/edges verarbeiten
 	for(unsigned int i = 0; i <= node_count; i++){
