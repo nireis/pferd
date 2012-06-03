@@ -88,9 +88,9 @@ int main(int argc, char *argv[]){
 	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
 	 * auf 15K Graph
 	 */
-	//CHDijkstra(&scg, 2271, 252); 
-	//scg.updateEdgeLoads();
-	//scg.shareShortcutLoads();
+	CHDijkstra(&scg, 2271, 252); 
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
 
 //	for(unsigned int i=0; i<scg.getNodeCount(); i++){
 //		EdgesIterator it = scg.getOutEdgesIt(i);

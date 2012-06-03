@@ -1215,6 +1215,10 @@ void SCGraph::buildGraphFinal(){
 	for(unsigned int i = 0; i < edge_count; i++){
 		edge_data[i] = g->getEdgeData(i);
 	}
+	for(unsigned int c = 0; c < shortcut_count; c++ ){
+		Shortcut s = shortcuts[c];
+		edge_data[ s.id ] = ED(0, 0, s.papa_edge, s.mama_edge, 0);
+	}
 
 	/* Edges der Knoten abzählen */
 	nodes_out_offs[0] = 0;
@@ -1253,16 +1257,18 @@ void SCGraph::buildGraphFinal(){
 	for(unsigned int c = 0; c < shortcut_count; c++ ){
 		Shortcut s = shortcuts[c];
 		o = nodes_out_offs[ s.source ];
-		i = nodes_in_offs[ s.target ];
 		while( out_edges[ o ].id != 0 ){
 			o++;
 		}
 		out_edges[ o ] = E(s.id, s.value, s.target );
+	}
+	for(unsigned int c = 0; c < shortcut_count; c++ ){
+		Shortcut s = shortcuts[c];
+		i = nodes_in_offs[ s.target ];
 		while( in_edges[ i ].id != 0 ){
 			i++;
 		}
 		in_edges[ i ] = E(s.id, s.value, s.source );
-		edge_data[ s.id ] = ED(o, i, s.papa_edge, s.mama_edge, 0);
 	}
 	/* Graph Edges übernehmen */
 	EdgesIterator eit;
@@ -1271,7 +1277,6 @@ void SCGraph::buildGraphFinal(){
 		o = nodes_out_offs[c + 1] - 1;
 		while( eit.hasNext() ){
 			out_edges[ o ] = * eit.getNext();
-			edge_data[ out_edges[ o ].id ].out_index = o;
 			o--;
 		}
 	}
@@ -1280,7 +1285,6 @@ void SCGraph::buildGraphFinal(){
 		i = nodes_in_offs[c + 1] - 1;
 		while( eit.hasNext() ){
 			in_edges[ i ] = * eit.getNext();
-			edge_data[ in_edges[ i ].id ].in_index = i;
 			i--;
 		}
 	}
@@ -1294,39 +1298,27 @@ void SCGraph::buildGraphFinal(){
 		in_edges[i].other_lvl = node_lvl[ in_edges[i].other_node ];
 	}
 
-	for(unsigned int j = 0; j < edge_count+shortcut_count; j++){
-		if(in_edges[j].id >= edge_count+shortcut_count){
-			cout << "[BEFORE SORT] IN-EDGE-ID TOO DAMN HIGH " << in_edges[j].id << endl; 
-		}
-		if(out_edges[j].id >= edge_count+shortcut_count){
-			cout << "[BEFORE SORT] OUT-EDGE-ID TOO DAMN HIGH " << out_edges[j].id << endl; 
-		}
-	}
-
-	/* sortieren der Edges eines Knotens absteigend nach lvl */
-	
+	/* Eges absteigend nach other_lvl sortieren */
 	for( i = 0; i < node_count; i++){
 		Edge* start = out_edges + nodes_out_offs[i];
 		Edge* end = out_edges + nodes_out_offs[i+1];
-		//std::make_heap(start, end, compare_edges_desc_by_lvl);
-		sort/*_heap*/(start, end, compare_edges_desc_by_lvl);
+		std::make_heap(start, end, compare_edges_desc_by_lvl);
+		std::sort_heap(start, end, compare_edges_desc_by_lvl);
 	}
 	for( i = 0; i < node_count; i++){
 		Edge* start = in_edges + nodes_in_offs[i];
 		Edge* end = in_edges + nodes_in_offs[i+1];
-		//std::make_heap(start, end, compare_edges_desc_by_lvl);
-		sort/*_heap*/(start, end, compare_edges_desc_by_lvl);
+		std::make_heap(start, end, compare_edges_desc_by_lvl);
+		std::sort_heap(start, end, compare_edges_desc_by_lvl);
 	}
-	
-	for(unsigned int j = 0; j < edge_count+shortcut_count; j++){
-		if(in_edges[j].id >= edge_count+shortcut_count){
-			cout << "[AFTER SORT] IN-EDGE-ID TOO DAMN HIGH " << in_edges[j].id << endl; 
-		}
-		if(out_edges[j].id >= edge_count+shortcut_count){
-			cout << "[AFTER SORT] OUT-EDGE-ID TOO DAMN HIGH " << out_edges[j].id << endl; 
-		}
+
+	/* Edge-indizes in EdgeData anpassen*/
+	for( o = 0; o < edge_count+shortcut_count; o++){
+		edge_data[ out_edges[ o ].id ].out_index = o;
 	}
-	
+	for( i = 0; i < edge_count+shortcut_count; i++){
+		edge_data[ in_edges[ i ].id ].in_index = i;
+	}
 
 }
 
