@@ -83,15 +83,6 @@ int main(int argc, char *argv[]){
 	//scg.updateEdgeLoads(colors, scg.getEdgeCount() + scg.getShortcutCount());
 	//scg.shareShortcutLoads(); // shortcut loads verteilen
 
-	// Markiere einen Weg im Graph
-	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
-	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
-	 * auf 15K Graph
-	 */
-	CHDijkstra(&scg, 2271, 252); 
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
-
 //	for(unsigned int i=0; i<scg.getNodeCount(); i++){
 //		EdgesIterator it = scg.getOutEdgesIt(i);
 //		while(it.hasNext()){
@@ -128,8 +119,18 @@ int main(int argc, char *argv[]){
 //	}
 
 	CHDijkstraTest(&g, &scg, 149909);
+	
+	// Markiere einen Weg im Graph
+	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
+	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
+	 * auf 15K Graph
+	 */
+	CHDijkstra(&scg, 2271, 252); 
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
 
-	//vis anzeige(&scg); anzeige.start();
+
+	vis anzeige(&scg); anzeige.start();
 
 	return 0;
 }

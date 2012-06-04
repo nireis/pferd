@@ -942,7 +942,8 @@ SCGraph::SCGraph(Graph* gr) :
 	shortcutlist( new list<Shortcut>[gr->getNodeCount()] ),
 	round_shortcutlist( new list<Shortcut> ),
 	round_node_blacklist(),
-	goodNodesHeap(),
+	//goodNodesHeap(),
+	goodNodesSorted(new uint_pair[gr->getNodeCount()]),
 	EdgeLoads(0)
 {
 	for(unsigned int i = 0; i < node_count; i++){
@@ -995,8 +996,9 @@ SCGraph::~SCGraph(){
 	delete[] shortcutlist; shortcutlist = 0;
 	delete round_shortcutlist; round_shortcutlist = 0;
 	round_node_blacklist.clear();
-	while( !goodNodesHeap.empty() )
-		goodNodesHeap.pop();
+	//while( !goodNodesHeap.empty() )
+	//	goodNodesHeap.pop();
+	delete[] goodNodesSorted; goodNodesSorted = 0;
 	delete[] EdgeLoads; EdgeLoads = 0;
 }
 
@@ -1201,13 +1203,31 @@ void SCGraph::buildGraph(){
 	delete[] ValidOutEdges; ValidOutEdges = 0;
 
 }
+bool compare_uint_pair_asc_by_key(uint_pair one, uint_pair two){
+	return one.key < two.key;
+}
 void SCGraph::fillGoodNodes(){
 	for(unsigned int i = 0; i < goodNodesSize; i++){
 		unsigned int gn = goodNodes[i];
-		goodNodesHeap.push(
+		//goodNodesHeap.push(
+		//		uint_pair(gn, 
+		//			nodes_in_edges[gn].count * nodes_out_edges[gn].count));
+		goodNodesSorted[i] = 
 				uint_pair(gn, 
-					nodes_in_edges[gn].count * nodes_out_edges[gn].count));
+					nodes_in_edges[gn].count * nodes_out_edges[gn].count);
 	}
+//	std::make_heap
+//		(goodNodesSorted, 
+//		 goodNodesSorted+goodNodesSize, 
+//		 compare_uint_pair_asc_by_key);
+//	std::sort_heap
+//		(goodNodesSorted, 
+//		 goodNodesSorted+goodNodesSize, 
+//		 compare_uint_pair_asc_by_key);
+	std::sort
+		(goodNodesSorted, 
+		 goodNodesSorted+goodNodesSize, 
+		 compare_uint_pair_asc_by_key);
 }
 
 bool compare_edges_desc_by_lvl(Edge one, Edge two){
@@ -1348,14 +1368,16 @@ void SCGraph::buildGraphFinal(){
 	for( i = 0; i < node_count; i++){
 		Edge* start = out_edges + nodes_out_offs[i];
 		Edge* end = out_edges + nodes_out_offs[i+1];
-		std::make_heap(start, end, compare_edges_desc_by_lvl);
-		std::sort_heap(start, end, compare_edges_desc_by_lvl);
+	//	std::make_heap(start, end, compare_edges_desc_by_lvl);
+	//	std::sort_heap(start, end, compare_edges_desc_by_lvl);
+		std::sort(start, end, compare_edges_desc_by_lvl);
 	}
 	for( i = 0; i < node_count; i++){
 		Edge* start = in_edges + nodes_in_offs[i];
 		Edge* end = in_edges + nodes_in_offs[i+1];
-		std::make_heap(start, end, compare_edges_desc_by_lvl);
-		std::sort_heap(start, end, compare_edges_desc_by_lvl);
+	//	std::make_heap(start, end, compare_edges_desc_by_lvl);
+	//	std::sort_heap(start, end, compare_edges_desc_by_lvl);
+		std::sort(start, end, compare_edges_desc_by_lvl);
 	}
 
 	/* Edge-indizes in EdgeData anpassen*/
@@ -1384,7 +1406,7 @@ bool SCGraph::mergeRound(unsigned int lvl){
 
 	/* TODO */
 	cout << new_sc_count << " neue Shortcuts" << endl;
-	cout << "Übrige Graphknoten: " << goodNodesHeap.size() << " ( " << (((double) goodNodesHeap.size())/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
+	cout << "Übrige Graphknoten: " << goodNodesSize << " ( " << (((double) goodNodesSize)/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
 	cout << "aktuelle Anzahl Kanten: " << ( (double)edge_count / (double)g->getEdgeCount() ) * 100.0 << "% der urspr. Kanten" << endl; // TODO
 
 	return true; 

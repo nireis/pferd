@@ -225,33 +225,61 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
 template <typename G>
 list<unsigned int>* CHConstruction<G>::independent_set(){
    list<unsigned int>* solution = new list<unsigned int>;
-	// hole goodNodes beim Graphen ab
-	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
-	// frühzeitiges abbrechen; sinnvoll ?
-	if(goodNodes->empty()){
-		return solution;
-	}
+
+	unsigned int size = g->getGoodNodesSize();
+	uint_pair* goodNodesSorted = g->getGoodNodes();
+
    vector<bool> marked(nr_of_nodes,false);
    EdgesIterator it;
 
-	while(!goodNodes->empty()){
-		uint_pair tmp = goodNodes->top();
-		if(!marked[tmp.id]){
-			solution->push_front(tmp.id);
-			// Alle ausgehenden Kanten verfolgen
-			it = g->getOutEdgesIt_Round(tmp.id);
-			while(it.hasNext()){
-				marked[it.getNext()->other_node] = true;
+	for(unsigned int i = 0; i < size; i++){
+		unsigned int gn = goodNodesSorted[i].id ;
+
+		if( ! marked[ gn ] ){
+			solution->push_front(gn);
+			marked[ gn ] = true;
+			it = g->getOutEdgesIt_Round( gn );
+			while( it.hasNext() ){
+				marked[ it.getNext() -> other_node ] = true;
 			}
-			// Alle eingehenden Kanten verfolgen
-			it = g->getInEdgesIt_Round(tmp.id);
-			while(it.hasNext()){
-				marked[it.getNext()->other_node] = true;
+			it = g->getInEdgesIt_Round( gn );
+			while( it.hasNext() ){
+				marked[ it.getNext() -> other_node ] = true;
 			}
 		}
-		goodNodes->pop();
 	}
+
    return solution;
+
+//   list<unsigned int>* solution = new list<unsigned int>;
+//	// hole goodNodes beim Graphen ab
+//	std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair>* goodNodes = g->getGoodNodes();
+//	// frühzeitiges abbrechen; sinnvoll ?
+//	if(goodNodes->empty()){
+//		return solution;
+//	}
+//   vector<bool> marked(nr_of_nodes,false);
+//   EdgesIterator it;
+//
+//	while(!goodNodes->empty()){
+//		uint_pair tmp = goodNodes->top();
+//		if(!marked[tmp.id]){
+//			solution->push_front(tmp.id);
+//			// Alle ausgehenden Kanten verfolgen
+//			it = g->getOutEdgesIt_Round(tmp.id);
+//			while(it.hasNext()){
+//				marked[it.getNext()->other_node] = true;
+//			}
+//			// Alle eingehenden Kanten verfolgen
+//			it = g->getInEdgesIt_Round(tmp.id);
+//			while(it.hasNext()){
+//				marked[it.getNext()->other_node] = true;
+//			}
+//		}
+//		goodNodes->pop();
+//	}
+//	a
+//   return solution;
 //	list<unsigned int>* solution = new list<unsigned int>;
 //	vector<uint_pair>* goodNodes = g->getGoodNodes();
 //	unsigned int r = rand() % goodNodes->size();

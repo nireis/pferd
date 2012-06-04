@@ -434,7 +434,8 @@ class SCGraph {
 		std::list<Shortcut>* round_shortcutlist;
 		std::list<unsigned int> round_node_blacklist;
 
-		std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodesHeap;
+		//std::priority_queue<uint_pair, std::vector<uint_pair>, compare_uint_pair> goodNodesHeap;
+		uint_pair* goodNodesSorted;
 		
 		unsigned int* EdgeLoads;
 
@@ -475,10 +476,16 @@ class SCGraph {
 		std::list<unsigned int>* getBlackNodesListPointer(){ 
 			return &round_node_blacklist; 
 		}
-		std::priority_queue
-			<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes(){
-				return &goodNodesHeap;
-			}
+		//std::priority_queue
+		//	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* getGoodNodes(){
+		//		return &goodNodesHeap;
+		//	}
+		uint_pair* getGoodNodes(){
+			return goodNodesSorted;
+		}
+		unsigned int getGoodNodesSize(){
+			return goodNodesSize;
+		}
 
 		ND getNodeData(unsigned int node_id);
 		ND* getNodeDataPointer(){ return node_data; }
