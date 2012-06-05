@@ -2,6 +2,7 @@
 
 CHDijkstras::CHDijkstras(SCGraph* g):
 	nr_of_nodes(g->getNodeCount()),
+	dist(nr_of_nodes),
 	o_found_by(2,vector<int> (nr_of_nodes,-1)),
 	marked(g->getEdgeCount() + g->getShortcutCount(), false),
 	m_found_by(nr_of_nodes,-1),
@@ -22,7 +23,6 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1)
 	std::priority_queue<U_element_bi, std::vector<U_element_bi>, Compare_U_element_bi> U;
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
 	unsigned int min_path_center;
-	vector<unsigned int> dist(nr_of_nodes);
 
 	unsigned int numEdges = 0;
 	unsigned int numNodes = 2;
@@ -149,8 +149,6 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 	// brechen wir ab.
 	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
 	unsigned int tmpnode;
-	// TODO zum Testen ist hier noch ein dist-vector drin.
-	vector<unsigned int> dist(nr_of_nodes);
 
 	// Den ersten Knoten abarbeiten
 	U.push(U_element(0,node_id0,0));
@@ -244,11 +242,9 @@ void CHDijkstras::resetOneToMany(){
 
 void CHDijkstras::markAscEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
 	vector<unsigned int> todo;
-	// Erstmal alle Startknoten einfürgen. TODO man könnte auch
+	// Erstmal alle Startknoten einfügen. Man könnte auch
 	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
 	// des Rests.
-	// TODO Der marked Vektor muss im Moment noch komplett mit false initialisiert
-	// übergeben werden.
 	todo.assign(nodes->begin(), nodes->end());
 	while(!todo.empty()){
 		unsigned int tmpnode = todo.back();todo.pop_back();

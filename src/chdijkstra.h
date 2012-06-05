@@ -71,6 +71,7 @@ class CHDijkstras{
 		unsigned int nr_of_nodes;
 		// Variablen für die Dijkstras...
 		// -1, wenn der Knoten noch nicht gefunden wurde, bei found_by.
+		vector<unsigned int> dist;
 		vector< vector<int> > o_found_by;
 		vector<unsigned int> marked;
 		vector<int> m_found_by;

@@ -801,10 +801,10 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int numDij = 0;//g->getNodeCount();
 	CHDijkstras chd(scg);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
-	unsigned int nc = g->getNodeCount();
-	for(unsigned int i=0; i< g->getNodeCount(); i += 5000){
+	unsigned int nc = scg->getNodeCount();
+	for(unsigned int i=0; i< nc; i += 5000){
 		start = clock();
-		unsigned int val = CHDijkstra(scg, 0, i);
+		unsigned int val1 = CHDijkstra(scg, 0, i);
 		finish = clock();
 		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
@@ -813,13 +813,13 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		// Dijkstra(g, 0, i) << endl;
 		// CHDijkstra(scg, 0, i);
 		}*/
-		vector<unsigned int> tgt(1,i);
+		//vector<unsigned int> tgt(1,i);
 		start = clock();
-		chd.oneToMany(0, &tgt);
+		unsigned int val2 = chd.oneToOne(0, i);
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
-		if(tgt[0] != val){
+		if(val1 != val2){
 			cout << "Error" << endl;
 		}
 	}
