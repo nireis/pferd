@@ -576,6 +576,9 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	// Wenn nicht ist der Wert -1.
 	vector< vector<int> > found_by(2,vector<int> (nr_of_nodes,-1));
 
+	unsigned int numEdges = 0;
+	unsigned int numNodes = 2;
+
 	// Die ersten Knoten abarbeiten
 	if(node_id0 == node_id1){
 		min_path_center = node_id0;
@@ -606,6 +609,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			else{
 				break;
 			}
+			numEdges++;
 		}
 	}
 	dist[node_id0] = 0;
@@ -613,6 +617,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 
 	// Die restlichen Knoten abarbeiten
 	while(!U.empty() && min_path_length > U.top().distance){
+		numNodes++;
 		int i = U.top().found_by;
 		unsigned int tmpid = U.top().id;
 		if(found_by[i][tmpid] == -1){
@@ -639,6 +644,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 				else{
 					break;
 				}
+				numEdges++;
 			}
 		}
 		U.pop();
@@ -660,6 +666,10 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 			}
 		}
 	}
+
+	cout << "numNodes: " << numNodes << endl;
+	cout << "numEdges: " << numEdges << endl;
+
 	return min_path_length;
 }
 
@@ -786,23 +796,31 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	clock_t start,finish;
-	double time = 0;
+	double time1 = 0;
+	double time2 = 0;
 	unsigned int numDij = 0;//g->getNodeCount();
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	for(unsigned int i=0; i< g->getNodeCount(); i += 10000){
 		start = clock();
 		CHDijkstra(scg, 0, i);
 		finish = clock();
-		time += (double(finish)-double(start))/CLOCKS_PER_SEC;
-		//if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
-		//	cout << "ERROR!" << endl;
+		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
+		if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
+			cout << "ERROR!" << endl;
 		//	cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " << endl;
-				//Dijkstra(g, 0, i) << endl;
-		CHDijkstra(scg, 0, i);
-	//	}
+		// Dijkstra(g, 0, i) << endl;
+		// CHDijkstra(scg, 0, i);
+		}
+		start = clock();
+		vector<unsigned int>* tgts = new vector<unsigned int>(1,i);
+		CHDijkstra(scg, 0, tgts);
+		finish = clock();
+		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
 	}
-	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time << endl;
-	cout << "Zeit pro Dijkstra im Schnitt: " << time/numDij << endl;
+	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time1 << endl;
+	cout << "Zeit insgesamt für " << numDij << " One to Many Dijkstras: " << time2 << endl;
+	cout << "Zeit pro Dijkstra im Schnitt: " << time1/numDij << endl;
+	cout << "Zeit pro One to Many Dijkstra im Schnitt: " << time2/numDij << endl;
 	return true;
 }

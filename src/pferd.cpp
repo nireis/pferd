@@ -7,6 +7,7 @@
 #include "ch.h"
 #include "rlparser.h"
 #include "vis.h"
+#include "chdijkstra.h"
 
 using namespace std;
 
@@ -129,6 +130,7 @@ int main(int argc, char *argv[]){
 	scg.updateEdgeLoads();
 	scg.shareShortcutLoads();
 
+	CHDijkstras chd(&scg);
 
 	vis anzeige(&scg); anzeige.start();
 
