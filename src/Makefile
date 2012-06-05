@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -Wall -g -std=c++0x -lglut -lGL -pthread -O3
+CXXFLAGS = -Wall -g -std=c++0x -lglut -lGL -pthread
 LDFLAGS = -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a
 BIN =pferd
 
@@ -7,8 +7,8 @@ OBJDIR=obj
 
 # zu jeder X.cpp datei, die kompiliert wird, hier in
 # OBJ eine entsprechende X.o file anlegen lassen
-CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp rlparser.cpp openGLrender.cpp vis.cpp chdijkstra.cpp clust.cpp
-OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o chdijkstra.o clust.o
+CPP =pferd.cpp graphalgs.cpp parser.cpp graph.cpp ch.cpp rlparser.cpp openGLrender.cpp vis.cpp chdijkstra.cpp
+OBJ =pferd.o graphalgs.o parser.o graph.o ch.o rlparser.o openGLrender.o vis.o chdijkstra.o
 
 all: $(BIN)
 
