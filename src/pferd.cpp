@@ -7,6 +7,7 @@
 #include "ch.h"
 #include "rlparser.h"
 #include "vis.h"
+#include "clust.h"
 
 using namespace std;
 
@@ -23,19 +24,41 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 	cout << " " << endl;
 
-   if(argc != 2){
+	string file;
+	bool startVis = false;
+
+	if(argc < 3 || argc > 4){
 		cout << "---" << endl 
-				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " Graphendatei " << endl
-				<< "-- Graphdatei: Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
+				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " -g <Graphendatei> [-v]" << endl
+				<< "-- -g <Graphdatei> : Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
+				<< "-- -v : Visualisierung starten " << endl
 				<< "---" << endl;
 		return 0;
-	} 
-
-	string file = argv[1];
+	} else {
+		int i = 1;
+		while(i < argc){
+			if( string(argv[i]) == "-g"){
+				if( i+1 < argc){
+					file = argv[i+1];
+					i += 2;
+				} else {
+					cout << "Input Error. " << endl;
+					return 0;
+				}
+			} else
+			if( string(argv[i]) == "-v"){
+				startVis = true;
+				i++;
+			} else {
+				cout << "Input Error. " << endl;
+				return 0;
+			}
+		}
+	}
 
 	ifstream checkfile(file.c_str());
 	if(!checkfile){
-		cout << "-> angegebene Datei existiert nicht." << endl;
+		cout << "-> angegebene Datei '"<< file <<"' existiert nicht." << endl;
 		return 0;
 	}
    
@@ -60,10 +83,12 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "SCGraph erstellt in zeit: : " << time << endl;
 
-	CH hy(&g, &scg);
-	//hy.calcCHverbose();
-	hy.calcCH();
+	//CH hy(&g, &scg);
+	////hy.calcCHverbose();
+	//hy.calcCH();
 
+	cluster cl(&g, 0.01/16.0); /* 8.0 für gröber, 32.0 für sehr fein */
+	scg.mergeShortcutsAndGraph(1);
 
 	/*
 	 * ein paar kanten einfärben, 
@@ -118,19 +143,21 @@ int main(int argc, char *argv[]){
 //		}
 //	}
 
-	CHDijkstraTest(&g, &scg, 149909);
+	//CHDijkstraTest(&g, &scg, 149909);
 	
 	// Markiere einen Weg im Graph
 	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
 	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
 	 * auf 15K Graph
 	 */
-	CHDijkstra(&scg, 2271, 252); 
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
+	//CHDijkstra(&scg, 2271, 252); 
+	//scg.updateEdgeLoads();
+	//scg.shareShortcutLoads();
 
 
-	vis anzeige(&scg); anzeige.start();
+	if( startVis ){
+		vis anzeige(&scg); anzeige.start();
+	}
 
 	return 0;
 }
