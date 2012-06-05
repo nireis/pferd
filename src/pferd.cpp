@@ -7,7 +7,7 @@
 #include "ch.h"
 #include "rlparser.h"
 #include "vis.h"
-//#include "clust.h"
+#include "clust.h"
 #include "chdijkstra.h"
 
 using namespace std;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]){
 	//hy.calcCHverbose();
 	hy.calcCH();
 
-	//cluster cl(&g, 0.01/16.0); /* 8.0 für gröber, 32.0 für sehr fein */
+	cluster cl(&g, 0.01/16.0); /* 8.0 für gröber, 32.0 für sehr fein */
 
 	/*
 	 * ein paar kanten einfärben, 

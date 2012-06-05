@@ -802,30 +802,38 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	CHDijkstras chd(scg);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	unsigned int nc = scg->getNodeCount();
-	for(unsigned int i=0; i< nc; i += 5000){
+//	for(unsigned int i=0; i< nc; i += 5000){
+//		start = clock();
+//		unsigned int val1 = CHDijkstra(scg, 0, i);
+//		finish = clock();
+//		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
+//		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
+//			cout << "ERROR!" << endl;
+//		//	cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " << endl;
+//		// Dijkstra(g, 0, i) << endl;
+//		// CHDijkstra(scg, 0, i);
+//		}*/
+//		//vector<unsigned int> tgt(1,i);
+//		start = clock();
+//		unsigned int val2 = chd.oneToOne(0, i);
+//		finish = clock();
+//		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
+//		numDij++;
+//		if(val1 != val2){
+//			cout << "Error" << endl;
+//		}
+//	}
+	unsigned int val2 = 0;
+	for(unsigned int i=0; i< nc; i += 50){
+		unsigned int s = (42*i + 23) % g->getNodeCount();
 		start = clock();
-		unsigned int val1 = CHDijkstra(scg, 0, i);
-		finish = clock();
-		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
-		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
-			cout << "ERROR!" << endl;
-		//	cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " << endl;
-		// Dijkstra(g, 0, i) << endl;
-		// CHDijkstra(scg, 0, i);
-		}*/
-		//vector<unsigned int> tgt(1,i);
-		start = clock();
-		unsigned int val2 = chd.oneToOne(0, i);
+		val2 += chd.oneToOne(s, i);
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
-		if(val1 != val2){
-			cout << "Error" << endl;
-		}
 	}
-	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time1 << endl;
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
-	cout << "Zeit pro Dijkstra im Schnitt: " << time1/numDij << endl;
 	cout << "Zeit pro Dijkstra mit Klasse im Schnitt: " << time2/numDij << endl;
+	cout << val2 << endl;
 	return true;
 }
