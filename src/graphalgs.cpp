@@ -803,7 +803,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	for(unsigned int i=0; i< g->getNodeCount(); i += 10000){
 		start = clock();
-		CHDijkstra(scg, 0, i);
+		unsigned int val = CHDijkstra(scg, 0, i);
 		finish = clock();
 		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
@@ -812,11 +812,15 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		// Dijkstra(g, 0, i) << endl;
 		// CHDijkstra(scg, 0, i);
 		}*/
+		vector<unsigned int> tgt(1,i);
 		start = clock();
-		chd.oneToOne(0, i);
+		chd.oneToMany(0, &tgt);
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
+		if(tgt[0] != val){
+			cout << "Error" << endl;
+		}
 	}
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time1 << endl;
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
