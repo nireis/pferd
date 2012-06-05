@@ -8,6 +8,7 @@
 #include "rlparser.h"
 #include "vis.h"
 #include "clust.h"
+#include "chdijkstra.h"
 
 using namespace std;
 
@@ -83,12 +84,11 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "SCGraph erstellt in zeit: : " << time << endl;
 
-	//CH hy(&g, &scg);
-	////hy.calcCHverbose();
-	//hy.calcCH();
+	CH hy(&g, &scg);
+	//hy.calcCHverbose();
+	hy.calcCH();
 
 	cluster cl(&g, 0.01/16.0); /* 8.0 für gröber, 32.0 für sehr fein */
-	scg.mergeShortcutsAndGraph(1);
 
 	/*
 	 * ein paar kanten einfärben, 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
 //		}
 //	}
 
-	//CHDijkstraTest(&g, &scg, 149909);
+	CHDijkstraTest(&g, &scg, 149909);
 	
 	// Markiere einen Weg im Graph
 	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
@@ -154,6 +154,12 @@ int main(int argc, char *argv[]){
 	//scg.updateEdgeLoads();
 	//scg.shareShortcutLoads();
 
+	/*CHDijkstras chd(&scg);
+	for(unsigned int i=0; i<=scg.getNodeCount(); i++){
+		if(chd.oneToOne(5, i) != CHDijkstra(&scg, 5, i)){
+			cout << "Error!" << endl;
+		}
+	}*/
 
 	if( startVis ){
 		vis anzeige(&scg); anzeige.start();

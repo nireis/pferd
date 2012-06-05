@@ -2,6 +2,7 @@
 #define graphalgs_h
 
 #include "graph.h"
+#include "chdijkstra.h"
 #include <queue>
 #include <limits>
 #include <list>
