@@ -7,6 +7,10 @@ CHDijkstras::CHDijkstras(SCGraph* g):
 	m_found_by(nr_of_nodes,-1),
 	o_reset_found_by(2){
 	this->g = g;
+	o_reset_found_by[1].reserve(nr_of_nodes);
+	o_reset_found_by[2].reserve(nr_of_nodes);
+	m_reset_found_by.reserve(nr_of_nodes);
+	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
 unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1){

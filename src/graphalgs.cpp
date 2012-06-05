@@ -806,12 +806,12 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		CHDijkstra(scg, 0, i);
 		finish = clock();
 		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
-		if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
+		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
 			cout << "ERROR!" << endl;
 		//	cout << "CHDijkstra Distanz: " << CHDijkstra(scg, 0, i) << ", Dijkstra Distanz: " << endl;
 		// Dijkstra(g, 0, i) << endl;
 		// CHDijkstra(scg, 0, i);
-		}
+		}*/
 		start = clock();
 		chd.oneToOne(0, i);
 		finish = clock();
