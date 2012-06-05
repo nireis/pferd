@@ -667,8 +667,8 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 		}
 	}
 
-	cout << "numNodes: " << numNodes << endl;
-	cout << "numEdges: " << numEdges << endl;
+	// cout << "numNodes: " << numNodes << endl;
+	// cout << "numEdges: " << numEdges << endl;
 
 	return min_path_length;
 }
@@ -799,6 +799,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	double time1 = 0;
 	double time2 = 0;
 	unsigned int numDij = 0;//g->getNodeCount();
+	CHDijkstras chd(scg);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	for(unsigned int i=0; i< g->getNodeCount(); i += 10000){
 		start = clock();
@@ -812,15 +813,14 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		// CHDijkstra(scg, 0, i);
 		}
 		start = clock();
-		vector<unsigned int>* tgts = new vector<unsigned int>(1,i);
-		CHDijkstra(scg, 0, tgts);
+		chd.oneToOne(0, i);
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
 	}
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras: " << time1 << endl;
-	cout << "Zeit insgesamt für " << numDij << " One to Many Dijkstras: " << time2 << endl;
+	cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
 	cout << "Zeit pro Dijkstra im Schnitt: " << time1/numDij << endl;
-	cout << "Zeit pro One to Many Dijkstra im Schnitt: " << time2/numDij << endl;
+	cout << "Zeit pro Dijkstra mit Klasse im Schnitt: " << time2/numDij << endl;
 	return true;
 }

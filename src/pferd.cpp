@@ -130,7 +130,12 @@ int main(int argc, char *argv[]){
 	scg.updateEdgeLoads();
 	scg.shareShortcutLoads();
 
-	CHDijkstras chd(&scg);
+	/*CHDijkstras chd(&scg);
+	for(unsigned int i=0; i<=scg.getNodeCount(); i++){
+		if(chd.oneToOne(5, i) != CHDijkstra(&scg, 5, i)){
+			cout << "Error!" << endl;
+		}
+	}*/
 
 	vis anzeige(&scg); anzeige.start();
 
