@@ -7,6 +7,10 @@ CHDijkstras::CHDijkstras(SCGraph* g):
 	m_found_by(nr_of_nodes,-1),
 	o_reset_found_by(2){
 	this->g = g;
+	o_reset_found_by[1].reserve(nr_of_nodes);
+	o_reset_found_by[2].reserve(nr_of_nodes);
+	m_reset_found_by.reserve(nr_of_nodes);
+	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
 unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1){
@@ -206,18 +210,18 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 		}
 		// Backtracing der Knoten.
 		if((*targets)[i] != numeric_limits<unsigned int>::max()){
-			cout << "=== Node " << target << " ===" << endl;
+			// cout << "=== Node " << target << " ===" << endl;
 			// ersten Knoten
 			tmpnode = target;
 			if(tmpnode != node_id0){
-				cout << tmpnode << endl;
+				// cout << tmpnode << endl;
 				int takenedge = tmpfoundby;
 				// path->push_front(takenedge);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
 			}
 			// restlichen Knoten
 			while(tmpnode != node_id0){
-				cout << tmpnode << endl;
+				// cout << tmpnode << endl;
 				int takenedge = m_found_by[tmpnode];
 				// path->push_front(takenedge);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
@@ -252,10 +256,15 @@ void CHDijkstras::markAscEdges(vector<unsigned int>* nodes, vector<unsigned int>
 		while(it.hasNext()){
 			Edge* tmpedge = it.getNext();
 			// Wenn wir nicht schon hier waren und es nach oben geht.
-			if(!((*marked)[tmpedge->id]) && tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
-				(*marked)[tmpedge->id] = true;
-				m_reset_marked.push_back(tmpedge->id);
-				todo.push_back(tmpedge->other_node);
+			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
+				if(!((*marked)[tmpedge->id])){
+					(*marked)[tmpedge->id] = true;
+					m_reset_marked.push_back(tmpedge->id);
+					todo.push_back(tmpedge->other_node);
+				}
+			}
+			else{
+				break;
 			}
 		}
 	}
