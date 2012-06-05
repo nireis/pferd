@@ -603,6 +603,9 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 						currentEdge->value,currentEdge->other_node,currentEdge->id,i));
 				}
 			}
+			else{
+				break;
+			}
 		}
 	}
 	dist[node_id0] = 0;
@@ -632,6 +635,9 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 						U.push(U_element_bi(
 							currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
 					}
+				}
+				else{
+					break;
 				}
 			}
 		}
