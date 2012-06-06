@@ -87,13 +87,13 @@ class CHDijkstras{
 		/*
 		* One to one Dijkstra auf der CH.
 		*/
-		unsigned int oneToOne(unsigned int node_id0, unsigned int node_id1);
+		unsigned int oneToOne(unsigned int node_id0, unsigned int node_id1, unsigned int weight);
 
 		/*
 		 * One to many Dijkstra auf der CH. Die Distanzen werden in den targets-vector geschrieben
 		 * and die entsprechende Stelle.
 		 */
-		void oneToMany(unsigned int node_id0, vector<unsigned int>* targets);
+		void oneToMany(unsigned int node_id0, vector<unsigned int>* targets, unsigned int weight);
 };
 
 #endif

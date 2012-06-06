@@ -14,7 +14,8 @@ CHDijkstras::CHDijkstras(SCGraph* g):
 	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
-unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1){
+unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
+		unsigned int weight){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -112,7 +113,7 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1)
 //				cout << tmpid << endl;
 				int takenedge = o_found_by[i][tmpid];
 				// path->push_front(takenedge);
-				g->addEdgeLoad(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}
@@ -134,7 +135,8 @@ void CHDijkstras::resetOneToOne(){
 	}
 }
 
-void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets){
+void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
+		unsigned int weight){
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
 	 *
@@ -215,6 +217,7 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 				// cout << tmpnode << endl;
 				int takenedge = tmpfoundby;
 				// path->push_front(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
 			}
 			// restlichen Knoten
@@ -222,6 +225,7 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 				// cout << tmpnode << endl;
 				int takenedge = m_found_by[tmpnode];
 				// path->push_front(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
 			}
 		}

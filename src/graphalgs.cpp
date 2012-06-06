@@ -815,7 +815,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		}*/
 		//vector<unsigned int> tgt(1,i);
 		start = clock();
-		unsigned int val2 = chd.oneToOne(0, i);
+		unsigned int val2 = chd.oneToOne(0, i, 1);
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
