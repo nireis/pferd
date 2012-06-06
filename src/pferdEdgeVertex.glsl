@@ -28,6 +28,6 @@ void main(void)
 	
 	vec2 offsetPos = vec2(x_mercator,y_mercator) + (vec2(x_normal_mercator,y_normal_mercator)*0.00002);
 	
-	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(offsetPos,0.0, 1.0);
+	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(offsetPos,(in_color/1000000.0), 1.0);
 }
 

@@ -35,18 +35,18 @@ vis::vis(SCGraph* g) : render() {
 				}
 			if( g->isShortcut( e.id )){
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.5 + 0.5*(1.0-LOAD)) );
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD );
 				s_index++;
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.5 + 0.5*(1.0-LOAD)) );
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD );
 				s_index++;
 			} else {
 
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, (0.33*(1.0-LOAD)), (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
+					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
 				index++;
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, (0.33*(1.0-LOAD)), (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
+					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
 				index++;
 			}
 		}
