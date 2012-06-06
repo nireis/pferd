@@ -60,7 +60,7 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
 			else{
 				break;
 			}
-			numEdges++;
+			// numEdges++;
 		}
 	}
 	dist[node_id0] = 0;
@@ -71,7 +71,7 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		int i = U.top().found_by;
 		unsigned int tmpid = U.top().id;
 		if(o_found_by[i][tmpid] == -1){
-			numNodes++;
+			// numNodes++;
 			o_found_by[i][tmpid] = (int)U.top().eid;
 			o_reset_found_by[i].push_back(tmpid);
 			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
@@ -96,7 +96,7 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
 				else{
 					break;
 				}
-				numEdges++;
+				// numEdges++;
 			}
 		}
 		U.pop();

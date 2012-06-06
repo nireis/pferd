@@ -71,9 +71,9 @@ struct Edge {
 		id(e.id), value(e.value), other_node(e.other_node), other_lvl(e.other_lvl) {}
 };
 struct EdgeData {
-	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0) {}
+	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0), colour(0), value(0) {}
 	EdgeData(unsigned int o, unsigned int i, unsigned int d, unsigned int t, unsigned int l) : 
-		out_index(o), in_index(i), distance(d), type(t), load(l) {}
+		out_index(o), in_index(i), distance(d), type(t), load(l), colour(0), value(distance) {}
 	
 	unsigned int out_index;
 	unsigned int in_index;
