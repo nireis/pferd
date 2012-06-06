@@ -804,7 +804,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	unsigned int nc = scg->getNodeCount();
 	for(unsigned int i=0; i< nc; i += 5000){
 		start = clock();
-		unsigned int val1 = CHDijkstra(scg, 0, i);
+		unsigned int val1 = CHDijkstra(scg, i, (unsigned int)0);
 		finish = clock();
 		time1 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		/*if(CHDijkstra(scg, 0, i) != Dijkstra(g, 0, i)){
@@ -813,9 +813,10 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		// Dijkstra(g, 0, i) << endl;
 		// CHDijkstra(scg, 0, i);
 		}*/
-		//vector<unsigned int> tgt(1,i);
+		vector<unsigned int> src(1,i);
 		start = clock();
-		unsigned int val2 = chd.oneToOne(0, i, 1);
+		chd.manyToOne(0, &src, 1);
+		unsigned int val2 = src[0];
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
