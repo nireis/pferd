@@ -15,7 +15,7 @@ Graph::Graph() :
 	node_data(0),
 	edge_data(0) {
 }
-const int Graph::BinID = 48;
+const int Graph::BinID = 49;
 const std::string Graph::dateiendung = "grp";
 
 
