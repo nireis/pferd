@@ -14,7 +14,8 @@ CHDijkstras::CHDijkstras(SCGraph* g):
 	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
-unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1){
+unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
+		unsigned int weight){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -112,15 +113,15 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1)
 //				cout << tmpid << endl;
 				int takenedge = o_found_by[i][tmpid];
 				// path->push_front(takenedge);
-				g->addEdgeLoad(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}
 	}
 
-	cout << "numNodes: " << numNodes << endl;
-	cout << "numEdges: " << numEdges << endl;
-	cout << "===" << endl;
+	//cout << "numNodes: " << numNodes << endl;
+	//cout << "numEdges: " << numEdges << endl;
+	//cout << "===" << endl;
 
 	resetOneToOne();
 	return min_path_length;
@@ -135,7 +136,8 @@ void CHDijkstras::resetOneToOne(){
 	}
 }
 
-void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets){
+void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
+		unsigned int weight){
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
 	 *
@@ -143,7 +145,7 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 	 * viele Kanten insgesammt, die maximale Edge-ID ist
 	 * (g->getEdgeCount() + g->getShortcutCount()) -1
 	 */
-	markAscEdges(targets, &marked);
+	markBackEdges(targets, &marked);
 
 	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
 	// und markierte Kanten benutzen. Sobald wir alle targets gefunden haben
@@ -216,6 +218,7 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 				// cout << tmpnode << endl;
 				int takenedge = tmpfoundby;
 				// path->push_front(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
 			}
 			// restlichen Knoten
@@ -223,7 +226,101 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 				// cout << tmpnode << endl;
 				int takenedge = m_found_by[tmpnode];
 				// path->push_front(takenedge);
+				g->addEdgeLoad(takenedge, weight);
 				tmpnode = g->getInEdge((unsigned int)takenedge)->other_node;
+			}
+		}
+	}
+	resetOneToMany();
+}
+
+void CHDijkstras::manyToOne(unsigned int node_id0, vector<unsigned int>* sources,
+		unsigned int weight){
+	// Von den sources alle aufsteigenden Kanten besuchen und markieren.
+	/* !TODO! wenn die CH fertig ist, gibt es
+	 *
+	 * g->getEdgeCount() + g->getShortcutCount()
+	 * viele Kanten insgesammt, die maximale Edge-ID ist
+	 * (g->getEdgeCount() + g->getShortcutCount()) -1
+	 */
+	markForwEdges(sources, &marked);
+
+	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
+	// und markierte Kanten benutzen. Sobald wir alle sources gefunden haben
+	// brechen wir ab.
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+	unsigned int tmpnode;
+
+	// Den ersten Knoten abarbeiten
+	U.push(U_element(0,node_id0,0));
+
+	// Die restlichen Knoten abarbeiten
+	for(unsigned int i=0; i<sources->size(); i++){
+		unsigned int target = (*sources)[i];
+		if(m_found_by[target] == -1){
+			while(!U.empty() && U.top().id != target){
+				// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+				tmpnode = U.top().id;
+				if(m_found_by[tmpnode] == -1){
+					dist[tmpnode] = U.top().distance;
+					m_found_by[tmpnode] = (int)U.top().eid;
+					m_reset_found_by.push_back(tmpnode);
+					// Die ausgehenden Kanten durchgehen und wenn sie aufwärts gehen oder
+					// markiert sind auf ihnen weitersuchen.
+					EdgesIterator it = g->getInEdgesIt(tmpnode);
+					while(it.hasNext()){
+						Edge* tmpedge = it.getNext();
+						// Wenn der Knoten noch nicht gefunden wurde UND (sein Level größer ist
+						// ODER die Kante markiert ist).
+						if(m_found_by[tmpedge->other_node] == -1
+								&& (tmpedge->other_lvl > g->getNodeLVL(tmpnode) || marked[tmpedge->id])){
+							// ...tu sie in U
+							U.push(U_element(
+										tmpedge->value+U.top().distance,tmpedge->other_node,tmpedge->id));
+						}
+					}
+				}
+				U.pop();
+			}
+		}
+		int tmpfoundby = -1;
+		// Die Distanz des Knotens setzen, je nachdem ob er...
+		if(m_found_by[target] != -1){
+			//...schon gefunden wurde...
+			(*sources)[i] = dist[target];
+			tmpfoundby = m_found_by[target];
+		}
+		else{
+			if(!U.empty() && U.top().id == target){
+				(*sources)[i] = U.top().distance;
+				tmpfoundby = (int)U.top().eid;
+				//...erst gerade gefunden wurde...
+				if(target == sources->back()){
+					dist[target] = U.top().distance;
+					m_found_by[target] = (int)U.top().eid;
+					m_reset_found_by.push_back(target);
+				}
+			}
+			else{
+				//...oder garnicht gefunden wurde.
+				(*sources)[i] = numeric_limits<unsigned int>::max();
+				dist[target] = numeric_limits<unsigned int>::max();
+			}
+		}
+		// Backtracing der Knoten.
+		if((*sources)[i] != numeric_limits<unsigned int>::max()){
+			// ersten Knoten
+			tmpnode = target;
+			if(tmpnode != node_id0){
+				int takenedge = tmpfoundby;
+				g->addEdgeLoad(takenedge, weight);
+				tmpnode = g->getOutEdge((unsigned int)takenedge)->other_node;
+			}
+			// restlichen Knoten
+			while(tmpnode != node_id0){
+				int takenedge = m_found_by[tmpnode];
+				g->addEdgeLoad(takenedge, weight);
+				tmpnode = g->getOutEdge((unsigned int)takenedge)->other_node;
 			}
 		}
 	}
@@ -241,7 +338,7 @@ void CHDijkstras::resetOneToMany(){
 	}
 }
 
-void CHDijkstras::markAscEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
+void CHDijkstras::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
 	vector<unsigned int> todo;
 	// Erstmal alle Startknoten einfügen. Man könnte auch
 	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
@@ -250,6 +347,32 @@ void CHDijkstras::markAscEdges(vector<unsigned int>* nodes, vector<unsigned int>
 	while(!todo.empty()){
 		unsigned int tmpnode = todo.back();todo.pop_back();
 		EdgesIterator it = g->getInEdgesIt(tmpnode);
+		while(it.hasNext()){
+			Edge* tmpedge = it.getNext();
+			// Wenn wir nicht schon hier waren und es nach oben geht.
+			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
+				if(!((*marked)[tmpedge->id])){
+					(*marked)[tmpedge->id] = true;
+					m_reset_marked.push_back(tmpedge->id);
+					todo.push_back(tmpedge->other_node);
+				}
+			}
+			else{
+				break;
+			}
+		}
+	}
+}
+
+void CHDijkstras::markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
+	vector<unsigned int> todo;
+	// Erstmal alle Startknoten einfügen. Man könnte auch
+	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
+	// des Rests.
+	todo.assign(nodes->begin(), nodes->end());
+	while(!todo.empty()){
+		unsigned int tmpnode = todo.back();todo.pop_back();
+		EdgesIterator it = g->getOutEdgesIt(tmpnode);
 		while(it.hasNext()){
 			Edge* tmpedge = it.getNext();
 			// Wenn wir nicht schon hier waren und es nach oben geht.

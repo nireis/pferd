@@ -55,7 +55,12 @@ class CHDijkstras{
 		/*
 		 * Method to mark ascending edges for the one to many Dijkstra.
 		 */
-		void markAscEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked);
+		void markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked);
+
+		/*
+		 * Method to mark ascending edges for the many to one Dijkstra.
+		 */
+		void markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked);
 
 		/*
 		 * Setzt den one to one Dijkstra zurück.
@@ -87,13 +92,18 @@ class CHDijkstras{
 		/*
 		* One to one Dijkstra auf der CH.
 		*/
-		unsigned int oneToOne(unsigned int node_id0, unsigned int node_id1);
+		unsigned int oneToOne(unsigned int node_id0, unsigned int node_id1, unsigned int weight);
 
 		/*
 		 * One to many Dijkstra auf der CH. Die Distanzen werden in den targets-vector geschrieben
 		 * and die entsprechende Stelle.
 		 */
-		void oneToMany(unsigned int node_id0, vector<unsigned int>* targets);
+		void oneToMany(unsigned int node_id0, vector<unsigned int>* targets, unsigned int weight);
+
+		/*
+		 * Many to one Dijkstra, welcher die Distanzen in den sources-vector schreibt.
+		 */
+		void manyToOne(unsigned int node_id0, vector<unsigned int>* sources, unsigned int weight);
 };
 
 #endif
