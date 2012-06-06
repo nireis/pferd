@@ -151,8 +151,8 @@ int main(int argc, char *argv[]){
 	 * auf 15K Graph
 	 */
 	//CHDijkstra(&scg, 2271, 252); 
-	//scg.updateEdgeLoads();
-	//scg.shareShortcutLoads();
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
 
 	/*CHDijkstras chd(&scg);
 	for(unsigned int i=0; i<=scg.getNodeCount(); i++){

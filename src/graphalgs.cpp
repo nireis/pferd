@@ -824,7 +824,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 //		}
 //	}
 	unsigned int val2 = 0;
-	for(unsigned int i=0; i< nc; i += 50){
+	for(unsigned int i=0; i< nc; i += 500){
 		unsigned int s = (42*i + 23) % g->getNodeCount();
 		start = clock();
 		val2 += chd.oneToOne(s, i);

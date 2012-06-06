@@ -189,7 +189,9 @@ bool Graph::parseTextGraphFile(std::string graphdata){
 				&& edges[slow].target == edges[fast].target ){
 			if(edges[slow].distance <= edges[fast].distance){
 				/* slow nach vorne kopieren, altes slow killen */
-				cout << "Killing ParserEdge Nr. " << fast << ", killed Type: " << edges[fast].type << ", keeping Type " << edges[slow].type << endl; /*TODO*/
+				cout << "Killing ParserEdge Nr. " << fast 
+					<< ", killed Type: " << edges[fast].type 
+					<< ", keeping Type " << edges[slow].type << endl;
 				edges[fast] = edges[slow];
 				edges[slow].source = node_count;
 				fast++;
@@ -197,7 +199,9 @@ bool Graph::parseTextGraphFile(std::string graphdata){
 				
 			} else {
 				/* slow killen */
-				cout << "Killing ParserEdge Nr. " << slow << ", killed Type: " << edges[slow].type << ", keeping Type " << edges[fast].type << endl; /*TODO*/
+				cout << "Killing ParserEdge Nr. " << slow 
+					<< ", killed Type: " << edges[slow].type 
+					<< ", keeping Type " << edges[fast].type << endl;
 				edges[slow].source = node_count;
 				fast++;
 				slow++;
@@ -255,7 +259,6 @@ bool Graph::parseTextGraphFile(std::string graphdata){
 		in_edges[index] = E( i, edges[i].distance, edges[i].source );
 		edge_data[i].in_index = index;
 
-		// cout << "id: " << i << " ,out id: " << out_edges[edge_data[i].out_index].id << " , in id: " << in_edges[edge_data[i].in_index].id << endl; 
 	}
 
 	delete[] nodes; nodes = 0;
@@ -278,31 +281,23 @@ unsigned int Graph::getEdgeCount(unsigned int node_id){
 }
 
 ND Graph::getNodeData(unsigned int id){
-//	if(id < node_count)
-		return node_data[id];
-
-//	ND nd;
-//	return nd;
+	return node_data[id];
 }
 ED Graph::getEdgeData(unsigned int id){
-//	if(id < edge_count)
-		return edge_data[id];
-	
-//	ED ed;
-//	return ed;
+	return edge_data[id];
 }
 
 E* Graph::getOutEdge(unsigned int edge_id){
-		return out_edges + edge_id;
+	return out_edges + edge_id;
 }
 E* Graph::getInEdge(unsigned int edge_id){
-		return in_edges + edge_data[edge_id].in_index;
+	return in_edges + edge_data[edge_id].in_index;
 }
 E* Graph::copyOutEdge(unsigned int edge_id){
-		return out_edges + edge_id;
+	return out_edges + edge_id;
 }
 E* Graph::copyInEdge(unsigned int edge_id){
-		return in_edges + edge_id;
+	return in_edges + edge_id;
 }
 
 /* 
@@ -325,597 +320,6 @@ void Graph::getEdgeLoads(SCGraph* g){
 		edge_data[i].load = g->getEdgeData(i).load;
 	}
 }
-
-/* == Graph ende == */
-//	
-//	
-//	
-//	SCGraph::SCGraph(Graph* gr) : 
-//		g(gr),
-//		shortcut_count( 0 ), 
-//		shortcutlist(),
-//		round_node_blacklist(),
-//		goodNodes(),
-//		EdgeLoads(0)
-//	{
-//		// init-daten aus übegebenem Graph übernehmen
-//		node_count = gr->getNodeCount();
-//		edge_count = gr->getEdgeCount();
-//		current_edge_arrays_size = edge_count;
-//		node_data = new ND[ node_count ];
-//		node_lvl = new unsigned int[ node_count ];
-//		nodes_in_offs = new N[ node_count +1 ];
-//		nodes_out_offs = new N[ node_count +1 ];
-//		node_in_edges_count = new unsigned int[ node_count ];
-//		node_out_edges_count = new unsigned int[ node_count ];
-//		edge_data = new ED[ edge_count ];
-//		in_edges = new E[ edge_count ];
-//		out_edges = new E[ edge_count ];
-//		//goodNodes = new unsigned int[ node_count ];
-//		//goodNodesSize = node_count;
-//	
-//		//for(unsigned int i = 0; i < node_count; i++){
-//		//	goodNodes[i] = i;
-//		//}
-//		
-//		round_shortcutlist = new list<Shortcut>[node_count];
-//		for(unsigned int i = 0; i < node_count; i++){
-//			round_shortcutlist[i] = list<Shortcut>();
-//		}
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_lvl[i] = 0;
-//		}
-//	
-//		// TODO
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_data[i] = gr->getNodeData(i);
-//		}
-//	
-//		for(unsigned int i = 0; i <= node_count; i++){
-//			nodes_in_offs[i] = gr->getLowerInEdgeBound(i);
-//		}
-//	
-//		for(unsigned int i = 0; i <= node_count; i++){
-//			nodes_out_offs[i] = gr->getLowerOutEdgeBound(i);
-//		}
-//		
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_in_edges_count[i] = nodes_in_offs[i+1] - nodes_in_offs[i];
-//		}
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_out_edges_count[i] = nodes_out_offs[i+1] - nodes_out_offs[i];
-//		}
-//		
-//		for(unsigned int i = 0; i < edge_count; i++){
-//			edge_data[i] = gr->getEdgeData(i);
-//		}
-//	
-//		for(unsigned int i = 0; i < edge_count; i++){
-//			in_edges[i] = * (gr->copyInEdge(i));
-//			in_edges[i].other_lvl = edge_data[ in_edges[i].id ].out_index ;
-//		}
-//	
-//		for(unsigned int i = 0; i < edge_count; i++){
-//			out_edges[i] = * (gr->copyOutEdge(i));
-//			out_edges[i].other_lvl = edge_data[ out_edges[i].id ].in_index ;
-//		}
-//		for(unsigned int i = 0; i < node_count; i++){
-//			goodNodes.push(uint_pair(i, 
-//						node_in_edges_count[i]*node_out_edges_count[i]));
-//		}
-//	}
-//	
-//	SCGraph::~SCGraph(){
-//		g = 0;
-//		delete[] EdgeLoads; EdgeLoads = 0;
-//		delete[] node_data; node_data = 0;
-//		delete[] node_lvl; node_lvl = 0;
-//	
-//		clearAlmostEverything();
-//	
-//		// shortcutlist.clear();
-//		while( ! shortcutlist.empty() ){
-//			ShortcutArray a = shortcutlist.pop();
-//			delete[] a.array; a.array = 0;
-//		}
-//		for(unsigned int i = 0; i < node_count; i++){
-//			round_shortcutlist[i].clear();
-//		}
-//		delete[] round_shortcutlist; round_shortcutlist = 0;
-//		round_node_blacklist.clear();
-//	}
-//	
-//	void SCGraph::addShortcut(unsigned int source_node_id, S sc){
-//		round_shortcutlist[source_node_id].push_front(sc);
-//	}
-//	
-//	void SCGraph::blacklistNode(unsigned int node_id){
-//		round_node_blacklist.push_front(node_id);
-//	}
-//	
-//	void printEdges(EdgesIterator it){
-//		while( it.hasNext() ){
-//			Edge* e = it.getNext();
-//			cout << " ## e-id: " << e->id << " , e-value: " << e->value << " , e-otherLVL: " << e->other_lvl << " , e-otherNODE: " << e->other_node << endl;
-//		}
-//	}
-//	
-//	bool SCGraph::mergeRound(unsigned int lvl){
-//		unsigned int n;
-//	
-//		//goodNodesSize = goodNodesSize - round_node_blacklist.size();
-//	
-//		// nehme kontrahierte knoten raus
-//		while( ! round_node_blacklist.empty() ){
-//			n = round_node_blacklist.front();
-//			node_lvl[n] = lvl;
-//	
-//			//schneide andere enden der in-edges ab
-//			for(unsigned int i = nodes_in_offs[n]; i < nodes_in_offs[n] + node_in_edges_count[n];i++){
-//				unsigned int othernode = in_edges[i].other_node;
-//				in_edges[i].other_node = node_count + n;
-//				unsigned int otherlvl = in_edges[i].other_lvl;
-//	
-//				node_out_edges_count[ othernode ] --;
-//				
-//				// tausche letzte gültige edge mit ungültiger
-//				E lastedge = out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ];
-//				out_edges[ otherlvl ] = lastedge;
-//				out_edges[ nodes_out_offs[ othernode ] + node_out_edges_count[ othernode ] ].other_node = node_count + othernode;
-//	
-//				// sag partner von getauschter gültiger, wo neuer sitzplatz
-//				in_edges[ lastedge.other_lvl ].other_lvl = otherlvl;
-//	
-//			}
-//			//schneide andere enden der out-edges ab
-//			for(unsigned int i = nodes_out_offs[n]; i < nodes_out_offs[n] + node_out_edges_count[n] ;i++){
-//				unsigned int othernode = out_edges[i].other_node;
-//				out_edges[i].other_node = node_count + n;
-//				unsigned int otherlvl = out_edges[i].other_lvl;
-//	
-//				node_in_edges_count[ othernode ] --;
-//	
-//				E lastedge = in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ];
-//				in_edges[ otherlvl ] = lastedge;
-//				in_edges[ nodes_in_offs[ othernode ] + node_in_edges_count[ othernode ] ].other_node = node_count + othernode;
-//	
-//				out_edges[ lastedge.other_lvl ].other_lvl = otherlvl;
-//			}
-//	
-//			//mache kanten von n unerreichbar
-//			node_in_edges_count[n] = 0;
-//			node_out_edges_count[n] = 0;
-//			round_node_blacklist.pop_front();
-//		}
-//	
-//		// neue anzahl an kanten zählen
-//		unsigned int edgesum = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			edgesum = edgesum + node_in_edges_count[i];
-//		}
-//	
-//		unsigned int roundshortcutssize = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			roundshortcutssize += round_shortcutlist[i].size();
-//		}
-//	
-//		unsigned int old_edge_arrays_size = current_edge_arrays_size;
-//	
-//		current_edge_arrays_size = edgesum + roundshortcutssize;
-//		
-//		// neue offsets vorbereiten
-//		E* tmpedges = new E[ current_edge_arrays_size ];
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_out_offs[i+1] = node_out_edges_count[i];
-//		}
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_in_offs[i+1] = node_in_edges_count[i];
-//		}
-//	
-//		// shortcuts umlagern und offsets um shortcuts erweitern
-//		S* roundshortcuts = new S[ roundshortcutssize ];
-//	
-//		// splicen der listen in erste array-liste
-//		for(unsigned int i = 1; i < node_count; i++){
-//			round_shortcutlist[0].splice( round_shortcutlist[0].end(), 
-//													round_shortcutlist[i] );
-//		}
-//	
-//		for(unsigned int i = 0; i < roundshortcutssize; i++){
-//			S stmp = round_shortcutlist[0].front();
-//			round_shortcutlist[0].pop_front();
-//			roundshortcuts[i] = stmp; // TODO evtl ausseinander ziehen
-//			nodes_out_offs[ stmp.source +1]++;
-//			nodes_in_offs[ stmp.target +1]++;
-//		}
-//		if( ! round_shortcutlist[0].empty() ){
-//			cout << ">>>> GREAT ERROR ! - Graph Merge hat Shortcuts übrig." << endl;
-//		}
-//	
-//		// merke shortcuts
-//		shortcutlist.push(ShortcutArray(roundshortcuts, roundshortcutssize));
-//		
-//		// out-edges umverlagern
-//		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//			tmpedges[i].other_node = node_count;
-//		}
-//		unsigned int newI = 0;
-//		unsigned int oldI = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			unsigned int j = node_out_edges_count[i]; // anzahl aktueller knoten von i
-//			unsigned int k = nodes_out_offs[i+1] - j; // anzahl shortcuts die hinzukommen
-//			while(j>0){ // vorhandene edges übertragen
-//				tmpedges[ newI ] = out_edges[ oldI ];
-//				j--;
-//				oldI++;
-//				newI++;
-//			}
-//			newI = newI + k;
-//			while(oldI < old_edge_arrays_size && out_edges[ oldI ].other_node == node_count + i){
-//				oldI++;
-//			}
-//		}
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_out_offs[i+1] = nodes_out_offs[i+1] + nodes_out_offs[i];
-//		}
-//		
-//		// sage anderen enden der out edges bescheid, wo neuer index
-//		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//			if( tmpedges[i].other_node != node_count )
-//				in_edges[ tmpedges[i].other_lvl ].other_lvl = i;
-//		}
-//	
-//		/* nun liegen alle out-edges mit platz für shortcuts in tmpedges
-//		 * und die in-edges können diese erreichen
-//		 */
-//	
-//		if(current_edge_arrays_size > old_edge_arrays_size){
-//			// wir brauchen nun größere arrays für in/out_edges
-//			delete[] out_edges;
-//			out_edges = tmpedges;
-//			tmpedges = new E[ current_edge_arrays_size ];
-//	
-//		} else {
-//			// behalte alte edges arrays, verwende tmpedges wieder
-//			for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//				out_edges[i] = tmpedges[i];
-//			}
-//		}
-//	
-//		/* nun verteilen der in-edges in tmpedges */
-//		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//			tmpedges[i].other_node = node_count;
-//		}
-//		newI = oldI = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			unsigned int j = node_in_edges_count[i]; // anzahl aktueller knoten von i
-//			unsigned int k = nodes_in_offs[i+1] - j; // anzahl shortcuts die hinzukommen
-//			while(j>0){ // vorhandene edges übertragen
-//				tmpedges[ newI ] = in_edges[ oldI ];
-//				j--;
-//				oldI++;
-//				newI++;
-//			}
-//			newI = newI + k;
-//			// überspringe ungültige edges im alten array
-//			while(oldI < old_edge_arrays_size && in_edges[ oldI ].other_node == node_count + i){
-//				oldI++;
-//			}
-//		}
-//	
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_in_offs[i+1] = nodes_in_offs[i+1] + nodes_in_offs[i];
-//		}
-//		// sage anderen enden der in-edges bescheid, wo neuer index
-//		for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//			if( tmpedges[i].other_node != node_count )
-//				out_edges[ tmpedges[i].other_lvl ].other_lvl = i;
-//		}
-//	
-//		// kopiere in-edges aus tmpedges zurück
-//		if(current_edge_arrays_size > old_edge_arrays_size){
-//			// wir brauchen nun größere arrays für in/out_edges
-//			delete[] in_edges;
-//			in_edges = tmpedges;
-//			tmpedges = 0;
-//		} else {
-//			// behalte alte edges arrays
-//			for(unsigned int i = 0; i < current_edge_arrays_size; i++){
-//				in_edges[i] = tmpedges[i];
-//			}
-//			delete[] tmpedges; tmpedges = 0;
-//		}
-//	
-//		// verteile shortcuts
-//		for(unsigned int i = 0; i < roundshortcutssize; i++){
-//			S stmp = roundshortcuts[i];
-//			unsigned int oindex = nodes_out_offs[ stmp.source +1] -1;
-//			while( out_edges[ oindex ].other_node != node_count ){
-//				oindex--;
-//			}
-//			unsigned int iindex = nodes_in_offs[ stmp.target +1] -1;
-//			while( in_edges[ iindex ].other_node != node_count ){
-//				iindex--;
-//			}
-//	
-//			out_edges[ oindex ] = Edge(edge_count + shortcut_count + i, stmp.value, stmp.target, iindex);
-//			in_edges[ iindex ] = Edge(edge_count + shortcut_count + i, stmp.value, stmp.source, oindex);
-//		}
-//		shortcut_count = shortcut_count + roundshortcutssize;
-//	
-//		// neue anzahl an kanten verteilen
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_in_edges_count[i] = nodes_in_offs[i+1] - nodes_in_offs[i];
-//		}
-//		for(unsigned int i = 0; i < node_count; i++){
-//			node_out_edges_count[i] = nodes_out_offs[i+1] - nodes_out_offs[i];
-//		}
-//		for(unsigned int i = 0; i < node_count; i++){
-//			if( node_lvl[i] == 0 ){
-//				goodNodes.push(uint_pair(i, 
-//							node_in_edges_count[i]*node_out_edges_count[i]));
-//			}
-//		}
-//	
-//	
-//		cout << "übrige Graphknoten: " << goodNodes.size() << " ( " << (((double) goodNodes.size())/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
-//		cout << "aktuelle Anzahl Kanten: " << ( (double)current_edge_arrays_size / (double)edge_count ) * 100.0 << "% der urspr. Kanten" << endl; // TODO
-//	
-//		return true;
-//	}
-//	
-//	void SCGraph::clearAlmostEverything(){
-//		delete[] nodes_in_offs; nodes_in_offs = 0;
-//		delete[] nodes_out_offs; nodes_out_offs = 0;
-//		delete[] in_edges; in_edges = 0;
-//		delete[] out_edges; out_edges = 0;
-//		delete[] edge_data; edge_data = 0;
-//		delete[] node_in_edges_count; node_in_edges_count = 0;
-//		delete[] node_out_edges_count; node_out_edges_count = 0;
-//		// delete[] goodNodes; goodNodes = 0;
-//	}
-//	
-//	bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
-//		if(g == 0)
-//			return false;
-//	
-//		if( ! g->isSet() )
-//			return false;
-//		
-//		// um fragmentierung ein wenig "vorzubeugen" verlagern wir aus der liste
-//		// in ein array, um den platz der gelöschten liste dann für neue arrays zu haben
-//		S* shortcuts = new S[shortcut_count];
-//	
-//		// die jüngeren shortcuts stehen hiernach
-//		// am anfang des arrays
-//		unsigned int sindex = shortcut_count-1;
-//		while(  !shortcutlist.empty() ){
-//			ShortcutArray sa = shortcutlist.pop();
-//			if( sa.size > 0 ){ // da size unsigned int 
-//				for(unsigned int j = sa.size-1; j > 0; j--){
-//					shortcuts[sindex] = sa.array[j];
-//					sindex--;
-//				}
-//				shortcuts[sindex] = sa.array[0];
-//				sindex--;
-//			}
-//			delete[] sa.array; sa.array = 0;
-//		}
-//	
-//		clearAlmostEverything();
-//	
-//		// letztes lvl verteilen
-//		for(unsigned int i = 0; i < node_count; i++){
-//			if( node_lvl[i] == 0){
-//				node_lvl[i] = lvl;
-//			}
-//		}
-//		
-//		nodes_in_offs = new N[ node_count +1 ];
-//		in_edges = new E[ edge_count + shortcut_count ](); 
-//		nodes_out_offs = new N[ node_count +1 ];
-//		out_edges = new E[ edge_count + shortcut_count ]();
-//	
-//		edge_data = new ED[ edge_count + shortcut_count ];
-//	
-//		for(unsigned int i = 0; i < edge_count; i++){
-//			edge_data[i] = g->getEdgeData(i);
-//		}
-//	
-//		// offsets aus dem graph übernehmen
-//		nodes_in_offs[0] = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_in_offs[i + 1] = 
-//				g->getUpperInEdgeBound(i) - g->getLowerInEdgeBound(i) ;
-//		}
-//		nodes_out_offs[0] = 0;
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_out_offs[i + 1] = 
-//				g->getUpperOutEdgeBound(i) - g->getLowerOutEdgeBound(i) ;
-//		}
-//	
-//		// shortcuts hinzufügen
-//		S s;
-//		for(unsigned int i=0; i < shortcut_count; i++ ){
-//			s = shortcuts[i];
-//			nodes_in_offs[ s.target +1 ]++;
-//			nodes_out_offs[ s.source +1 ]++;
-//		}
-//		for(unsigned int i = 0; i < node_count; i++){
-//			nodes_in_offs[i+1] 
-//				= nodes_in_offs[i+1] + nodes_in_offs[i];
-//			nodes_out_offs[i+1] 
-//				= nodes_out_offs[i+1] + nodes_out_offs[i];
-//		}
-//		unsigned int o;
-//		unsigned int i;
-//		for(unsigned int c = 0; c < shortcut_count; c++ ){
-//			s = shortcuts[c];
-//			o = nodes_out_offs[ s.source ];
-//			i = nodes_in_offs[ s.target ];
-//			while( out_edges[ o ].id != 0 ){
-//				o++;
-//			}
-//			while( in_edges[ i ].id != 0 ){
-//				i++;
-//			}
-//			out_edges[ o ] = E(edge_count + c, s.value, s.target );
-//			in_edges[ i ] = E(edge_count + c, s.value, s.source );
-//			edge_data[ edge_count + c ] = ED(o, i, s.papa_edge, s.mama_edge, 0);
-//		}
-//		// edges verteilen
-//		EdgesIterator eit;
-//		for(unsigned int c = 0; c < node_count; c++){
-//			eit = g->getOutEdgesIt(c);
-//			o = nodes_out_offs[c + 1] - 1;
-//			while( eit.hasNext() ){
-//				out_edges[ o ] = * eit.getNext();
-//				edge_data[ out_edges[ o ].id ].out_index = o;
-//				// in edge_data index aktualisieren
-//				o--;
-//			}
-//		}
-//		for(unsigned int c = 0; c < node_count; c++){
-//			eit = g->getInEdgesIt(c);
-//			i = nodes_in_offs[c + 1] - 1;
-//			while( eit.hasNext() ){
-//				in_edges[ i ] = * eit.getNext();
-//				edge_data[ in_edges[ i ].id ].in_index = i;
-//				i--;
-//			}
-//		}
-//		delete[] shortcuts; shortcuts = 0;
-//	
-//		for(unsigned int i = 0; i < edge_count + shortcut_count; i++){
-//			out_edges[i].other_lvl = node_lvl[ out_edges[i].other_node ];
-//		}
-//		for(unsigned int i = 0; i < edge_count + shortcut_count; i++){
-//			in_edges[i].other_lvl = node_lvl[ in_edges[i].other_node ];
-//		}
-//	
-//		EdgeLoads = new unsigned int[edge_count + shortcut_count];
-//		for(unsigned int i = 0; i < edge_count + shortcut_count; i++){
-//			EdgeLoads[i] = 0;
-//		}
-//	
-//		return true;
-//	}
-//	
-//	bool SCGraph::isShortcut(unsigned int edge_id){
-//		return ( edge_count <= edge_id );
-//	}
-//	
-//	unsigned int SCGraph::getNodeLVL(unsigned int node_id){
-//		return node_lvl[node_id];
-//	}
-//	
-//	unsigned int SCGraph::getNodeCount(){
-//		return node_count;
-//	}
-//	unsigned int SCGraph::getEdgeCount(){
-//		return edge_count;
-//	}
-//	unsigned int SCGraph::getEdgeCount(unsigned int node_id){
-//		unsigned int in = nodes_in_offs[node_id+1] - nodes_in_offs[node_id];
-//		unsigned int out = nodes_out_offs[node_id+1] - nodes_out_offs[node_id];
-//		return in+out;
-//	}
-//	unsigned int SCGraph::getEdgeCount_Round(unsigned int node_id){
-//		unsigned int in = node_in_edges_count[node_id];
-//		unsigned int out = node_out_edges_count[node_id];
-//		return in+out;
-//	}
-//	unsigned int SCGraph::getShortcutCount(){
-//		return shortcut_count;
-//	}
-//	
-//	ND SCGraph::getNodeData(unsigned int node_id){
-//		return node_data[ node_id ];
-//	}
-//	ED SCGraph::getEdgeData(unsigned int edge_id){
-//		return edge_data[ edge_id ];
-//	}
-//	
-//	 std::priority_queue
-//	 	<uint_pair, std::vector<uint_pair>, compare_uint_pair>* 
-//	//std::vector<uint_pair>* 
-//		SCGraph::getGoodNodes(){
-//			return &goodNodes;
-//	}
-//	
-//	E* SCGraph::getOutEdge(unsigned int edge_id){
-//			return out_edges+edge_data[edge_id].out_index;
-//	}
-//	E* SCGraph::getInEdge(unsigned int edge_id){
-//			return in_edges+edge_data[edge_id].in_index;
-//	}
-//	/*
-//	 * hier out1_in0 semantik 
-//	 * genau umgekehrt im vgl. zu getEdgesIt
-//	 * wegen backtracing im dijkstra (?)
-//	 */
-//	E* SCGraph::getEdge(bool out1_in0, unsigned int edge_id){
-//		if(out1_in0){
-//			return out_edges+edge_data[edge_id].out_index;
-//		}
-//		else{
-//			return in_edges+edge_data[edge_id].in_index;
-//		}
-//	}
-//	void SCGraph::updateEdgeLoads(list< uint_pair >* edge_load_values){
-//		while( ! edge_load_values->empty() ){
-//			edge_data[ edge_load_values->front().id ].load = 
-//				edge_load_values->front().key;
-//			edge_load_values->pop_front();
-//		}
-//	}
-//	void SCGraph::updateEdgeLoads(unsigned int* edge_loads, unsigned int array_length){
-//		for(unsigned int i = 0; i < array_length; i++){
-//			edge_data[i].load = edge_loads[i];
-//		}
-//	}
-//	void SCGraph::shareShortcutLoads(){
-//		// die jungen shortcuts stehen hinten in edge_data
-//		// jeder junge shortcut hat höchstens zwei ältere 
-//		// shortcuts als eltern
-//		for(unsigned int i = edge_count+shortcut_count-1; i >= edge_count; i--){
-//			edge_data[edge_data[i].distance /* papa */].load 
-//				+= edge_data[i].load;
-//			edge_data[edge_data[i].type /* mama */].load 
-//				+= edge_data[i].load; 
-//			// edge_data[i].load = 0; 
-//		}
-//		// TODO wenn keine bugs festellbar
-//	/*	for(unsigned int i = edge_count; i < edge_count+shortcut_count; i++){
-//			if(edge_data[i].load != 0)
-//				cout << ">>>> ERROR: Shortcut Load ungleich null nach verteilen! " << endl;
-//		} */
-//	}
-//	void SCGraph::updateEdgeLoads(){
-//		for(unsigned int i = 0; i < edge_count+shortcut_count; i++){
-//			edge_data[i].load += EdgeLoads[i];
-//			EdgeLoads[i] = 0; 
-//		}
-//		//shareShortcutLoads();
-//	}
-//	void SCGraph::addEdgeLoad(unsigned int edge_id){
-//		EdgeLoads[edge_id]++;
-//	}
-//	void SCGraph::addEdgeLoad(unsigned int edge_id, unsigned int times){
-//		EdgeLoads[edge_id] += times;
-//	}
-//	
-//	E* SCGraph::copyOutEdge(unsigned int edge_id){
-//	    	return out_edges + edge_id;
-//	}
-//	E* SCGraph::copyInEdge(unsigned int edge_id){
-//			return in_edges + edge_id;
-//	}
 
 /*
  * ========= CH Graph ==========
@@ -942,7 +346,6 @@ SCGraph::SCGraph(Graph* gr) :
 	shortcutlist( new list<Shortcut>[gr->getNodeCount()] ),
 	round_shortcutlist( new list<Shortcut> ),
 	round_node_blacklist(),
-	//goodNodesHeap(),
 	goodNodesSorted(new uint_pair[gr->getNodeCount()]),
 	EdgeLoads(0)
 {
@@ -996,8 +399,6 @@ SCGraph::~SCGraph(){
 	delete[] shortcutlist; shortcutlist = 0;
 	delete round_shortcutlist; round_shortcutlist = 0;
 	round_node_blacklist.clear();
-	//while( !goodNodesHeap.empty() )
-	//	goodNodesHeap.pop();
 	delete[] goodNodesSorted; goodNodesSorted = 0;
 	delete[] EdgeLoads; EdgeLoads = 0;
 }
@@ -1061,6 +462,7 @@ unsigned int SCGraph::sortShortcuts(){
 	}
 
 	/* SCs jeweils sortieren/duplikate bereinigen */
+	/*TODO auch alte doppelte SCs erkennen */
 	for(unsigned int i = 0; i < goodNodesSize; i++){
 		tmp_shortcutlist[ i ].sort(compare_shortcuts_asc_by_target);
 		tmp_shortcutlist[ i ].unique( equal_if_targets_equal );
@@ -1133,7 +535,7 @@ void SCGraph::buildGraph(){
 
 	/* Evtl neue Edge-Arrays anlegen */
 	if((current_edge_arrays_size) < ( new_ec )){
-		/*TODO*/ cout << "BRAUCHE NEUE EDGE-ARRAYS" << endl;
+		cout << "SCGraph Shortcut Merging: brauche neue Edge-Arrays" << endl;
 		delete[] out_edges;
 		delete[] in_edges;
 		out_edges = new Edge[new_ec];
@@ -1209,21 +611,10 @@ bool compare_uint_pair_asc_by_key(uint_pair one, uint_pair two){
 void SCGraph::fillGoodNodes(){
 	for(unsigned int i = 0; i < goodNodesSize; i++){
 		unsigned int gn = goodNodes[i];
-		//goodNodesHeap.push(
-		//		uint_pair(gn, 
-		//			nodes_in_edges[gn].count * nodes_out_edges[gn].count));
 		goodNodesSorted[i] = 
 				uint_pair(gn, 
 					nodes_in_edges[gn].count * nodes_out_edges[gn].count);
 	}
-//	std::make_heap
-//		(goodNodesSorted, 
-//		 goodNodesSorted+goodNodesSize, 
-//		 compare_uint_pair_asc_by_key);
-//	std::sort_heap
-//		(goodNodesSorted, 
-//		 goodNodesSorted+goodNodesSize, 
-//		 compare_uint_pair_asc_by_key);
 	std::sort
 		(goodNodesSorted, 
 		 goodNodesSorted+goodNodesSize, 
@@ -1235,15 +626,6 @@ bool compare_edges_desc_by_lvl(Edge one, Edge two){
 	return (one.other_lvl > two.other_lvl);
 }
 void SCGraph::buildGraphFinal(){
-	
-	/* SCs jeweils sortieren/duplikate bereinigen */
-	/* leider hier schwer machbar */
-	/*
-	for(unsigned int i = 0; i < node_count; i++){
-		shortcutlist[ i ].sort(compare_shortcuts_asc_by_target);
-		shortcutlist[ i ].unique( equal_if_targets_equal );
-	}
-	*/
 
 	/* Shortcuts sichern */
 	Shortcut* shortcuts = new Shortcut[shortcut_count];
@@ -1368,15 +750,11 @@ void SCGraph::buildGraphFinal(){
 	for( i = 0; i < node_count; i++){
 		Edge* start = out_edges + nodes_out_offs[i];
 		Edge* end = out_edges + nodes_out_offs[i+1];
-	//	std::make_heap(start, end, compare_edges_desc_by_lvl);
-	//	std::sort_heap(start, end, compare_edges_desc_by_lvl);
 		std::sort(start, end, compare_edges_desc_by_lvl);
 	}
 	for( i = 0; i < node_count; i++){
 		Edge* start = in_edges + nodes_in_offs[i];
 		Edge* end = in_edges + nodes_in_offs[i+1];
-	//	std::make_heap(start, end, compare_edges_desc_by_lvl);
-	//	std::sort_heap(start, end, compare_edges_desc_by_lvl);
 		std::sort(start, end, compare_edges_desc_by_lvl);
 	}
 
@@ -1404,10 +782,14 @@ bool SCGraph::mergeRound(unsigned int lvl){
 	buildGraph();
 	fillGoodNodes();
 
-	/* TODO */
 	cout << new_sc_count << " neue Shortcuts" << endl;
-	cout << "Übrige Graphknoten: " << goodNodesSize << " ( " << (((double) goodNodesSize)/((double) node_count)) * 100.0 << "% der urspr. Knoten ) " << endl; // TODO
-	cout << "aktuelle Anzahl Kanten: " << ( (double)edge_count / (double)g->getEdgeCount() ) * 100.0 << "% der urspr. Kanten" << endl; // TODO
+	cout << "Übrige Graphknoten: " << goodNodesSize 
+		<< " ( " 
+		<< (((double) goodNodesSize)/((double) node_count)) * 100.0 
+		<< "% der urspr. Knoten ) " << endl;
+	cout << "aktuelle Anzahl Kanten: " 
+		<< ( (double)edge_count / (double)g->getEdgeCount() ) * 100.0 
+		<< "% der urspr. Kanten" << endl;
 
 	return true; 
 }
@@ -1416,7 +798,8 @@ bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
 	prepareNodes(lvl);
 	shortcut_count += sortShortcuts();
 	buildGraphFinal();
-	cout << "SCGraph merged. " << endl;
+	cout << "Edges: " << edge_count << ", Shortcuts: " << shortcut_count << endl;
+	cout << "SCGraph merged with Graph and Shortcuts. " << endl;
 	return true; 
 }
 
@@ -1489,7 +872,10 @@ void SCGraph::updateEdgeLoads(std::list< uint_pair >* edge_load_values){
 		edge_load_values->pop_front();
 	}
 }
-void SCGraph::updateEdgeLoads(unsigned int* edge_loads, unsigned int array_length){
+void SCGraph::updateEdgeLoads(
+		unsigned int* edge_loads, 
+		unsigned int array_length)
+{
 	for(unsigned int i = 0; i < array_length; i++){
 		edge_data[i].load = edge_loads[i];
 	}
@@ -1505,11 +891,6 @@ void SCGraph::shareShortcutLoads(){
 			+= edge_data[i].load; 
 		// edge_data[i].load = 0; 
 	}
-	// TODO wenn keine bugs festellbar
-/*	for(unsigned int i = edge_count; i < edge_count+shortcut_count; i++){
-		if(edge_data[i].load != 0)
-			cout << ">>>> ERROR: Shortcut Load ungleich null nach verteilen! " << endl;
-	} */
 }
 void SCGraph::updateEdgeLoads(){
 	for(unsigned int i = 0; i < edge_count+shortcut_count; i++){
@@ -1524,3 +905,4 @@ void SCGraph::addEdgeLoad(unsigned int edge_id){
 void SCGraph::addEdgeLoad(unsigned int edge_id, unsigned int times){
 	EdgeLoads[edge_id] += times;
 }
+

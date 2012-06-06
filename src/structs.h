@@ -80,6 +80,8 @@ struct EdgeData {
 	unsigned int distance;
 	unsigned int type;
 	unsigned int load;
+	float colour;
+	unsigned int value; // TODO float ?
 };
 
 struct NodeData {

@@ -79,10 +79,15 @@ void cluster::setMostPopulatedCells(unsigned int count){
 	mostPopSize = count;
 	delete[] mostPop;
 	mostPop = new point[count];
+	unsigned int k = 0;
 	
-	for(unsigned int i = 0; i < Xcells; i++)
-		for(unsigned int j = 0; j < Ycells; j++){
-		}
-		
+	while( k < count ){
+		for(unsigned int i = 0; i < Xcells; i++)
+			for(unsigned int j = 0; j < Ycells; j++){
+				
+			}
+		k++;
+	}
+	
 }
 

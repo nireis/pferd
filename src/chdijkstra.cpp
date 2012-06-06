@@ -67,10 +67,10 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1)
 
 	// Die restlichen Knoten abarbeiten
 	while(!U.empty() && min_path_length > U.top().distance){
-		numNodes++;
 		int i = U.top().found_by;
 		unsigned int tmpid = U.top().id;
 		if(o_found_by[i][tmpid] == -1){
+			numNodes++;
 			o_found_by[i][tmpid] = (int)U.top().eid;
 			o_reset_found_by[i].push_back(tmpid);
 			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
@@ -118,8 +118,9 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1)
 		}
 	}
 
-//	cout << "numNodes: " << numNodes << endl;
-//	cout << "numEdges: " << numEdges << endl;
+	cout << "numNodes: " << numNodes << endl;
+	cout << "numEdges: " << numEdges << endl;
+	cout << "===" << endl;
 
 	resetOneToOne();
 	return min_path_length;

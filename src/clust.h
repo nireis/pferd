@@ -1,3 +1,6 @@
+#ifndef clust_h
+#define clust_h
+
 #include "structs.h"
 #include "graph.h"
 #include <list>
@@ -50,3 +53,5 @@ class cluster {
 		void setMostPopulatedCells(unsigned int count);
 
 };
+
+#endif
