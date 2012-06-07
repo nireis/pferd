@@ -796,8 +796,9 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	clock_t start,finish;
-	double time1 = 0;
+	//double time1 = 0;
 	double time2 = 0;
+	unsigned int val2 = 0;
 	unsigned int numDij = 0;//g->getNodeCount();
 	CHDijkstras chd(scg);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
@@ -816,12 +817,13 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		vector<unsigned int> src(1,i);
 		start = clock();
 		chd.manyToOne(0, &src, 1);
-		unsigned int val2 = src[0];
+		val2 += src[0];
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
 		numDij++;
 	}
 	cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
 	cout << "Zeit pro Dijkstra mit Klasse im Schnitt: " << time2/numDij << endl;
+	cout << val2 << endl;
 	return true;
 }

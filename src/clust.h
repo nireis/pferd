@@ -18,6 +18,8 @@ class cluster {
 		unsigned int Xcells, Ycells;
 
 		struct cell {
+			cell() : nodes() {}
+
 			std::list<unsigned int> nodes;
 		};
 
@@ -50,7 +52,15 @@ class cluster {
 		cluster(Graph* gr, double s);
 		~cluster();
 
+		unsigned int getMostPopSize(){ return mostPopSize; }
 		void setMostPopulatedCells(unsigned int count);
+		void getNodes(unsigned int count, std::list<unsigned int>* nodes);
+		void getNodesUpper(unsigned int count, 
+				unsigned int upper, 
+				std::list<unsigned int>* nodes);
+		void getNodesLower(unsigned int count, 
+				unsigned int lower, 
+				std::list<unsigned int>* nodes);
 
 };
 

@@ -62,7 +62,6 @@ int main(int argc, char *argv[]){
 		cout << "-> angegebene Datei '"<< file <<"' existiert nicht." << endl;
 		return 0;
 	}
-   
 
 	clock_t start,finish;
 	double time;
@@ -88,62 +87,61 @@ int main(int argc, char *argv[]){
 	//hy.calcCHverbose();
 	hy.calcCH();
 
-	cluster cl(&g, 0.01/16.0); /* 8.0 für gröber, 32.0 für sehr fein */
+	//CHDijkstraTest(&g, &scg, 149909);
+	
+	/* male per cluster ein paar gebiete an */
+	{
+		cout << "> Erstelle Cluster und starte Pendler" << endl;
+		cluster cl(&g, 0.01/64.0);
 
-	/*
-	 * ein paar kanten einfärben, 
-	 * indem man ihnen ein load von mindestens 1 gibt
-	 * und diese dann in der vis anzeigen lassen
-	 */
-	//unsigned int* colors = 
-	//	new unsigned int[scg.getEdgeCount() + scg.getShortcutCount() ];
-	//for(unsigned int i = 0; i < scg.getEdgeCount() 
-	//		+ scg.getShortcutCount(); i++){
-	//	if( scg.isShortcut(i) ){ 
-	//		colors[i] = 1;
-	//	} else {
-	//		colors[i] = 0;
-	//	}
-	//}
-	//scg.updateEdgeLoads(colors, scg.getEdgeCount() + scg.getShortcutCount());
-	//scg.shareShortcutLoads(); // shortcut loads verteilen
+		unsigned int count = 50;
+		cl.setMostPopulatedCells( count );
+		
+		list<unsigned int> starts;
+		list<unsigned int> targets;
 
-//	for(unsigned int i=0; i<scg.getNodeCount(); i++){
-//		EdgesIterator it = scg.getOutEdgesIt(i);
-//		while(it.hasNext()){
-//			EdgesIterator it1 = scg.getOutEdgesIt(i);
-//			int count = 0;
-//			unsigned int id1 = it.getNext()->other_node;
-//			while(it1.hasNext()){
-//				if(id1 == it1.getNext()->other_node){
-//					count++;
-//				}
-//			}
-//			if(count > 1){
-//				cout << i << endl;
-//				cout << "Fuck you!" << endl;
-//			}
-//		}
-//	}
-//
-//	for(unsigned int i=0; i<g.getNodeCount(); i++){
-//		EdgesIterator it = g.getOutEdgesIt(i);
-//		while(it.hasNext()){
-//			EdgesIterator it1 = g.getOutEdgesIt(i);
-//			int count = 0;
-//			unsigned int id1 = it.getNext()->other_node;
-//			while(it1.hasNext()){
-//				if(id1 == it1.getNext()->other_node){
-//					count++;
-//				}
-//			}
-//			if(count > 1){
-//				cout << "Penis!" << endl;
-//			}
-//		}
-//	}
+		double perc = 0.5;
+		unsigned int upper = (unsigned int)(((double)count)*perc);
+		
+		cl.getNodesLower(5000,count-upper, &starts);
 
-	CHDijkstraTest(&g, &scg, 149909);
+		while( ! starts.empty()){
+			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
+			starts.pop_front();
+			while(it.hasNext()){
+				Edge* e = it.getNext();
+				if( ! scg.isShortcut(e->id) )
+					scg.addEdgeLoad(e->id);
+			}
+		}
+
+		cl.getNodesUpper(5,upper, &targets);
+		cl.getNodesLower(50,count-upper, &starts);
+
+		/* starte Dijkstras von starts zu targets */
+		cout << "> Starte Dijkstras " << endl;
+		CHDijkstras chd(&scg);
+		for(list<unsigned int>::iterator it = targets.begin(); 
+				it != targets.end(); it++)
+		{
+			for(list<unsigned int>::iterator it2 = starts.begin();
+					it2 != starts.end(); it2++)
+			{
+				chd.oneToOne(*it2, *it, 1);
+			}
+		}
+		
+	}
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
+
+	if( startVis ){
+		cout << "> Starte Visualisierung" << endl;
+		vis anzeige(&scg); anzeige.start();
+	}
+
+	return 0;
+}
 	
 	// Markiere einen Weg im Graph
 	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
@@ -151,8 +149,6 @@ int main(int argc, char *argv[]){
 	 * auf 15K Graph
 	 */
 	//CHDijkstra(&scg, 2271, 252); 
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
 
 	/*CHDijkstras chd(&scg);
 	for(unsigned int i=0; i<=scg.getNodeCount(); i++){
@@ -161,9 +157,3 @@ int main(int argc, char *argv[]){
 		}
 	}*/
 
-	if( startVis ){
-		vis anzeige(&scg); anzeige.start();
-	}
-
-	return 0;
-}

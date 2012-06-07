@@ -25,8 +25,8 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
 	unsigned int min_path_length = numeric_limits<unsigned int>::max();
 	unsigned int min_path_center;
 
-	unsigned int numEdges = 0;
-	unsigned int numNodes = 2;
+	//unsigned int numEdges = 0;
+	//unsigned int numNodes = 2;
 
 	// Die ersten Knoten abarbeiten
 	if(node_id0 == node_id1){
