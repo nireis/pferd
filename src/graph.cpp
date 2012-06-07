@@ -316,8 +316,18 @@ unsigned int Graph::getUpperInEdgeBound(unsigned int id){
 	return nodes_in_offs[id+1] ;
 }
 void Graph::getEdgeLoads(SCGraph* g){
+	EdgeData* scedge_data = g->getEdgeDataPointer();
 	for(unsigned int i = 0; i < edge_count; i++){
-		edge_data[i].load = g->getEdgeData(i).load;
+		edge_data[i].load = scedge_data[i].load;
+	}
+}
+
+void Graph::updateEdgeValues(){
+	for(unsigned int i = 0; i < edge_count; i++){
+		out_edges[ edge_data[i].out_index ].value = edge_data[i].value;
+	}
+	for(unsigned int i = 0; i < edge_count; i++){
+		in_edges[ edge_data[i].in_index ].value = edge_data[i].value;
 	}
 }
 

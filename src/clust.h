@@ -43,7 +43,7 @@ class cluster {
 		point* mostPop;
 		unsigned int mostPopSize;
 		
-		cluster(){}
+		cluster();
 
 		void setXY();
 		void run();

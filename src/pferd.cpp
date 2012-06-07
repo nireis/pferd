@@ -9,6 +9,7 @@
 #include "vis.h"
 #include "clust.h"
 #include "chdijkstra.h"
+#include "sim.h"
 
 using namespace std;
 
@@ -76,6 +77,14 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
 
+	/* erstelle Simulation und i
+	 * lasse Kantengewichte an 
+	 * Reisezeit des Kantentyps anpassen 
+	 */
+	simulation sim(&g);
+	sim.setEdgeValues(g.getEdgeDataPointer(), g.getEdgeCount());
+	g.updateEdgeValues();
+
 	cout << "Erstelle neuen Graph: " << endl;
 	start = clock();
 	SCGraph scg = SCGraph(&g);
@@ -92,7 +101,11 @@ int main(int argc, char *argv[]){
 	/* male per cluster ein paar gebiete an */
 	{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
-		cluster cl(&g, 0.01/64.0);
+		double step = 0.01/16.0;
+		cluster cl(&g, step);
+		/* zweites Argument ist die Randlänge einer Zelle
+		 * in einer unbestimmten Einheit 
+		 */
 
 		unsigned int count = 50;
 		cl.setMostPopulatedCells( count );
@@ -100,10 +113,10 @@ int main(int argc, char *argv[]){
 		list<unsigned int> starts;
 		list<unsigned int> targets;
 
-		double perc = 0.5;
+		double perc = 0.1;
 		unsigned int upper = (unsigned int)(((double)count)*perc);
 		
-		cl.getNodesLower(5000,count-upper, &starts);
+		cl.getNodesLower(5000,(count-upper)/4, &starts);
 
 		while( ! starts.empty()){
 			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
@@ -116,7 +129,7 @@ int main(int argc, char *argv[]){
 		}
 
 		cl.getNodesUpper(5,upper, &targets);
-		cl.getNodesLower(50,count-upper, &starts);
+		cl.getNodesLower(50,(count-upper)/4, &starts);
 
 		/* starte Dijkstras von starts zu targets */
 		cout << "> Starte Dijkstras " << endl;

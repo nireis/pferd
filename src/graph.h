@@ -137,6 +137,13 @@ class Graph {
 		void getEdgeLoads(SCGraph* g);
 
 		/*
+		 * zum Updaten der Values der Kanten, 
+		 * wenn diese von aussen in EdgeData
+		 * geändert wurden
+		 */
+		void updateEdgeValues();
+
+		/*
 		 * hier werden Iteratoren über Kanten nach Aussen gegeben
 		 * 
 		 * ein Iterator funktioniert 

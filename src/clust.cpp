@@ -91,6 +91,62 @@ void cluster::setMostPopulatedCells(unsigned int count){
 					mostPop[k].x = i;
 					mostPop[k].y = j;
 					min = cells[i][j].nodes.size();
+					/* Zellen drumherum null setzen */
+					{
+						unsigned int im = i-1;
+						unsigned int ip = i+1;
+						unsigned int jm = j-1;
+						unsigned int jp = j+1;
+
+						bool imv = (im < Xcells);
+						bool ipv = (ip < Xcells);
+						bool jmv = (jm < Ycells);
+						bool jpv = (jp < Ycells);
+
+						if(imv && jmv)
+						cells[im][jm].nodes.clear();
+						if(jmv)
+						cells[i][jm].nodes.clear();
+						if(ipv && jmv)
+						cells[ip][jm].nodes.clear();
+						if(imv)
+						cells[im][j].nodes.clear();
+						if(ipv)
+						cells[ip][j].nodes.clear();
+						if(imv && jpv)
+						cells[im][jp].nodes.clear();
+						if(jpv)
+						cells[i][jp].nodes.clear();
+						if(ipv && jpv)
+						cells[ip][jp].nodes.clear();
+
+						//unsigned int im2 = i-2;
+						//unsigned int ip2 = i+2;
+						//unsigned int jm2 = j-2;
+						//unsigned int jp2 = j+2;
+
+						//bool imv2 = (im2 < Xcells);
+						//bool ipv2 = (ip2 < Xcells);
+						//bool jmv2 = (jm2 < Ycells);
+						//bool jpv2 = (jp2 < Ycells);
+
+						//if(imv2 && jmv2)
+						//cells[im2][jm2].nodes.clear();
+						//if(jmv2)
+						//cells[i][jm2].nodes.clear();
+						//if(ipv2 && jmv2)
+						//cells[ip2][jm2].nodes.clear();
+						//if(imv2)
+						//cells[im2][j].nodes.clear();
+						//if(ipv2)
+						//cells[ip2][j].nodes.clear();
+						//if(imv2 && jpv2)
+						//cells[im2][jp2].nodes.clear();
+						//if(jpv2)
+						//cells[i][jp2].nodes.clear();
+						//if(ipv2 && jpv2)
+						//cells[ip2][jp2].nodes.clear();
+					}
 				}
 			}
 		max = min;

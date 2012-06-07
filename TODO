@@ -2,22 +2,6 @@
 
 * nach dem beenden des openGL-Fensters sollte das hauptprogramm nicht beendet werden
 
-* wie werden straßenlasten berechnet ? welche informationen brauchen wir dafür in kanten?
-
-* genaue zeitmessung für die simulation / initialisierung der objekte => in log?
-
-* interne log/error struktur einführen ?
-
-=== chaot ===
-
-* Ind Set Berechnung mit in*out Heuristik
-
-* Vectors statt Lists
-
-* Möglicherweise CH selbst testen
-
-* CHDijkstra implementieren
-
 === Stefan ===
 
 Pferd
