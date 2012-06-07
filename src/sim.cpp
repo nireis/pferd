@@ -28,22 +28,13 @@ simulation::simulation(Graph* gr) :
 { 
 	initTypes();
 }
-simulation::simulation(Graph* gr, SCGraph* scgr) :
-	g(gr),
-	scg(scgr),
-	graphtype(-1),
-	traffic(0),
-	trafficSize(0)
-{ 
-	initTypes();
-}
 void simulation::initTypes(){
-	smallTypes[0] =  0;
+	smallTypes[0] =  0; // not used
 	smallTypes[1] =  130;
 	smallTypes[2] =  120;
 	smallTypes[3] =  80;
 	smallTypes[4] =  70;
-	smallTypes[5] =  0;
+	smallTypes[5] =  0; // not used
 	smallTypes[6] =  130;
 	smallTypes[7] =  50;
 	smallTypes[8] =  45;
@@ -87,13 +78,33 @@ void simulation::setEdgeValues(EdgeData* ed, unsigned int edge_count){
 				ttype = (double)smallTypes[(unsigned int)ttype];
 			}
 			unsigned int newvalue = (unsigned int)std::floor(
-					(((double)ed[i].distance) / ((ttype/100.0))) +0.5
+					(((double)ed[i].distance) / ((ttype/100.0))) +0.5 //zum runden
 					);
 			//TODO std::cout << "Value diff: " << newvalue - ed[i].value << std::endl;
 			ed[i].value = newvalue;
 		}
 	}
 }
+
+void simulation::setSCGraph(SCGraph* scgr){
+	scg = scgr;
+}
+void simulation::setEdgeColours(EdgeData* ed, unsigned int edge_count){
+	double mult = 3.0;
+	for(unsigned int i = 0; i < edge_count; i++){
+		double ttype = ed[i].type;
+			if(graphtype == 1){
+				ttype = (double)smallTypes[(unsigned int)ttype];
+			}
+		double c = ((double)ed[i].load) / (ttype * mult);
+		if(c < 0.0)
+			c = 0.0;
+		if(c > 1.0)
+			c = 1.0;
+		ed[i].colour = c;
+	}
+}
+
 
 
 

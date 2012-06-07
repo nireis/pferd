@@ -81,6 +81,7 @@ int main(int argc, char *argv[]){
 	 * lasse Kantengewichte an 
 	 * Reisezeit des Kantentyps anpassen 
 	 */
+	cout << "> Erstelle Simulation und passe Kantengewichte an" << endl;
 	simulation sim(&g);
 	sim.setEdgeValues(g.getEdgeDataPointer(), g.getEdgeCount());
 	g.updateEdgeValues();
@@ -92,6 +93,7 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "SCGraph erstellt in zeit: : " << time << endl;
 
+	cout << "> Berechne CH auf SCGraph" << endl;
 	CH hy(&g, &scg);
 	//hy.calcCHverbose();
 	hy.calcCH();
@@ -147,6 +149,9 @@ int main(int argc, char *argv[]){
 	}
 	scg.updateEdgeLoads();
 	scg.shareShortcutLoads();
+
+	sim.setSCGraph(&scg);
+	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
 
 	if( startVis ){
 		cout << "> Starte Visualisierung" << endl;

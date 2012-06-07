@@ -37,19 +37,25 @@ class simulation {
 		simpletraffic* traffic;
 		unsigned int trafficSize;
 
+		/*
+		 * das Bestimmen der Typen der Kanten
+		 * ist deshalb wichtig, 
+		 * weil wir für usnere Graphen
+		 * zwei verschiedene Nöglichkeiten haben,
+		 * wie die Typen der Kanten
+		 * angegeben werden
+		 */
 		unsigned int smallTypes[13];
-
 		void initTypes();
-
 		void findGraphEdgesTypes();
 
 	public:
 		simulation(Graph* gr);
-		simulation(Graph* gr, SCGraph* scgr);
 		~simulation();
 
 		void setEdgeValues(EdgeData* ed, unsigned int edge_count);
-
+		void setSCGraph(SCGraph* scgr);
+		void setEdgeColours(EdgeData* ed, unsigned int edge_count);
 };
 
 

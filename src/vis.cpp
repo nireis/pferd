@@ -29,8 +29,7 @@ void vis::init(){
 
 	unsigned int index = 0;
 	unsigned int s_index = 0;
-	float LOAD = 0.0; 
-	// setze load in [0.0, 1.0] für färbung der kanten
+	float COLOUR = 0.0; 
 	for(unsigned int i = 0; i < p.getNodeCount() ; i++){
 		EdgesIterator it = p.getOutEdgesIt(i);
 		while( it.hasNext() ){
@@ -38,25 +37,21 @@ void vis::init(){
 				/*
 				 * kante färben
 				 */
-				if(p.getEdgeData(e.id).load != 0){
-					LOAD = 1.0;
-				} else {
-					LOAD = 0.0;
-				}
+				COLOUR = p.getEdgeData(e.id).colour;
 			if( p.isShortcut( e.id )){
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD );
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, COLOUR );
 				s_index++;
 				shortcut_edges[s_index] = 
-					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD );
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, COLOUR );
 				s_index++;
 			} else {
 
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
+					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, COLOUR, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
 				index++;
 				edges[index] = 
-					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
+					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, COLOUR, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
 				index++;
 			}
 		}
