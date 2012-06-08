@@ -2,7 +2,7 @@
 
 
 void simplesim::update_weight(){
-	EdgeData* edptr = g.getEdgeDataPointer();
+	// EdgeData* edptr = g.getEdgeDataPointer();
 }
 
 void simplesim::next(unsigned int n){

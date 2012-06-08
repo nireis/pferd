@@ -3,6 +3,7 @@
 
 #include "graph.h"
 #include "chdijkstra.h"
+#include "dijkstra.h"
 #include <queue>
 #include <limits>
 #include <list>
@@ -32,14 +33,14 @@ class Compare_U_element{
 /*
  * Dijkstra mit Iterator.
  */
-void Dijkstra(Graph* g, unsigned int node_id);
-bool Dijkstra(Graph* g, unsigned int start_node_id,
+void DijkstraFunc(Graph* g, unsigned int node_id);
+bool DijkstraFunc(Graph* g, unsigned int start_node_id,
 		unsigned int end_node_id, unsigned int over_node_id);
 
 /*
  * Dijkstra mit Iterator, welcher sobal er node_id1 gefunden hat abbricht.
  */
-unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1);
+unsigned int DijkstraFunc(Graph* g, unsigned int node_id0, unsigned int node_id1);
 
 /*
  * Dijkstra, welcher direkt auf den Graphstrukturen arbeitet.
@@ -68,13 +69,13 @@ list<unsigned int> independent_set(Graph* g);
 /*
  * One to one Dijkstra auf der CH.
  */
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
+unsigned int CHDijkstraFunc(SCGraph* g, unsigned int node_id0, unsigned int node_id1);
 
 /*
  * One to many Dijkstra auf der CH. Die Distanzen werden in den targets-vector geschrieben
  * and die entsprechende Stelle.
  */
-void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets);
+void CHDijkstraFunc(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets);
 
 /*
  * Markiert alle aufsteigenden Kanten von nodes aus.

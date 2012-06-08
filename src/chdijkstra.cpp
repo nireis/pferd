@@ -1,6 +1,6 @@
 #include "chdijkstra.h"
 
-CHDijkstras::CHDijkstras(SCGraph* g):
+CHDijkstra::CHDijkstra(SCGraph* g):
 	nr_of_nodes(g->getNodeCount()),
 	dist(nr_of_nodes),
 	o_found_by(2,vector<int> (nr_of_nodes,-1)),
@@ -14,7 +14,7 @@ CHDijkstras::CHDijkstras(SCGraph* g):
 	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
-unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
+unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		unsigned int weight){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
@@ -127,7 +127,7 @@ unsigned int CHDijkstras::oneToOne(unsigned int node_id0, unsigned int node_id1,
 	return min_path_length;
 }
 
-void CHDijkstras::resetOneToOne(){
+void CHDijkstra::resetOneToOne(){
 	for(int i=0; i<2; i++){
 		while(!o_reset_found_by[i].empty()){
 			o_found_by[i][o_reset_found_by[i].back()] = -1;
@@ -136,7 +136,7 @@ void CHDijkstras::resetOneToOne(){
 	}
 }
 
-void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
+void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 		unsigned int weight){
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
@@ -234,7 +234,7 @@ void CHDijkstras::oneToMany(unsigned int node_id0, vector<unsigned int>* targets
 	resetOneToMany();
 }
 
-void CHDijkstras::manyToOne(unsigned int node_id0, vector<unsigned int>* sources,
+void CHDijkstra::manyToOne(unsigned int node_id0, vector<unsigned int>* sources,
 		unsigned int weight){
 	// Von den sources alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
@@ -327,7 +327,7 @@ void CHDijkstras::manyToOne(unsigned int node_id0, vector<unsigned int>* sources
 	resetOneToMany();
 }
 
-void CHDijkstras::resetOneToMany(){
+void CHDijkstra::resetOneToMany(){
 	while(!m_reset_found_by.empty()){
 		m_found_by[m_reset_found_by.back()] = -1;
 		m_reset_found_by.pop_back();
@@ -338,7 +338,7 @@ void CHDijkstras::resetOneToMany(){
 	}
 }
 
-void CHDijkstras::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
+void CHDijkstra::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
 	vector<unsigned int> todo;
 	// Erstmal alle Startknoten einfügen. Man könnte auch
 	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
@@ -364,7 +364,7 @@ void CHDijkstras::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int
 	}
 }
 
-void CHDijkstras::markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
+void CHDijkstra::markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
 	vector<unsigned int> todo;
 	// Erstmal alle Startknoten einfügen. Man könnte auch
 	// vllt direkt den nodes Vektor benutzen, je nach Implementierung

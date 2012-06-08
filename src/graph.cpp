@@ -13,7 +13,12 @@ Graph::Graph() :
 	nodes_out_offs(0),
 	out_edges(0), 
 	node_data(0),
-	edge_data(0) {
+	edge_data(0),
+	EdgeLoads(new unsigned int[edge_count])
+{
+	for(unsigned int i=0; i<edge_count; i++){
+		EdgeLoads[i] = 0;
+	}
 }
 const int Graph::BinID = 49;
 const std::string Graph::dateiendung = "grp";
@@ -293,11 +298,30 @@ E* Graph::getOutEdge(unsigned int edge_id){
 E* Graph::getInEdge(unsigned int edge_id){
 	return in_edges + edge_data[edge_id].in_index;
 }
+/*
+ * hier out1_in0 semantik 
+ * genau umgekehrt im vgl. zu getEdgesIt
+ * wegen backtracing im dijkstra (?)
+ */
+E* Graph::getEdge(bool out1_in0, unsigned int edge_id){
+	if(out1_in0){
+		return out_edges+edge_data[edge_id].out_index;
+	}
+	else{
+		return in_edges+edge_data[edge_id].in_index;
+	}
+}
 E* Graph::copyOutEdge(unsigned int edge_id){
 	return out_edges + edge_id;
 }
 E* Graph::copyInEdge(unsigned int edge_id){
 	return in_edges + edge_id;
+}
+void Graph::addEdgeLoad(unsigned int edge_id){
+	EdgeLoads[edge_id]++;
+}
+void Graph::addEdgeLoad(unsigned int edge_id, unsigned int times){
+	EdgeLoads[edge_id] += times;
 }
 
 /* 

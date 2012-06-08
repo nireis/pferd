@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 
-class CHDijkstras{
+class CHDijkstra{
 	private:
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
@@ -87,7 +87,7 @@ class CHDijkstras{
 
 	public:
 
-		CHDijkstras(SCGraph* g);
+		CHDijkstra(SCGraph* g);
 
 		/*
 		* One to one Dijkstra auf der CH.

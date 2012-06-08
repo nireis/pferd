@@ -29,7 +29,7 @@ class Compare_U_element_bi{
 		}   
 };
 
-void Dijkstra(Graph* g, unsigned int node_id){
+void DijkstraFunc(Graph* g, unsigned int node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -112,7 +112,7 @@ void Dijkstra(Graph* g, unsigned int node_id){
 //	}
 }
 
-bool Dijkstra(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
+bool DijkstraFunc(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 		unsigned int over_node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(start_node_id);
@@ -173,7 +173,7 @@ bool Dijkstra(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 
 
 
-unsigned int Dijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+unsigned int DijkstraFunc(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id0);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -385,8 +385,6 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
 	unsigned int currentEdgeTarget;
 	vector<unsigned int> dist(nr_of_nodes,numeric_limits<unsigned int>::max());
 
-	vector<bool> found0(nr_of_nodes,false);
-	vector<bool> found1(nr_of_nodes,false);
 	vector< vector<bool> > found(2,vector<bool> (nr_of_nodes,false));
 
 	Edge* currentEdge;
@@ -561,7 +559,7 @@ list<unsigned int> independent_set(Graph* g){
 	return solution;
 }
 
-unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
+unsigned int CHDijkstraFunc(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -673,7 +671,7 @@ unsigned int CHDijkstra(SCGraph* g, unsigned int node_id0, unsigned int node_id1
 	return min_path_length;
 }
 
-void CHDijkstra(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets){
+void CHDijkstraFunc(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets){
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
 	 *
@@ -795,12 +793,13 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 }
 
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
-	clock_t start,finish;
+	/*clock_t start,finish;
 	//double time1 = 0;
 	double time2 = 0;
-	unsigned int val2 = 0;
+	unsigned int val2 = 0;*/
 	unsigned int numDij = 0;//g->getNodeCount();
-	CHDijkstras chd(scg);
+	CHDijkstra chd(scg);
+	Dijkstra d(g);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	unsigned int nc = scg->getNodeCount();
 	for(unsigned int i=0; i< nc; i += 5000){
@@ -814,16 +813,22 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		// Dijkstra(g, 0, i) << endl;
 		// CHDijkstra(scg, 0, i);
 		}*/
-		vector<unsigned int> src(1,i);
+		/*vector<unsigned int> src(1,i);
 		start = clock();
 		chd.manyToOne(0, &src, 1);
 		val2 += src[0];
 		finish = clock();
-		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;
+		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;*/
+		cout << "Aktuell bei " << i << endl;
+		cout << chd.oneToOne(0, i, 1) << endl;
+		cout << d.oneToOne(0, i, 1) << endl;
+		if(chd.oneToOne(0, i, 1) != d.oneToOne(0, i, 1)){
+			cout << "Error: " << i << endl;
+		}
 		numDij++;
 	}
-	cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
+	/*cout << "Zeit insgesamt für " << numDij << " Dijkstras mit Klasse: " << time2 << endl;
 	cout << "Zeit pro Dijkstra mit Klasse im Schnitt: " << time2/numDij << endl;
-	cout << val2 << endl;
+	cout << val2 << endl;*/
 	return true;
 }

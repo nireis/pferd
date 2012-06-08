@@ -9,6 +9,7 @@
 #include "vis.h"
 #include "clust.h"
 #include "chdijkstra.h"
+#include "dijkstra.h"
 #include "sim.h"
 
 using namespace std;
@@ -101,13 +102,12 @@ int main(int argc, char *argv[]){
 	//CHDijkstraTest(&g, &scg, 149909);
 	
 	/* male per cluster ein paar gebiete an */
-	{
+	/*{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
 		double step = 0.01/16.0;
 		cluster cl(&g, step);
 		/* zweites Argument ist die Randlänge einer Zelle
-		 * in einer unbestimmten Einheit 
-		 */
+		 * in einer unbestimmten Einheit
 
 		unsigned int count = 50;
 		cl.setMostPopulatedCells( count );
@@ -126,16 +126,16 @@ int main(int argc, char *argv[]){
 			while(it.hasNext()){
 				Edge* e = it.getNext();
 				if( ! scg.isShortcut(e->id) )
-					scg.addEdgeLoad(e->id);
+					scg.addEdgeLoad(e->id, 70000);
 			}
 		}
 
 		cl.getNodesUpper(5,upper, &targets);
 		cl.getNodesLower(50,(count-upper)/4, &starts);
 
-		/* starte Dijkstras von starts zu targets */
+		/* starte Dijkstras von starts zu targets
 		cout << "> Starte Dijkstras " << endl;
-		CHDijkstras chd(&scg);
+		CHDijkstra chd(&scg);
 		for(list<unsigned int>::iterator it = targets.begin(); 
 				it != targets.end(); it++)
 		{
@@ -156,7 +156,9 @@ int main(int argc, char *argv[]){
 	if( startVis ){
 		cout << "> Starte Visualisierung" << endl;
 		vis anzeige(&scg); anzeige.start();
-	}
+	}*/
+
+	CHDijkstraTest(&g, &scg, 0);
 
 	return 0;
 }
