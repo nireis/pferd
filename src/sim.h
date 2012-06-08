@@ -3,6 +3,11 @@
 
 #include "graph.h"
 #include "chdijkstra.h"
+#include "clust.h"
+#include "ch.h"
+#include "vis.h"
+#include <thread>
+#include <mutex>
 
 struct simpletraffic {
 	unsigned int src;
@@ -34,8 +39,9 @@ class simulation {
 
 		int graphtype;
 
-		simpletraffic* traffic;
-		unsigned int trafficSize;
+		cluster* cl;
+		SCGraph* oscg;
+		CH* ch;
 
 		/*
 		 * das Bestimmen der Typen der Kanten
@@ -48,6 +54,9 @@ class simulation {
 		unsigned int smallTypes[13];
 		void initTypes();
 		void findGraphEdgesTypes();
+		/* TODO neue Vis von michi */
+//		void launchVisThread(Graph* g, std::list<openGL_Cluster>* clist); 
+//		void launchVisThread(SCGraph* g, std::list<openGL_Cluster>* clist);
 
 	public:
 		simulation(Graph* gr);
@@ -56,6 +65,9 @@ class simulation {
 		void setEdgeValues(EdgeData* ed, unsigned int edge_count);
 		void setSCGraph(SCGraph* scgr);
 		void setEdgeColours(EdgeData* ed, unsigned int edge_count);
+		void runVis(bool graph0_scgraph1);
+
+		void run();
 };
 
 

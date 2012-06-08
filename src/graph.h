@@ -255,9 +255,9 @@ class SCGraph {
 		void addShortcut(unsigned int source_node_id, S sc);
 		void blacklistNode(unsigned int node_id);
 
-		bool mergeRound(unsigned int lvl);
+		bool mergeRound(unsigned int lvl, bool verbose);
 
-		bool mergeShortcutsAndGraph(unsigned int lvl);
+		bool mergeShortcutsAndGraph(unsigned int lvl, bool verbose);
 
 		bool isShortcut(unsigned int edge_id);
 

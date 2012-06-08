@@ -15,29 +15,15 @@ CH::~CH(){
 	bnlistpointer = 0;
 }
 
-void CH::calcCH(unsigned int rnds){
+void CH::calcCH(bool verbose){
 	if( isDone )
 		return;
 
-	max_rounds = rnds;
-	while(rounds < max_rounds){
-		algos.calcOneRound(sclistpointer, bnlistpointer);
-		scg->mergeRound(rounds);
+	while(algos.calcOneRound(sclistpointer, bnlistpointer, verbose)){
+		scg->mergeRound(rounds, verbose);
 		rounds++;
 	}
-	scg->mergeShortcutsAndGraph(max_rounds);
-	isDone = true;
-}
-
-void CH::calcCH(){
-	if( isDone )
-		return;
-
-	while(algos.calcOneRound(sclistpointer, bnlistpointer)){
-		scg->mergeRound(rounds);
-		rounds++;
-	}
-	scg->mergeShortcutsAndGraph(rounds);
+	scg->mergeShortcutsAndGraph(rounds, verbose);
 	isDone = true;
 }
 
@@ -55,7 +41,7 @@ void CH::calcCHverbose(){
 	while(run){
 		cout << "Berechne Shortcuts" << endl;
 		start = clock();
-		run = algos.calcOneRound(sclistpointer, bnlistpointer);
+		run = algos.calcOneRound(sclistpointer, bnlistpointer, true);
 		finish = clock();
 		time = (double(finish)-double(start));
 		alltime += time;
@@ -64,7 +50,7 @@ void CH::calcCHverbose(){
 
 		cout << "Merge Shortcuts in SCGraph. " << endl;
 		start = clock();
-		scg->mergeRound(j);
+		scg->mergeRound(j, true);
 		finish = clock();
 		time = (double(finish)-double(start));
 		alltime += time;
@@ -76,7 +62,7 @@ void CH::calcCHverbose(){
 	cout << "Insgesamt gebrauchte Zeit für Runden: " << (alltime/CLOCKS_PER_SEC) / 60.0 << " Minuten " << endl;
 	cout << "Merge Shortcuts und original-Graph. " << endl;
 	start = clock();
-	scg->mergeShortcutsAndGraph(j);
+	scg->mergeShortcutsAndGraph(j, true);
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit: " << time << endl;

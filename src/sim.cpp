@@ -2,7 +2,7 @@
 
 
 void simplesim::update_weight(){
-	EdgeData* edptr = g.getEdgeDataPointer();
+	//EdgeData* edptr = g.getEdgeDataPointer();
 }
 
 void simplesim::next(unsigned int n){
@@ -23,8 +23,9 @@ simulation::simulation(Graph* gr) :
 	g(gr),
 	scg(0),
 	graphtype(-1),
-	traffic(0),
-	trafficSize(0)
+	cl(0),
+	oscg(0),
+	ch(0)
 { 
 	initTypes();
 }
@@ -46,7 +47,9 @@ void simulation::initTypes(){
 simulation::~simulation(){
 	g=0;
 	scg=0;
-	delete[] traffic; traffic=0;
+	delete cl; cl = 0;
+	delete oscg; oscg = 0;
+	delete ch; ch = 0;
 }
 
 void simulation::findGraphEdgesTypes(){
@@ -90,13 +93,13 @@ void simulation::setSCGraph(SCGraph* scgr){
 	scg = scgr;
 }
 void simulation::setEdgeColours(EdgeData* ed, unsigned int edge_count){
-	double mult = 3.0;
+	double mult = 4.0;
 	for(unsigned int i = 0; i < edge_count; i++){
 		double ttype = ed[i].type;
 			if(graphtype == 1){
 				ttype = (double)smallTypes[(unsigned int)ttype];
 			}
-		double c = ((double)ed[i].load) / (ttype * mult);
+		double c = ((double)ed[i].load) / (130 /* ttype */ * mult);
 		if(c < 0.0)
 			c = 0.0;
 		if(c > 1.0)
@@ -104,6 +107,16 @@ void simulation::setEdgeColours(EdgeData* ed, unsigned int edge_count){
 		ed[i].colour = c;
 	}
 }
+void simulation::runVis(bool graph0_scgraph1){
+	if( graph0_scgraph1 ){
+	} else {
+	}
+}
+/* TODO neue Vis von michi */
+//void simulation::launchVisThread(Graph* g, std::list<openGL_Cluster>* clist){
+//}
+//void simulation::launchVisThread(SCGraph* g, std::list<openGL_Cluster>* clist){
+//}
 
 
 

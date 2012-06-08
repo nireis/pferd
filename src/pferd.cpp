@@ -11,7 +11,19 @@
 #include "chdijkstra.h"
 #include "sim.h"
 
+#include <thread>
+
 using namespace std;
+
+void startVisThread(SCGraph* g){
+	cout << "> Starte Visualisierung" << endl;
+	vis anzeige(g); anzeige.start();
+}
+//void startVisThread(Graph* g){
+//	cout << "> Starte Visualisierung" << endl;
+//	vis anzeige(g); anzeige.start();
+//}
+
 
 int main(int argc, char *argv[]){
 	cout << "            _|\\__/|, " << endl;
@@ -28,12 +40,14 @@ int main(int argc, char *argv[]){
 
 	string file;
 	bool startVis = false;
+	bool chverbose = false;
 
-	if(argc < 3 || argc > 4){
+	if(argc < 3 || argc > 5){
 		cout << "---" << endl 
 				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " -g <Graphendatei> [-v]" << endl
 				<< "-- -g <Graphdatei> : Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
 				<< "-- -v : Visualisierung starten " << endl
+				<< "-- -chv : Contraction Hierarchie teilt Statusmeldungen mit " << endl
 				<< "---" << endl;
 		return 0;
 	} else {
@@ -51,6 +65,10 @@ int main(int argc, char *argv[]){
 			if( string(argv[i]) == "-v"){
 				startVis = true;
 				i++;
+			} else
+			if( string(argv[i]) == "-chv"){
+					chverbose = true;
+					i++;
 			} else {
 				cout << "Input Error. " << endl;
 				return 0;
@@ -96,20 +114,20 @@ int main(int argc, char *argv[]){
 	cout << "> Berechne CH auf SCGraph" << endl;
 	CH hy(&g, &scg);
 	//hy.calcCHverbose();
-	hy.calcCH();
+	hy.calcCH(chverbose);
 
 	//CHDijkstraTest(&g, &scg, 149909);
 	
 	/* male per cluster ein paar gebiete an */
 	{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
-		double step = 0.01/16.0;
+		double step = 0.01/32.0;
 		cluster cl(&g, step);
 		/* zweites Argument ist die Randlänge einer Zelle
 		 * in einer unbestimmten Einheit 
 		 */
 
-		unsigned int count = 50;
+		unsigned int count = 150;
 		cl.setMostPopulatedCells( count );
 		
 		list<unsigned int> starts;
@@ -118,7 +136,7 @@ int main(int argc, char *argv[]){
 		double perc = 0.1;
 		unsigned int upper = (unsigned int)(((double)count)*perc);
 		
-		cl.getNodesLower(5000,(count-upper)/4, &starts);
+		cl.getNodesLower(5,(count-upper)/1, &starts);
 
 		while( ! starts.empty()){
 			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
@@ -126,12 +144,12 @@ int main(int argc, char *argv[]){
 			while(it.hasNext()){
 				Edge* e = it.getNext();
 				if( ! scg.isShortcut(e->id) )
-					scg.addEdgeLoad(e->id);
+					scg.addEdgeLoad(e->id,50);
 			}
 		}
 
-		cl.getNodesUpper(5,upper, &targets);
-		cl.getNodesLower(50,(count-upper)/4, &starts);
+		cl.getNodesUpper(1,upper, &targets);
+		cl.getNodesLower(38,(count-upper)/1, &starts);
 
 		/* starte Dijkstras von starts zu targets */
 		cout << "> Starte Dijkstras " << endl;
@@ -154,9 +172,13 @@ int main(int argc, char *argv[]){
 	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
 
 	if( startVis ){
-		cout << "> Starte Visualisierung" << endl;
-		vis anzeige(&scg); anzeige.start();
+		thread t = thread(&startVisThread, &scg);
+		t.join();
+		//cout << "> Starte Visualisierung" << endl;
+		//vis anzeige(&scg); anzeige.start();
 	}
+
+	cout << "> Exit Pferd" << endl;
 
 	return 0;
 }

@@ -785,31 +785,35 @@ void SCGraph::blacklistNode(unsigned int node_id){
 	round_node_blacklist.push_front(node_id);
 }
 
-bool SCGraph::mergeRound(unsigned int lvl){
+bool SCGraph::mergeRound(unsigned int lvl, bool verbose){
 	prepareNodes(lvl);
 	unsigned int new_sc_count = sortShortcuts();
 	shortcut_count += new_sc_count;
 	buildGraph();
 	fillGoodNodes();
-
-	cout << new_sc_count << " neue Shortcuts" << endl;
-	cout << "Übrige Graphknoten: " << goodNodesSize 
-		<< " ( " 
-		<< (((double) goodNodesSize)/((double) node_count)) * 100.0 
-		<< "% der urspr. Knoten ) " << endl;
-	cout << "aktuelle Anzahl Kanten: " 
-		<< ( (double)edge_count / (double)g->getEdgeCount() ) * 100.0 
-		<< "% der urspr. Kanten" << endl;
-
+	
+	if(verbose){
+		cout << new_sc_count << " neue Shortcuts" << endl;
+		cout << "Übrige Graphknoten: " << goodNodesSize 
+			<< " ( " 
+			<< (((double) goodNodesSize)/((double) node_count)) * 100.0 
+			<< "% der urspr. Knoten ) " << endl;
+		cout << "aktuelle Anzahl Kanten: " 
+			<< ( (double)edge_count / (double)g->getEdgeCount() ) * 100.0 
+			<< "% der urspr. Kanten" << endl;
+	}
 	return true; 
 }
 
-bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl){
+bool SCGraph::mergeShortcutsAndGraph(unsigned int lvl, bool verbose){
 	prepareNodes(lvl);
 	shortcut_count += sortShortcuts();
 	buildGraphFinal();
-	cout << "Edges: " << edge_count << ", Shortcuts: " << shortcut_count << endl;
-	cout << "SCGraph merged with Graph and Shortcuts. " << endl;
+	if(verbose){
+		cout << "Edges: " << edge_count 
+			<< ", Shortcuts: " << shortcut_count << endl;
+		cout << "SCGraph merged with Graph and Shortcuts. " << endl;
+	}
 	return true; 
 }
 

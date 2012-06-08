@@ -55,6 +55,8 @@ class cluster {
 		unsigned int getMostPopSize(){ return mostPopSize; }
 		void setMostPopulatedCells(unsigned int count);
 		void getNodes(unsigned int count, std::list<unsigned int>* nodes);
+		void getNodes(unsigned int count, 
+				std::vector< std::vector<unsigned int> >* nodes);
 		void getNodesUpper(unsigned int count, 
 				unsigned int upper, 
 				std::list<unsigned int>* nodes);

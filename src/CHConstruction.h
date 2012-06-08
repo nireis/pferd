@@ -138,7 +138,7 @@ class CHConstruction{
 		 * löschenden Knoten geschrieben werden.
 		 * @return Gibt true zurück, solange man noch nicht fertig ist.
 		 */
-		bool calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist);
+		bool calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist, bool verbose);
 		/*
 		 * Kontrahiert einen Knoten.
 		 *
@@ -185,7 +185,7 @@ CHConstruction<G>::CHConstruction(G* g):
 	this->g = g;
 	allsclist = 0;
 	conodelist = 0;
-	cout << "Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
+	cout << "CH: Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
 }
 
 template <typename G>
@@ -195,7 +195,7 @@ CHConstruction<G>::~CHConstruction(){
 }
 
 template <typename G>
-bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist){
+bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>* nodelist, bool verbose){
 	numRounds++;
    allsclist = sclist;
    conodelist = nodelist;
@@ -212,10 +212,12 @@ bool CHConstruction<G>::calcOneRound(list<Shortcut>* sclist, list<unsigned int>*
       threadlist.pop_front();
    }
    delete nodes;
-	cout << len << endl;
+	if(verbose)
+		cout << "CH: Independent Set Size " << len << endl;
 	// Das arithmetische Mittel dieser Runde berechnen.
 	if(len != 0){
-		cout << "Arith Mean: " << tmpArithMean/len << endl;
+		if(verbose)
+			cout << "CH: Arith Mean: " << tmpArithMean/len << endl;
 		lastArithMean = tmpArithMean/len;
 		return true;
 	}
@@ -416,7 +418,7 @@ void CHConstruction<G>::addShortcuts(DijkstraData* dd, list<Shortcut>* sclist,
 		dd->resetlist.push_front(dd->U.top().targetedge->other_node);
 	}
 	else{
-		cout << "Warnung: U ist leer" << endl;
+		cout << "CH: Warnung: U ist leer" << endl;
 	}
 	// Alle zu erreichenden Knoten durchgehen.
 	it = g->getOutEdgesIt_Round(conode);

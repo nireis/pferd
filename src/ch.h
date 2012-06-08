@@ -15,6 +15,8 @@
 
 class CH {
 	private:
+		CH();
+
 		bool isDone;
 
 		Graph* g;
@@ -32,8 +34,7 @@ class CH {
 		CH(Graph* gr, SCGraph* scgr);
 		~CH();
 
-		void calcCH(unsigned int rounds);
-		void calcCH();
+		void calcCH(bool verbose);
 		void calcCHverbose();
 };
 

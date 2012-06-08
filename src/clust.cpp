@@ -169,6 +169,27 @@ void cluster::getNodes(unsigned int count, std::list<unsigned int>* nodes){
 		}
 	}
 }
+void cluster::getNodes(unsigned int count, 
+		std::vector< std::vector<unsigned int> >* nodes)
+{
+	if(!nodes){
+		delete nodes;
+		nodes = new std::vector< std::vector<unsigned int> >;
+		nodes->reserve(mostPopSize);
+	}
+	for(unsigned int i = 0; i < mostPopSize; i++){
+		unsigned int x = (unsigned int)mostPop[i].x;
+		unsigned int y = (unsigned int)mostPop[i].y;
+		std::list<unsigned int>::iterator it = cells[x][y].nodes.begin();
+		unsigned int counter = 0;
+		while(counter < count && it != cells[x][y].nodes.end()){
+			//(*nodes)[i].push_back(*it);
+			nodes->operator[](i).push_back(*it);
+			it++;
+			counter++;
+		}
+	}
+}
 
 void cluster::getNodesLower(unsigned int count, 
 		unsigned int lower,
