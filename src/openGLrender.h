@@ -95,11 +95,6 @@ private:
 	openGL_Cluster *clusterArray;
 
 	//stuff needed for openGL
-	bool showNodes;
-	bool showEdges;
-	bool showShortcuts;
-	bool showMap;
-	bool showCluster;
 	int wWidth;
 	int wHeight;
 	glm::vec3 cameraPos;
@@ -114,47 +109,40 @@ private:
 	//transformation matrixes
 	glm::mat4 projMX, modelMX, viewMX;
 
-	//openGL buffer objects
-	GLuint vbo_map;
-	GLuint vbo_nodes;
-	GLuint vbo_edges;
-	GLuint vbo_shortcuts;
-	GLuint vbo_cluster;
+	//Entities
+	openGL_Entity *sceneEntities;
+	int entityCount;
 
 	//openGL textures
 	GLuint *map_textures;
 	int mapCount;
 
-	//shader program
-	GLuint program;
-	GLuint program1;
-	GLuint program2;
-	GLuint program3;
-	GLuint program4;
-
 	//used to read the shader source code - needs to be replaced
 	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
 	//for the code
 	char* file_read(const char*);
-
 	//loads & compiles shader sources
 	GLint loadShader(const char*, GLenum);
 	//initializes shader programs
-	bool initShaderProgram();
-	//loads all nodes
-	bool initNodes();
-	//loads all edge geometry
-	bool initEdges();
-	//loads all shortcut geometry
-	bool initShortcuts();
-	//loads all circle geometry
+	GLuint initShaderProgram(char* , char*, char**, int);
+	//loads node/shortcut type geometry
+	bool initOpenGL_Node_3d(GLuint, openGL_Node_3d*, int);
+	//loads edge type geometry
+	bool initOpenGL_Edge_Node(GLuint*, openGL_Edge_Node* , int);
+	//TODO loads cluster type geometry
 	bool initCluster();
+
+	bool initGraphVis();
+
+	/*
 	//loads map geometry
 	bool initMap();
 	//loads map textures and actually heavily relies on SOIL to do all the nasty stuff
 	bool initTextures();
 	//draw node label
 	bool drawText(glm::mat4);
+	*/
+
 	//clean up
 	void uninit();
 	

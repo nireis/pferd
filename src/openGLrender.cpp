@@ -3,11 +3,6 @@
 
 openGLrender::openGLrender()
 {
-	showNodes = false;
-	showEdges = true;
-	showMap = false;
-	showShortcuts = false;
-	showCluster = false;
 	mapCount = 16;
 	camZoom = 1.0;
 }
@@ -120,105 +115,37 @@ GLint openGLrender::loadShader(const char* filename, GLenum type)
 	return shader;
 }
 
-bool openGLrender::initShaderProgram()
+GLuint openGLrender::initShaderProgram(char* fragment, char* vertex, char** attributes, int attributeCount)
 {
 	//nodes shader program
 	GLuint vShader;
 	GLuint fShader;
-	if ((fShader = loadShader("pferdFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
+	GLuint program;
+
+	if ((fShader = loadShader(fragment, GL_FRAGMENT_SHADER)) == 0)
 	{ return false; };
-	if ((vShader = loadShader("pferdVertex.glsl", GL_VERTEX_SHADER)) == 0)
+	if ((vShader = loadShader(vertex, GL_VERTEX_SHADER)) == 0)
 	{ return false; };
 
 	program = glCreateProgram();
 	glAttachShader(program, vShader);
 	glAttachShader(program, fShader);
-	glBindAttribLocation(program, 0, "in_position");
-	glBindAttribLocation(program, 1, "in_color");
 
-	glLinkProgram(program);
-	glUseProgram(program);
+	for(int i=0; i< attributeCount; i++)
+	{
+		glBindAttribLocation(program, i, attributes[i]);
+	}
 
-	//edges shader program
-	GLuint edge_vShader;
-	GLuint edge_fShader;
-	if ((edge_fShader = loadShader("pferdEdgeFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
-	{ return false; };
-	if ((edge_vShader = loadShader("pferdEdgeVertex.glsl", GL_VERTEX_SHADER)) == 0)
-	{ return false; };
-
-	program1 = glCreateProgram();
-	glAttachShader(program1, edge_vShader);
-	glAttachShader(program1, edge_fShader);
-	glBindAttribLocation(program1, 0, "in_position");
-	glBindAttribLocation(program1, 1, "in_color");
-	glBindAttribLocation(program1, 2, "in_normal");
-
-	glLinkProgram(program1);
-	glUseProgram(program1);
-
-	//map shader program
-	GLuint map_vShader;
-	GLuint map_fShader;
-	if ((map_vShader = loadShader("pferdMapVertex.glsl", GL_VERTEX_SHADER)) == 0)
-	{ return false; };
-	if ((map_fShader = loadShader("pferdMapFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
-	{ return false; };
-
-	program2 = glCreateProgram();
-	glAttachShader(program2, map_vShader);
-	glAttachShader(program2, map_fShader);
-	glBindAttribLocation(program2, 0, "in_position");
-	glBindAttribLocation(program2, 1, "in_color");
-	glBindAttribLocation(program2, 2, "in_uv_coord");
-
-	glLinkProgram(program2);
-	glUseProgram(program2);
-
-	//shortcut shader program
-	GLuint sc_vShader;
-	GLuint sc_fShader;
-	if ((sc_fShader = loadShader("pferdEdgeFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
-	{ return false; };
-	if ((sc_vShader = loadShader("pferdVertex.glsl", GL_VERTEX_SHADER)) == 0)
-	{ return false; };
-
-	program3 = glCreateProgram();
-	glAttachShader(program3, sc_vShader);
-	glAttachShader(program3, sc_fShader);
-	glBindAttribLocation(program3, 0, "in_position");
-	glBindAttribLocation(program3, 1, "in_color");
-
-	glLinkProgram(program3);
-	glUseProgram(program3);
-
-	//Clusters shader program
-	GLuint c_vShader;
-	GLuint c_fShader;
-	if ((c_fShader = loadShader("pferdClusterFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
-	{ return false; };
-	if ((c_vShader = loadShader("pferdClusterVertex.glsl", GL_VERTEX_SHADER)) == 0)
-	{ return false; };
-
-	program4 = glCreateProgram();
-	glAttachShader(program4, c_vShader);
-	glAttachShader(program4, c_fShader);
-	glBindAttribLocation(program4, 0, "in_position");
-	glBindAttribLocation(program4, 1, "in_color");
-
-	glLinkProgram(program4);
-	glUseProgram(program4);
-
-	return true;
+	return program;
 }
 
-bool openGLrender::initNodes()
+bool openGLrender::initOpenGL_Node_3d(GLuint vbo, openGL_Node_3d* nodeData, int size)
 {
-	glGenVertexArrays(1, &vbo_nodes);
-	glBindVertexArray(vbo_nodes);
-	glGenBuffers(1, &vbo_nodes);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_nodes);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*nodeCount, nodeArray, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &vbo);
+	glBindVertexArray(vbo);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*size, nodeData, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),NULL);
 	glEnableVertexAttribArray(1);
@@ -229,13 +156,13 @@ bool openGLrender::initNodes()
 	return true;
 }
 
-bool openGLrender::initEdges()
+bool openGLrender::initOpenGL_Edge_Node(GLuint *vbo, openGL_Edge_Node* nodeData, int size)
 {
-	glGenVertexArrays(1, &vbo_edges);
-	glBindVertexArray(vbo_edges);
-	glGenBuffers(1, &vbo_edges);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_edges);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Edge_Node)*edgeCount, edgeArray, GL_STATIC_DRAW);
+	glGenVertexArrays(1, vbo);
+	glBindVertexArray(*vbo);
+	glGenBuffers(1, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Edge_Node)*size, nodeData, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Edge_Node), NULL);
 	glEnableVertexAttribArray(1);
@@ -248,28 +175,12 @@ bool openGLrender::initEdges()
 	return true;
 }
 
-bool openGLrender::initShortcuts()
-{
-	glGenVertexArrays(1, &vbo_shortcuts);
-	glBindVertexArray(vbo_shortcuts);
-	glGenBuffers(1, &vbo_shortcuts);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_shortcuts);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*shortcutCount, shortcutArray, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d), NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(float) + sizeof(float)));
-
-	glBindVertexArray(0);
-
-	return true;
-}
-
 bool openGLrender::initCluster()
 {
 	return true;
 }
 
+/*
 bool openGLrender::initMap()
 {
 	openGL_quad *map = new openGL_quad[mapCount];
@@ -415,7 +326,7 @@ bool openGLrender::initTextures()
 
 bool openGLrender::drawText(glm::mat4 mvp)
 {
-	/*glm::vec4 textPos;
+	glm::vec4 textPos;
 	glColor3f(0.5f, 0.5f, 0.5f);
 	float pi = 3.141592;
 	float pos_radian;
@@ -437,25 +348,35 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 		glRasterPos2f((textPos.x/textPos.w),(textPos.y/textPos.w));
 		glutBitmapString(GLUT_BITMAP_HELVETICA_12, (unsigned char*)text);
-	}*/
+	}
+
+	return true;
+}*/
+
+bool openGLrender::initGraphVis()
+{
+	entityCount = 1;
+	sceneEntities = new openGL_Entity[entityCount];
+
+	sceneEntities[0] = openGL_Entity();
+	initOpenGL_Edge_Node(&(sceneEntities[0].vbo_handler),edgeArray,edgeCount);
+	sceneEntities[0].geometryType = GL_LINES;
+	sceneEntities[0].numElements = edgeCount;
+	char* atrb[3];
+	atrb[0] = "in_position";
+	atrb[1] = "in_color";
+	atrb[2] = "in_normal";
+	sceneEntities[0].shader_program = initShaderProgram("pferdEdgeFragment.glsl", "pferdEdgeVertex.glsl", atrb, 3);
+	glLinkProgram(sceneEntities[0].shader_program);
+	sceneEntities[0].texture = NULL;
+	sceneEntities[0].visabilty = true;
+	sceneEntities[0].world_position = glm::vec3(0.0);
 
 	return true;
 }
 
 void openGLrender::uninit()
 {
-	//delete nodes
-	glDeleteBuffers(1, &vbo_nodes);
-	glDeleteVertexArrays(1, &vbo_nodes);
-
-	//delete edges
-	glDeleteBuffers(1, &vbo_edges);
-	glDeleteVertexArrays(1, &vbo_edges);
-
-	//delete map
-	glDeleteBuffers(1, &vbo_map);
-	glDeleteVertexArrays(1, &vbo_map);
-	glDeleteTextures(1, map_textures);
 }
 
 void openGLrender::mouse(int x, int y)
@@ -564,7 +485,7 @@ void openGLrender::keyboard (unsigned char key, int x, int y)
 		case '-':
 			cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
 			glutPostRedisplay();
-			break;
+			break;/*
 		case 'n':
 			showNodes = !showNodes;
 			glutPostRedisplay();
@@ -584,7 +505,7 @@ void openGLrender::keyboard (unsigned char key, int x, int y)
 		case 'c':
 			showCluster = !showCluster;
 			glutPostRedisplay();
-			break;
+			break;*/
 	}
 }
 
@@ -639,61 +560,18 @@ void openGLrender::display()
 	//set model_view_projection matrix
 	glm::mat4 mvpMX = projMX * viewMX * modelMX;
 
-	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
-   
-   glLineWidth(2.5);
-   glEnable(GL_PROGRAM_POINT_SIZE);
-   glEnable(GL_DEPTH_TEST);
-	
-	if(showNodes)
-	{
-		glBindVertexArray(vbo_nodes);
-		glDrawArrays(GL_POINTS, 0, nodeCount);
-	}
+	glEnable(GL_DEPTH_TEST);
+	glLineWidth(2.0);
 
-	glUseProgram(program3);
-	glUniformMatrix4fv(glGetUniformLocation(program3, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
-	if(showShortcuts)
+	for(int i=0; i<entityCount; i++)
 	{
-		glBindVertexArray(vbo_shortcuts);
-		glDrawArrays(GL_LINES, 0, shortcutCount);
-	}
-
-	glUseProgram(program1);
-	glUniformMatrix4fv(glGetUniformLocation(program1, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
-	if(showEdges)
-	{
-		glBindVertexArray(vbo_edges);
-		glDrawArrays(GL_LINES, 0, edgeCount);
-	}
-
-
-	//We don't want to draw labels with Glut atm
-	//drawText(mvpMX);
-	
-	glUseProgram(program2);
-	glUniformMatrix4fv(glGetUniformLocation(program2, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
-	if(showMap)
-	{
-		glEnable( GL_TEXTURE_2D );
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glBindVertexArray(vbo_map);
-		
-		//draw the available map tiles
-		for(int i=0; i<mapCount; i++)
+		if(sceneEntities[i].visabilty)
 		{
-			glBindTexture(GL_TEXTURE_2D, map_textures[i]);
-			GLint locTex = glGetUniformLocation(program2, "mytexture");
-			glUniform1i(locTex, 0);
-			glDrawArrays(GL_TRIANGLE_STRIP, i*4, 4);
+			glUseProgram(sceneEntities[i].shader_program);
+			glUniformMatrix4fv(glGetUniformLocation(sceneEntities[i].shader_program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
+			glBindVertexArray(sceneEntities[i].vbo_handler);
+			glDrawArrays(sceneEntities[i].geometryType, 0, sceneEntities[i].numElements);
 		}
-	}
-	else
-	{
-		//disabling depth test when not needed speeds up performance
-		glDisable(GL_DEPTH_TEST);
 	}
 
 	glutSwapBuffers();
@@ -746,66 +624,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if (!initShaderProgram())
-	{
-		fprintf(stderr, "Couldn't initialize shaders\n");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Shaders initialized...\n");
-	}
-
-	if (!initNodes())
-	{
-		fprintf(stderr, "Couldn't initialize node geometry");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Node geometry initialized...\n");
-	}
-
-	if (!initEdges())
-	{
-		fprintf(stderr, "Couldn't initialize edge geometry");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Edge geometry initialized...\n");
-	}
-
-	if (!initShortcuts())
-	{
-		fprintf(stderr, "Couldn't initialize shortcuts geometry");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Shortcuts geometry initialized...\n");
-	}
-	/*
-	if (!initMap())
-	{
-		fprintf(stderr, "Couldn't initialize map geometry");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Map geometry initialized...\n");
-	}
-
-	if (!initTextures())
-	{
-		fprintf(stderr, "Couldn't initialize textures");
-		return false;
-	}
-	else
-	{
-		fprintf(stderr, "Map textures initialized...\n");
-	}*/
-
+	initGraphVis();
 
 	setInstance(this);
 	glutDisplayFunc(displayCallback);
