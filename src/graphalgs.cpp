@@ -802,7 +802,7 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 	Dijkstra d(g);
 	cout << "Starte Dijkstras von Knoten 0 aus." << endl;
 	unsigned int nc = scg->getNodeCount();
-	for(unsigned int i=0; i< nc; i += 5000){
+	for(unsigned int i=0; i< nc; i++){
 		// start = clock();
 		// unsigned int val1 = CHDijkstra(scg, i, (unsigned int)0);
 		// finish = clock();
@@ -819,11 +819,11 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		val2 += src[0];
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;*/
-		cout << "Aktuell bei " << i << endl;
-		cout << chd.oneToOne(0, i, 1) << endl;
-		cout << d.oneToOne(0, i, 1) << endl;
+		// cout << "Aktuell bei " << i << endl;
 		if(chd.oneToOne(0, i, 1) != d.oneToOne(0, i, 1)){
 			cout << "Error: " << i << endl;
+			cout << chd.oneToOne(0, i, 1) << endl;
+			cout << d.oneToOne(0, i, 1) << endl;
 		}
 		numDij++;
 	}

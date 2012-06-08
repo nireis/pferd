@@ -14,11 +14,7 @@ Graph::Graph() :
 	out_edges(0), 
 	node_data(0),
 	edge_data(0),
-	EdgeLoads(new unsigned int[edge_count])
-{
-	for(unsigned int i=0; i<edge_count; i++){
-		EdgeLoads[i] = 0;
-	}
+	EdgeLoads(0){
 }
 const int Graph::BinID = 49;
 const std::string Graph::dateiendung = "grp";
@@ -32,6 +28,7 @@ Graph::~Graph(){
 	delete[] out_edges; out_edges = 0;
 	delete[] in_edges; in_edges = 0;
 	delete[] edge_data; edge_data = 0;
+	delete[] EdgeLoads; EdgeLoads = 0;
 }
 
 bool Graph::setGraph(std::string graphdata, bool write_binary){
@@ -74,6 +71,10 @@ bool Graph::setGraph(std::string graphdata, bool write_binary){
 				writeBinaryGraphFile(graphdata);
 			}
 			break;
+	}
+	EdgeLoads = new unsigned int[edge_count];
+	for(unsigned int i=0; i<edge_count; i++){
+		EdgeLoads[i] = 0;
 	}
 	return r;
 }
@@ -321,6 +322,9 @@ void Graph::addEdgeLoad(unsigned int edge_id){
 	EdgeLoads[edge_id]++;
 }
 void Graph::addEdgeLoad(unsigned int edge_id, unsigned int times){
+	if(edge_id >= edge_count){
+		cout << "Fehler: " << edge_id << endl;
+	}
 	EdgeLoads[edge_id] += times;
 }
 
