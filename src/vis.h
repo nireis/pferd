@@ -18,6 +18,8 @@ class vis {
 		openGL_Node_3d* nodes;
 		openGL_Edge_Node* edges;
 		openGL_Node_3d* shortcut_edges;
+		openGL_Cluster* circles;
+
 
 		struct pipe {
 			pipe(Graph* g) : 
@@ -118,8 +120,11 @@ class vis {
 		pipe p;
 
 		void init();
+		void init(std::list<openGL_Cluster>* circs);
 
 	public: 
+		vis(Graph* g, std::list<openGL_Cluster>* circs);
+		vis(SCGraph* g, std::list<openGL_Cluster>* circs);
 		vis(Graph* g);
 		vis(SCGraph* g);
 		~vis();

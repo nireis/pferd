@@ -148,6 +148,17 @@ struct openGL_quad {
 	openGL_Node_3d_uv vert4;
 };
 
+//Cluster-Highlighting
+struct openGL_Cluster{
+	openGL_Cluster() : xCenter(0), yCenter(0), radius(0), color(0) {}
+	openGL_Cluster(float x, float y, float r, float c) :
+	xCenter(x), yCenter(y), radius(r), color(c) {}
+	float xCenter;
+	float yCenter;
+	float radius;
+	float color;
+};
+
 
 /*
  * Shortcut, wie der Graph ihn als Eingabe erwartet

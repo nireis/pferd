@@ -3,11 +3,13 @@
 
 openGLrender::openGLrender()
 {
-	showNodes = true;
-	showEdges = false;
+	showNodes = false;
+	showEdges = true;
 	showMap = false;
 	showShortcuts = false;
+	showCluster = false;
 	mapCount = 16;
+	camZoom = 1.0;
 }
 
 openGLrender::~openGLrender()
@@ -32,6 +34,12 @@ void openGLrender::setShortcutEdgeArray(openGL_Node_3d *in_Edges)
 	shortcutArray = in_Edges;
 }
 
+void openGLrender::setClusterArray(openGL_Cluster *in_Clusters)
+{
+	//shortcutArray = new openGL_Node_3d[edgeCount];
+	clusterArray = in_Clusters;
+}
+
 void openGLrender::setNodeCount(int count)
 {
 	this->nodeCount = count;
@@ -45,6 +53,11 @@ void openGLrender::setEdgeCount(int count)
 void openGLrender::setShortcutEdgeCount(int count)
 {
 	this->shortcutCount = count;
+}
+
+void openGLrender::setClusterCount(int count)
+{
+	this->clusterCount = count;
 }
 
 void openGLrender::setCamera(float x,float y,float z)
@@ -179,6 +192,23 @@ bool openGLrender::initShaderProgram()
 	glLinkProgram(program3);
 	glUseProgram(program3);
 
+	//Clusters shader program
+	GLuint c_vShader;
+	GLuint c_fShader;
+	if ((c_fShader = loadShader("pferdClusterFragment.glsl", GL_FRAGMENT_SHADER)) == 0)
+	{ return false; };
+	if ((c_vShader = loadShader("pferdClusterVertex.glsl", GL_VERTEX_SHADER)) == 0)
+	{ return false; };
+
+	program4 = glCreateProgram();
+	glAttachShader(program4, c_vShader);
+	glAttachShader(program4, c_fShader);
+	glBindAttribLocation(program4, 0, "in_position");
+	glBindAttribLocation(program4, 1, "in_color");
+
+	glLinkProgram(program4);
+	glUseProgram(program4);
+
 	return true;
 }
 
@@ -232,6 +262,11 @@ bool openGLrender::initShortcuts()
 
 	glBindVertexArray(0);
 
+	return true;
+}
+
+bool openGLrender::initCluster()
+{
 	return true;
 }
 
@@ -432,7 +467,7 @@ void openGLrender::mouse(int x, int y)
 			mouse_delta_x1 = x;
 			mouse_delta_y1 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/900.0)*cameraPos.z, cameraPos.y + ((float)(y-mouse_delta_y0)/900.0)*cameraPos.z, cameraPos.z);
+			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y0)/(4000.0*camZoom)), cameraPos.z);
 
 			swap = false;
 			glutPostRedisplay();
@@ -442,7 +477,7 @@ void openGLrender::mouse(int x, int y)
 			mouse_delta_x0 = x;
 			mouse_delta_y0 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/900.0)*cameraPos.z, cameraPos.y + ((float)(y-mouse_delta_y1)/900.0)*cameraPos.z, cameraPos.z);
+			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y1)/(4000.0*camZoom)), cameraPos.z);
 
 			swap = true;
 			glutPostRedisplay();
@@ -454,7 +489,7 @@ void openGLrender::mouse(int x, int y)
 		{
 			mouse_delta_y1 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + ((float)(y-mouse_delta_y0)/150.0)*cameraPos.z);
+			camZoom = camZoom - ((float)(y-mouse_delta_y0)/150.0)*camZoom;
 
 			swap = false;
 			glutPostRedisplay();
@@ -463,7 +498,7 @@ void openGLrender::mouse(int x, int y)
 		{
 			mouse_delta_y0 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + ((float)(y-mouse_delta_y1)/150.0)*cameraPos.z);
+			camZoom = camZoom - ((float)(y-mouse_delta_y1)/150.0)*camZoom;
 
 			swap = true;
 			glutPostRedisplay();
@@ -515,7 +550,6 @@ void openGLrender::mouseClickCallback(int button, int state, int x, int y)
 	currentInstance->mouseClick(button, state, x, y);
 }
 
-
 void openGLrender::keyboard (unsigned char key, int x, int y)
 {
 	switch( key ) 
@@ -545,6 +579,10 @@ void openGLrender::keyboard (unsigned char key, int x, int y)
 			break;
 		case 's':
 			showShortcuts = !showShortcuts;
+			glutPostRedisplay();
+			break;
+		case 'c':
+			showCluster = !showCluster;
 			glutPostRedisplay();
 			break;
 	}
@@ -589,26 +627,24 @@ void openGLrender::display()
 	
 	//set projection matrix
 	float fnear = 0.00001f;
+	float ffar = 10000.0f;
     float fov = 45;
     float aspect = float(wWidth) / float(wHeight);
-    projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
+    //projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
+	projMX = glm::ortho(-(float)wWidth/(8000.0f*camZoom),(float)wWidth/(8000.0f*camZoom),-(float)wHeight/(8000.0f*camZoom),(float)wHeight/(8000.0f*camZoom),fnear,ffar);
 	//set view matrix
 	viewMX = glm::lookAt(cameraPos,cameraPos - glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	//set model matrix
 	modelMX = glm::mat4(1.0f);
 	//set model_view_projection matrix
-	
-	/* TODO wird nicht verwendet */ 
-	//glm::mat4 mvpMX = projMX * viewMX * modelMX;
+	glm::mat4 mvpMX = projMX * viewMX * modelMX;
 
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));
-	glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projMX));
-	glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
-	//glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
+	glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
    
-   glPointSize(4.0);
    glLineWidth(2.5);
+   glEnable(GL_PROGRAM_POINT_SIZE);
+   glEnable(GL_DEPTH_TEST);
 	
 	if(showNodes)
 	{
@@ -617,9 +653,7 @@ void openGLrender::display()
 	}
 
 	glUseProgram(program3);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));
-	glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projMX));
-	glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
+	glUniformMatrix4fv(glGetUniformLocation(program3, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
 	if(showShortcuts)
 	{
 		glBindVertexArray(vbo_shortcuts);
@@ -627,29 +661,26 @@ void openGLrender::display()
 	}
 
 	glUseProgram(program1);
-	glUniformMatrix4fv(glGetUniformLocation(program1, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));
-	glUniformMatrix4fv(glGetUniformLocation(program1, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projMX));
-	glUniformMatrix4fv(glGetUniformLocation(program1, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
+	glUniformMatrix4fv(glGetUniformLocation(program1, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
 	if(showEdges)
 	{
 		glBindVertexArray(vbo_edges);
 		glDrawArrays(GL_LINES, 0, edgeCount);
 	}
 
+
 	//We don't want to draw labels with Glut atm
 	//drawText(mvpMX);
-
+	
 	glUseProgram(program2);
-	glUniformMatrix4fv(glGetUniformLocation(program2, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));
-	glUniformMatrix4fv(glGetUniformLocation(program2, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projMX));
-	glUniformMatrix4fv(glGetUniformLocation(program2, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
-/*	if(showMap)
+	glUniformMatrix4fv(glGetUniformLocation(program2, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
+	if(showMap)
 	{
 		glEnable( GL_TEXTURE_2D );
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glBindVertexArray(vbo_map);
-
+		
 		//draw the available map tiles
 		for(int i=0; i<mapCount; i++)
 		{
@@ -664,7 +695,7 @@ void openGLrender::display()
 		//disabling depth test when not needed speeds up performance
 		glDisable(GL_DEPTH_TEST);
 	}
-*/
+
 	glutSwapBuffers();
 }
 

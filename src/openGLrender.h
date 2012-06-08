@@ -57,7 +57,7 @@
 #endif
 
 //stores the vertex data structes
-#include "structs.h"
+#include "visStructs.h"
 
 //pragmas seem to be only necessary in windows
 #ifdef _WIN32
@@ -88,18 +88,22 @@ private:
 	unsigned int nodeCount;
 	unsigned int edgeCount;
 	unsigned int shortcutCount;
+	unsigned int clusterCount;
 	openGL_Node_3d *nodeArray;
 	openGL_Edge_Node *edgeArray;
 	openGL_Node_3d *shortcutArray;
+	openGL_Cluster *clusterArray;
 
 	//stuff needed for openGL
 	bool showNodes;
 	bool showEdges;
 	bool showShortcuts;
 	bool showMap;
+	bool showCluster;
 	int wWidth;
 	int wHeight;
 	glm::vec3 cameraPos;
+	float camZoom;
 	int mouse_delta_x0;
 	int mouse_delta_x1;
 	int mouse_delta_y0;
@@ -115,6 +119,7 @@ private:
 	GLuint vbo_nodes;
 	GLuint vbo_edges;
 	GLuint vbo_shortcuts;
+	GLuint vbo_cluster;
 
 	//openGL textures
 	GLuint *map_textures;
@@ -125,6 +130,7 @@ private:
 	GLuint program1;
 	GLuint program2;
 	GLuint program3;
+	GLuint program4;
 
 	//used to read the shader source code - needs to be replaced
 	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
@@ -141,6 +147,8 @@ private:
 	bool initEdges();
 	//loads all shortcut geometry
 	bool initShortcuts();
+	//loads all circle geometry
+	bool initCluster();
 	//loads map geometry
 	bool initMap();
 	//loads map textures and actually heavily relies on SOIL to do all the nasty stuff
@@ -173,10 +181,12 @@ public:
 	//set methods
 	void setNodeCount(int);
 	void setEdgeCount(int);
+	void setClusterCount(int);
 	void setShortcutEdgeCount(int);
 	void setNodeArray(openGL_Node_3d*);
 	void setEdgeArray(openGL_Edge_Node*);
 	void setShortcutEdgeArray(openGL_Node_3d*);
+	void setClusterArray(openGL_Cluster*);
 	void setCamera(float,float,float);
 
 };

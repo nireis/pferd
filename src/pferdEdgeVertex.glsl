@@ -1,19 +1,27 @@
 #version 120
 
-uniform mat4 projection_matrix;
-uniform mat4 model_matrix;
-uniform mat4 view_matrix;
+uniform mat4 mvp;
 
 attribute vec2 in_position;
 attribute float in_color;
 attribute vec3 in_normal;
 
-varying float color;
+varying vec4 color;
 
+vec4 transferFunction(in float value)
+{	
+	float r;
+	float g;
+	float b;
+	r = sin(value * 3.14/2.0);
+	g = sin(value * 3.14);
+	b = cos(value* 3.14/2.0);
+	return vec4(r,g,b,1.0);
+}
 
 void main(void) 
 {
-	color = in_color;
+	color = transferFunction(in_color);
 	//in_normal = normalize(in_normal); 
 	vec3 in_normal_normalized = normalize(vec3(in_normal));
 
@@ -28,6 +36,6 @@ void main(void)
 	
 	vec2 offsetPos = vec2(x_mercator,y_mercator) + (vec2(x_normal_mercator,y_normal_mercator)*0.00002);
 	
-	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(offsetPos,(in_color/1000000.0), 1.0);
+	gl_Position = mvp * vec4(offsetPos,(in_color), 1.0);
 }
 

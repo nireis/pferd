@@ -123,6 +123,8 @@ int main(int argc, char *argv[]){
 	//CHDijkstraTest(&g, &scg, 149909);
 	
 	/* male per cluster ein paar gebiete an */
+	list<unsigned int> starts;
+	list<unsigned int> targets;
 	{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
 		double step = 0.01/32.0;
@@ -134,8 +136,7 @@ int main(int argc, char *argv[]){
 		unsigned int count = 50;
 		cl.setMostPopulatedCells( count );
 		
-		list<unsigned int> starts;
-		list<unsigned int> targets;
+		
 
 		double perc = 0.1;
 		unsigned int upper = (unsigned int)(((double)count)*perc);
@@ -176,6 +177,19 @@ int main(int argc, char *argv[]){
 	sim.setSCGraph(&scg);
 	sim.setEdgeColours(g.getEdgeDataPointer(), g.getEdgeCount());
 
+	list<openGL_Cluster> clist;
+	for(list<unsigned int>::iterator it = targets.begin(); 
+			it != targets.end(); it++)
+	{
+		clist.push_front( 
+			openGL_Cluster(
+			g.getNodeData(*it).lon, /* X */
+			g.getNodeData(*it).lat, /* Y */
+			/* 0.01/ */ 64.0, /* Radius == Step Size */
+			(float)g.getNodeData(*it).id / (float)g.getNodeCount() /* Colour == NodeID */
+			) );
+	}
+	
 	if( startVis ){
 		//thread t = thread(&startVisThread, &scg);
 		//t.join();
