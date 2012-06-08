@@ -212,7 +212,7 @@ void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 	resetMany();
 }
 
-void Dijkstra::manyToOne(unsigned int node_id0, vector<unsigned int>* sources,
+void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 		unsigned int weight){
 	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
 	// und markierte Kanten benutzen. Sobald wir alle sources gefunden haben

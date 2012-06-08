@@ -91,7 +91,7 @@ class Dijkstra{
 		/*
 		 * Many to one Dijkstra, welcher die Distanzen in den sources-vector schreibt.
 		 */
-		void manyToOne(unsigned int node_id0, vector<unsigned int>* sources, unsigned int weight);
+		void manyToOne(vector<unsigned int>* sources, unsigned int node_id0, unsigned int weight);
 };
 
 #endif

@@ -234,7 +234,7 @@ void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 	resetOneToMany();
 }
 
-void CHDijkstra::manyToOne(unsigned int node_id0, vector<unsigned int>* sources,
+void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 		unsigned int weight){
 	// Von den sources alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es

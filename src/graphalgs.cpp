@@ -820,7 +820,9 @@ bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
 		finish = clock();
 		time2 += (double(finish)-double(start))/CLOCKS_PER_SEC;*/
 		// cout << "Aktuell bei " << i << endl;
-		if(chd.oneToOne(0, i, 1) != d.oneToOne(0, i, 1)){
+		vector<unsigned int> src(1,0);
+		d.manyToOne(&src, i, 1);
+		if(chd.oneToOne(0, i, 1) != src[0]){
 			cout << "Error: " << i << endl;
 			cout << chd.oneToOne(0, i, 1) << endl;
 			cout << d.oneToOne(0, i, 1) << endl;
