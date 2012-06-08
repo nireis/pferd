@@ -1,20 +1,18 @@
-#include "chdijkstra.h"
+#include "dijkstra.h"
 
-CHDijkstra::CHDijkstra(SCGraph* g):
+Dijkstra::Dijkstra(Graph* g):
 	nr_of_nodes(g->getNodeCount()),
 	dist(nr_of_nodes),
 	o_found_by(2,vector<int> (nr_of_nodes,-1)),
-	marked(g->getEdgeCount() + g->getShortcutCount(), false),
 	m_found_by(nr_of_nodes,-1),
 	o_reset_found_by(2){
 	this->g = g;
 	o_reset_found_by[0].reserve(nr_of_nodes);
 	o_reset_found_by[1].reserve(nr_of_nodes);
 	m_reset_found_by.reserve(nr_of_nodes);
-	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
-unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
+unsigned int Dijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		unsigned int weight){
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
@@ -41,24 +39,19 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		EdgesIterator it = g->getEdgesIt(i, node_id[i]);
 		while(it.hasNext()){
 			Edge* currentEdge = it.getNext();
-			if(currentEdge->other_lvl > g->getNodeLVL(node_id[i])){
-				unsigned int currentEdgeTarget = currentEdge->other_node;
-				// Wenn wir schon den anderen Knoten gefunden haben...
-				if(currentEdgeTarget == node_id[(i+1)%2]){
-					min_path_length = currentEdge->value;
-					// Die Werte für das Backtracing setzen.
-					min_path_center = node_id[(i+1)%2];
-					o_found_by[i][node_id[(i+1)%2]] = (int)currentEdge->id;
-					o_reset_found_by[i].push_back(node_id[(i+1)%2]);
-				}
-				else{
-					// ...sonst tu sie in U
-					U.push(U_element_bi(
-						currentEdge->value,currentEdge->other_node,currentEdge->id,i));
-				}
+			unsigned int currentEdgeTarget = currentEdge->other_node;
+			// Wenn wir schon den anderen Knoten gefunden haben...
+			if(currentEdgeTarget == node_id[(i+1)%2]){
+				min_path_length = currentEdge->value;
+				// Die Werte für das Backtracing setzen.
+				min_path_center = node_id[(i+1)%2];
+				o_found_by[i][node_id[(i+1)%2]] = (int)currentEdge->id;
+				o_reset_found_by[i].push_back(node_id[(i+1)%2]);
 			}
 			else{
-				break;
+				// ...sonst tu sie in U
+				U.push(U_element_bi(
+					currentEdge->value,currentEdge->other_node,currentEdge->id,i));
 			}
 			// numEdges++;
 		}
@@ -67,9 +60,10 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 	dist[node_id1] = 0;
 
 	// Die restlichen Knoten abarbeiten
-	while(!U.empty() && min_path_length > U.top().distance){
+	unsigned int tmpid = node_id0;
+	while(!U.empty() && min_path_length > dist[tmpid]){
 		int i = U.top().found_by;
-		unsigned int tmpid = U.top().id;
+		tmpid = U.top().id;
 		if(o_found_by[i][tmpid] == -1){
 			// numNodes++;
 			o_found_by[i][tmpid] = (int)U.top().eid;
@@ -85,16 +79,10 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 			while(it.hasNext()){
 				Edge* currentEdge = it.getNext();
 				unsigned int currentEdgeTarget = currentEdge->other_node;
-				// Wir laufen nur bergauf...
-				if(currentEdge->other_lvl > g->getNodeLVL(tmpid)){
-					// ...und tun die Knoten in U, wenn sie noch nicht abgearbeitet wurden.
-					if(o_found_by[i][currentEdgeTarget] == -1){
-						U.push(U_element_bi(
-							currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
-					}
-				}
-				else{
-					break;
+				// Nur Knoten, die wir noch nicht gesettled haben.
+				if(o_found_by[i][currentEdgeTarget] == -1){
+					U.push(U_element_bi(
+						currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
 				}
 				// numEdges++;
 			}
@@ -123,11 +111,11 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 	//cout << "numEdges: " << numEdges << endl;
 	//cout << "===" << endl;
 
-	resetOneToOne();
+	resetOne();
 	return min_path_length;
 }
 
-void CHDijkstra::resetOneToOne(){
+void Dijkstra::resetOne(){
 	for(int i=0; i<2; i++){
 		while(!o_reset_found_by[i].empty()){
 			o_found_by[i][o_reset_found_by[i].back()] = -1;
@@ -136,17 +124,8 @@ void CHDijkstra::resetOneToOne(){
 	}
 }
 
-void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
+void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 		unsigned int weight){
-	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
-	/* !TODO! wenn die CH fertig ist, gibt es
-	 *
-	 * g->getEdgeCount() + g->getShortcutCount()
-	 * viele Kanten insgesammt, die maximale Edge-ID ist
-	 * (g->getEdgeCount() + g->getShortcutCount()) -1
-	 */
-	markBackEdges(targets, &marked);
-
 	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
 	// und markierte Kanten benutzen. Sobald wir alle targets gefunden haben
 	// brechen wir ab.
@@ -174,8 +153,7 @@ void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 						Edge* tmpedge = it.getNext();
 						// Wenn der Knoten noch nicht gefunden wurde UND (sein Level größer ist
 						// ODER die Kante markiert ist).
-						if(m_found_by[tmpedge->other_node] == -1
-								&& (tmpedge->other_lvl > g->getNodeLVL(tmpnode) || marked[tmpedge->id])){
+						if(m_found_by[tmpedge->other_node] == -1){
 							// ...tu sie in U
 							U.push(U_element(
 										tmpedge->value+U.top().distance,tmpedge->other_node,tmpedge->id));
@@ -231,20 +209,11 @@ void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 			}
 		}
 	}
-	resetOneToMany();
+	resetMany();
 }
 
-void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
+void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 		unsigned int weight){
-	// Von den sources alle aufsteigenden Kanten besuchen und markieren.
-	/* !TODO! wenn die CH fertig ist, gibt es
-	 *
-	 * g->getEdgeCount() + g->getShortcutCount()
-	 * viele Kanten insgesammt, die maximale Edge-ID ist
-	 * (g->getEdgeCount() + g->getShortcutCount()) -1
-	 */
-	markForwEdges(sources, &marked);
-
 	// Von node_id0 aus einen "normalen" Dijkstra machen und dabei aufsteigende
 	// und markierte Kanten benutzen. Sobald wir alle sources gefunden haben
 	// brechen wir ab.
@@ -272,8 +241,7 @@ void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 						Edge* tmpedge = it.getNext();
 						// Wenn der Knoten noch nicht gefunden wurde UND (sein Level größer ist
 						// ODER die Kante markiert ist).
-						if(m_found_by[tmpedge->other_node] == -1
-								&& (tmpedge->other_lvl > g->getNodeLVL(tmpnode) || marked[tmpedge->id])){
+						if(m_found_by[tmpedge->other_node] == -1){
 							// ...tu sie in U
 							U.push(U_element(
 										tmpedge->value+U.top().distance,tmpedge->other_node,tmpedge->id));
@@ -324,68 +292,12 @@ void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 			}
 		}
 	}
-	resetOneToMany();
+	resetMany();
 }
 
-void CHDijkstra::resetOneToMany(){
+void Dijkstra::resetMany(){
 	while(!m_reset_found_by.empty()){
 		m_found_by[m_reset_found_by.back()] = -1;
 		m_reset_found_by.pop_back();
-	}
-	while(!m_reset_marked.empty()){
-		marked[m_reset_marked.back()] = false;
-		m_reset_marked.pop_back();
-	}
-}
-
-void CHDijkstra::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
-	vector<unsigned int> todo;
-	// Erstmal alle Startknoten einfügen. Man könnte auch
-	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
-	// des Rests.
-	todo.assign(nodes->begin(), nodes->end());
-	while(!todo.empty()){
-		unsigned int tmpnode = todo.back();todo.pop_back();
-		EdgesIterator it = g->getInEdgesIt(tmpnode);
-		while(it.hasNext()){
-			Edge* tmpedge = it.getNext();
-			// Wenn wir nicht schon hier waren und es nach oben geht.
-			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
-				if(!((*marked)[tmpedge->id])){
-					(*marked)[tmpedge->id] = true;
-					m_reset_marked.push_back(tmpedge->id);
-					todo.push_back(tmpedge->other_node);
-				}
-			}
-			else{
-				break;
-			}
-		}
-	}
-}
-
-void CHDijkstra::markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked){
-	vector<unsigned int> todo;
-	// Erstmal alle Startknoten einfügen. Man könnte auch
-	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
-	// des Rests.
-	todo.assign(nodes->begin(), nodes->end());
-	while(!todo.empty()){
-		unsigned int tmpnode = todo.back();todo.pop_back();
-		EdgesIterator it = g->getOutEdgesIt(tmpnode);
-		while(it.hasNext()){
-			Edge* tmpedge = it.getNext();
-			// Wenn wir nicht schon hier waren und es nach oben geht.
-			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
-				if(!((*marked)[tmpedge->id])){
-					(*marked)[tmpedge->id] = true;
-					m_reset_marked.push_back(tmpedge->id);
-					todo.push_back(tmpedge->other_node);
-				}
-			}
-			else{
-				break;
-			}
-		}
 	}
 }

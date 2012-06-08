@@ -1,5 +1,5 @@
-#ifndef chdijkstra_h
-#define chdijkstra_h
+#ifndef dijkstra_h
+#define dijkstra_h
 
 #include <iostream>
 #include "graph.h"
@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 
-class CHDijkstra{
+class Dijkstra{
 	private:
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
@@ -53,49 +53,37 @@ class CHDijkstra{
 		};
 
 		/*
-		 * Method to mark ascending edges for the one to many Dijkstra.
-		 */
-		void markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked);
-
-		/*
-		 * Method to mark ascending edges for the many to one Dijkstra.
-		 */
-		void markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>* marked);
-
-		/*
 		 * Setzt den one to one Dijkstra zurück.
 		 */
-		void resetOneToOne();
+		void resetOne();
 
 		/*
 		 * Setzt den one to many Dijkstra zurück.
 		 */
-		void resetOneToMany();
+		void resetMany();
 
-		SCGraph* g;
+		Graph* g;
 		unsigned int nr_of_nodes;
 		// Variablen für die Dijkstras...
 		// -1, wenn der Knoten noch nicht gefunden wurde, bei found_by.
 		vector<unsigned int> dist;
 		vector< vector<int> > o_found_by;
-		vector<unsigned int> marked;
 		vector<int> m_found_by;
 		// ...inkl. Resetlisten.
 		vector< vector<unsigned int>> o_reset_found_by;
 		vector<unsigned int> m_reset_found_by;
-		vector<unsigned int> m_reset_marked;
 
 	public:
 
-		CHDijkstra(SCGraph* g);
+		Dijkstra(Graph* g);
 
 		/*
-		* One to one Dijkstra auf der CH.
+		* One to one Dijkstra.
 		*/
 		unsigned int oneToOne(unsigned int node_id0, unsigned int node_id1, unsigned int weight);
 
 		/*
-		 * One to many Dijkstra auf der CH. Die Distanzen werden in den targets-vector geschrieben
+		 * One to many Dijkstra. Die Distanzen werden in den targets-vector geschrieben
 		 * and die entsprechende Stelle.
 		 */
 		void oneToMany(unsigned int node_id0, vector<unsigned int>* targets, unsigned int weight);

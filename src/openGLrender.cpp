@@ -643,7 +643,7 @@ void openGLrender::display()
 	glUniformMatrix4fv(glGetUniformLocation(program2, "view_matrix"), 1, GL_FALSE, glm::value_ptr(viewMX));
 	glUniformMatrix4fv(glGetUniformLocation(program2, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projMX));
 	glUniformMatrix4fv(glGetUniformLocation(program2, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMX));
-	if(showMap)
+/*	if(showMap)
 	{
 		glEnable( GL_TEXTURE_2D );
 		glEnable(GL_DEPTH_TEST);
@@ -664,7 +664,7 @@ void openGLrender::display()
 		//disabling depth test when not needed speeds up performance
 		glDisable(GL_DEPTH_TEST);
 	}
-
+*/
 	glutSwapBuffers();
 }
 

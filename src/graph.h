@@ -58,6 +58,8 @@ class Graph {
 		ND* node_data;
 		ED* edge_data;
 
+		unsigned int* EdgeLoads;
+
 		/*
 		 * private Methoden
 		 */
@@ -123,9 +125,13 @@ class Graph {
 		
 		E* getOutEdge(unsigned int edge_id);
 		E* getInEdge(unsigned int edge_id);
+		E* getEdge(bool out1_in0, unsigned int edge_id);
 		
 		E* copyOutEdge(unsigned int edge_id);
 		E* copyInEdge(unsigned int edge_id);
+
+		void addEdgeLoad(unsigned int edge_id);
+		void addEdgeLoad(unsigned int edge_id, unsigned int times);
 
 		/*
 		 * zum Updaten von Kantenbelastungen
@@ -142,6 +148,7 @@ class Graph {
 		 * geändert wurden
 		 */
 		void updateEdgeValues();
+		void updateEdgeLoads();
 
 		/*
 		 * hier werden Iteratoren über Kanten nach Aussen gegeben

@@ -9,6 +9,7 @@
 #include "vis.h"
 #include "clust.h"
 #include "chdijkstra.h"
+#include "dijkstra.h"
 #include "sim.h"
 
 #include <thread>
@@ -19,10 +20,6 @@ void startVisThread(SCGraph* g){
 	cout << "> Starte Visualisierung" << endl;
 	vis anzeige(g); anzeige.start();
 }
-//void startVisThread(Graph* g){
-//	cout << "> Starte Visualisierung" << endl;
-//	vis anzeige(g); anzeige.start();
-//}
 
 
 int main(int argc, char *argv[]){
@@ -42,7 +39,7 @@ int main(int argc, char *argv[]){
 	bool startVis = false;
 	bool chverbose = false;
 
-	if(argc < 3 || argc > 5){
+	if(argc < 2 || argc > 5){
 		cout << "---" << endl 
 				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " -g <Graphendatei> [-v]" << endl
 				<< "-- -g <Graphdatei> : Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
@@ -70,8 +67,15 @@ int main(int argc, char *argv[]){
 					chverbose = true;
 					i++;
 			} else {
-				cout << "Input Error. " << endl;
-				return 0;
+				/* check if argv[i] existing file */
+				ifstream pcheckfile(argv[i]);
+				if(pcheckfile){
+					file = argv[i];
+					i++;
+				} else {
+					cout << "Input Error. " << endl;
+					return 0;
+				}
 			}
 		}
 	}
@@ -124,10 +128,10 @@ int main(int argc, char *argv[]){
 		double step = 0.01/32.0;
 		cluster cl(&g, step);
 		/* zweites Argument ist die Randlänge einer Zelle
-		 * in einer unbestimmten Einheit 
+		 * in einer unbestimmten Einheit
 		 */
 
-		unsigned int count = 150;
+		unsigned int count = 50;
 		cl.setMostPopulatedCells( count );
 		
 		list<unsigned int> starts;
@@ -153,7 +157,7 @@ int main(int argc, char *argv[]){
 
 		/* starte Dijkstras von starts zu targets */
 		cout << "> Starte Dijkstras " << endl;
-		CHDijkstras chd(&scg);
+		Dijkstra chd(&g);
 		for(list<unsigned int>::iterator it = targets.begin(); 
 				it != targets.end(); it++)
 		{
@@ -164,36 +168,23 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
+	g.updateEdgeLoads();
+	//scg.shareShortcutLoads();
 	}
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
+	
 
 	sim.setSCGraph(&scg);
-	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
+	sim.setEdgeColours(g.getEdgeDataPointer(), g.getEdgeCount());
 
 	if( startVis ){
-		thread t = thread(&startVisThread, &scg);
-		t.join();
-		//cout << "> Starte Visualisierung" << endl;
-		//vis anzeige(&scg); anzeige.start();
+		//thread t = thread(&startVisThread, &scg);
+		//t.join();
+		cout << "> Starte Visualisierung" << endl;
+		vis anzeige(&g); anzeige.start();
 	}
 
-	cout << "> Exit Pferd" << endl;
 
+	cout << "> Exit Pferd" << endl;
 	return 0;
 }
-	
-	// Markiere einen Weg im Graph
-	/* von Tübinger Vorstadt, Herman-Kurz-Schule / Christuskirche 
-	 * bis Jüngingen, Killertal Apotheke/ Cafe Anlitz
-	 * auf 15K Graph
-	 */
-	//CHDijkstra(&scg, 2271, 252); 
-
-	/*CHDijkstras chd(&scg);
-	for(unsigned int i=0; i<=scg.getNodeCount(); i++){
-		if(chd.oneToOne(5, i) != CHDijkstra(&scg, 5, i)){
-			cout << "Error!" << endl;
-		}
-	}*/
 
