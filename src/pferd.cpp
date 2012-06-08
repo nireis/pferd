@@ -133,15 +133,13 @@ int main(int argc, char *argv[]){
 		 * in einer unbestimmten Einheit
 		 */
 
-		unsigned int count = 50;
+		unsigned int count = 40;
 		cl.setMostPopulatedCells( count );
-		
-		
 
 		double perc = 0.1;
 		unsigned int upper = (unsigned int)(((double)count)*perc);
 		
-		cl.getNodesLower(5,(count-upper)/1, &starts);
+		//cl.getNodesLower(5,(count-upper), &starts);
 
 		while( ! starts.empty()){
 			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
@@ -149,16 +147,16 @@ int main(int argc, char *argv[]){
 			while(it.hasNext()){
 				Edge* e = it.getNext();
 				if( ! scg.isShortcut(e->id) )
-					scg.addEdgeLoad(e->id,50);
+					scg.addEdgeLoad(e->id,1);
 			}
 		}
 
 		cl.getNodesUpper(1,upper, &targets);
-		cl.getNodesLower(38,(count-upper)/1, &starts);
+		cl.getNodesLower(68,(count-upper), &starts);
 
 		/* starte Dijkstras von starts zu targets */
 		cout << "> Starte Dijkstras " << endl;
-		Dijkstra chd(&g);
+		CHDijkstra chd(&scg);
 		for(list<unsigned int>::iterator it = targets.begin(); 
 				it != targets.end(); it++)
 		{
@@ -169,13 +167,13 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
-	g.updateEdgeLoads();
-	//scg.shareShortcutLoads();
+	scg.updateEdgeLoads();
+	scg.shareShortcutLoads();
 	}
 	
 
 	sim.setSCGraph(&scg);
-	sim.setEdgeColours(g.getEdgeDataPointer(), g.getEdgeCount());
+	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
 
 	list<openGL_Cluster> clist;
 	for(list<unsigned int>::iterator it = targets.begin(); 
@@ -183,10 +181,10 @@ int main(int argc, char *argv[]){
 	{
 		clist.push_front( 
 			openGL_Cluster(
-			g.getNodeData(*it).lon, /* X */
-			g.getNodeData(*it).lat, /* Y */
+			scg.getNodeData(*it).lon, /* X */
+			scg.getNodeData(*it).lat, /* Y */
 			/* 0.01/ */ 64.0, /* Radius == Step Size */
-			(float)g.getNodeData(*it).id / (float)g.getNodeCount() /* Colour == NodeID */
+			(float)scg.getNodeData(*it).id / (float)scg.getNodeCount() /* Colour == NodeID */
 			) );
 	}
 	
@@ -194,7 +192,7 @@ int main(int argc, char *argv[]){
 		//thread t = thread(&startVisThread, &scg);
 		//t.join();
 		cout << "> Starte Visualisierung" << endl;
-		vis anzeige(&g); anzeige.start();
+		vis anzeige(&scg); anzeige.start();
 	}
 
 
