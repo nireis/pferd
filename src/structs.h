@@ -506,6 +506,7 @@ struct conf{
 	/* per hand eingefügte daten beachten */
 	std::vector< travelCircle > manual_targets;
 
+	bool chConstVerbose;
 };
 
 #endif

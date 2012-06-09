@@ -1,6 +1,6 @@
 #include "conf.h"
 
-void readConf(string fname, conf* confstr){
+void readConf(string fname, conf* cfg){
 	string buffer;
 	ifstream f;
 	f.open(fname.c_str(), ios::in);
@@ -10,7 +10,7 @@ void readConf(string fname, conf* confstr){
 		while(!f.eof()){
 			getline(f,buffer,'\n');
 			if(buffer != ""){
-				parseLine(&buffer, confstr);
+				parseLine(&buffer, cfg);
 			}
 		}
 	}
@@ -20,7 +20,7 @@ void readConf(string fname, conf* confstr){
 	f.close();
 }
 
-void parseLine(string* line, conf* confstr){
+void parseLine(string* line, conf* cfg){
 	/*
 	 * Wir prüfen das erste Wort (bis zu ersten Leerzeichen) und entscheiden daran,
 	 * welche Konfigurationsvariable gesetzt werden soll und lesen dann den zweiten
@@ -51,7 +51,7 @@ void parseLine(string* line, conf* confstr){
 	// Den Keystring prüfen nach der zugehörigen Option.
 	if(key == "showVis"){
 		if(value.size() == 1){
-			confstr->showVis = toBool(&value[0]);
+			cfg->showVis = toBool(&value[0]);
 		}
 		else{
 			cout << "Fehler beim Einlesen des Wertes von \"showVis\":" << endl;
@@ -60,10 +60,19 @@ void parseLine(string* line, conf* confstr){
 	}
 	else if(key == "playSound"){
 		if(value.size() == 1){
-			confstr->playSound = toBool(&value[0]);
+			cfg->playSound = toBool(&value[0]);
 		}
 		else{
 			cout << "Fehler beim Einlesen des Wertes von \"playSound\":" << endl;
+			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
+		}
+	}
+	else if(key == "chConstVerbose"){
+		if(value.size() == 1){
+			cfg->chConstVerbose = toBool(&value[0]);
+		}
+		else{
+			cout << "Fehler beim Einlesen des Wertes von \"chConstVerbose\":" << endl;
 			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
 		}
 	}

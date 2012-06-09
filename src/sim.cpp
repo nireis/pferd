@@ -119,8 +119,64 @@ void simulation::runVis(bool graph0_scgraph1){
 //}
 
 
+sim::sim(Graph* g, travelers* t, conf* c):
+	base_g(g),
+	sim_g(0),
+	trav(t),
+	ch(0),
+	chd(0),
+	cfg(c){}
 
+void sim::calcOneRound(){
+	sim_g = new SCGraph(base_g);
+	ch = new CH(base_g, sim_g);
+	ch->calcCH(cfg->chConstVerbose);
+	chd = new CHDijkstra(sim_g);
+	simTravelers();
+	recalcEdgevals();
+}
 
+bool sim::eqFound(){
+	return false;
+}
 
+void sim::recalcEdgevals(){
 
+}
 
+void sim::simTravelers(){
+	// Alle Traveler fahren lassen.
+	for(unsigned int i=0; i<trav->traffic.size(); i++){
+		// Schauen welche Art weniger Dijkstras benötigt bzw. ob
+		// es ein one to one ist.
+		pendler* tmp_pendler = &(trav->traffic)[i];
+		vector<unsigned int>* src = &tmp_pendler->source;
+		vector<unsigned int>* tgt = &tmp_pendler->target;
+		unsigned int srcsize = src->size();
+		unsigned int tgtsize = tgt->size();
+		if(srcsize > tgtsize){
+			for(unsigned int j=0; j<tgtsize; j++){
+				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+			}
+		}
+		else if(srcsize < tgtsize){
+			for(unsigned int j=0; j<srcsize; j++){
+				chd->oneToMany((*src)[j], tgt, tmp_pendler->weight);
+			}
+		}
+		else if(srcsize == 1){ // Beide sizes sind 1.
+			chd->oneToOne((*src)[0], (*tgt)[0], tmp_pendler->weight);
+		}
+		else{ // Die sizes sind gleich, aber ungleich 1.
+			for(unsigned int j=0; j<tgtsize; j++){
+				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+			}
+		}
+	}
+}
+
+sim::~sim(){
+	delete sim_g;
+	delete ch;
+	delete chd;
+}
