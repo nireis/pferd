@@ -22,6 +22,22 @@ vis::~vis(){
 	delete[] circles; circles = 0;
 }
 
+float vis::merkatorX(float in_x)
+{
+	float pi = 3.141592;
+	float x_mercator = (pi/180.0)*in_x;
+
+	return x_mercator;
+}
+
+float vis::merkatorY(float in_y)
+{
+	float pi = 3.141592;
+	float pos_radian = (pi/180.0)*in_y;
+	float y_mercator = log((1.0 + sin(pos_radian))/cos(pos_radian));
+
+	return y_mercator;
+}
 
 void vis::init(){
 	init(0);
@@ -88,6 +104,8 @@ void vis::init(std::list<openGL_Cluster>* circs){
 		{
 			circles[ counter ] = circs->front();
 			circs->pop_front();
+			circles[ counter ].xCenter = merkatorX(circles[ counter ].xCenter);
+			circles[ counter ].yCenter = merkatorY(circles[ counter ].yCenter);
 			counter++;
 		}
 	}
