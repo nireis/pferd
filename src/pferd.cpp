@@ -128,9 +128,9 @@ int main(int argc, char *argv[]){
 	list<unsigned int> starts;
 	list<unsigned int> targets;
 	list<openGL_Cluster> clist;
+	double step = 0.01/32.0;
 	{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
-		double step = 0.01/32.0;
 		cluster cl(&g, step);
 		/* zweites Argument ist die Randlänge einer Zelle
 		 * in einer unbestimmten Einheit
@@ -185,8 +185,8 @@ int main(int argc, char *argv[]){
 			openGL_Cluster(
 			scg.getNodeData(*it).lon, /* X */
 			scg.getNodeData(*it).lat, /* Y */
-			/* 0.01/ */ 64.0, /* Radius == Step Size */
-			(float)scg.getNodeData(*it).id / (float)scg.getNodeCount() /* Colour == NodeID */
+			step, /* Radius == Step Size */
+			1.0 /* Colour == NodeID */
 			) );
 	}
 
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]){
 		//thread t = thread(&startVisThread, &scg);
 		//t.join();
 		cout << "> Starte Visualisierung" << endl;
-		vis anzeige(&scg); anzeige.start();
+		vis anzeige(&scg, &clist); anzeige.start();
 	}
 
 
