@@ -454,7 +454,6 @@ class compare_uint_pair{
 		}
 };
 
-
 struct pendler {
 	std::vector<unsigned int> source;
 	std::vector<unsigned int> target;
@@ -472,5 +471,10 @@ struct float_2d {
 	float y;
 };
 
+struct conf{
+	// std::vector<double> typeCapacity;
+	bool showVis;
+	bool playSound;
+};
 
 #endif

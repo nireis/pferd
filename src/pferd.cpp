@@ -11,6 +11,7 @@
 #include "chdijkstra.h"
 #include "dijkstra.h"
 #include "sim.h"
+#include "conf.h"
 
 #include <thread>
 

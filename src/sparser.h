@@ -2,8 +2,8 @@
  * Parser zum Einlesen einer Graphdatei
  */
 
-#ifndef parser_h
-#define parser_h
+#ifndef sparser_h
+#define sparser_h
 
 #include "structs.h"
 #include <cstdlib>
@@ -12,7 +12,7 @@
 #include <iostream>
 #include <iomanip>
 
-class parser
+class sparser
 {
 private:
 	unsigned int NodeCount, EdgeCount;
@@ -40,13 +40,13 @@ public:
 	/*
 	 *default constructer
 	 */
-	parser();
-	parser(std::string graphdata);
+	sparser();
+	sparser(std::string graphdata);
 	void getNodesAndEdges(ParserNode* n,ParserEdge* e );
 	/*
 	 *default desctucter
 	 */
-	~parser();
+	~sparser();
 
 	/*
 	 * getNodeCount - Gibt Knotenanzahl zurück

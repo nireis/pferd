@@ -1,22 +1,31 @@
 /* 
  * Parser zum Einlesen einer Graphdatei
- * Kommentare in der parser.h
+ * Kommentare in der sparser.h
  * Zu Details befragen sie bitte den Autor, da er zu faul war jede Zeile
  * der Implementierung zu kommentieren
+ */
+
+/*
+ * !
+ * !
+ * ! liest den Stuttgart Graph ein
+ * ! und schreibt ihn wieder nach cout
+ * ! mi angepassten typen
+ * !
  */
 
 #include "sparser.h"
 using namespace std;
 
-parser::parser()
+sparser::sparser()
 {
 }
 
-parser::~parser()
+sparser::~sparser()
 {
 }
 
-void parser::createNode(string inputString, ParserNode* rNode)
+void sparser::createNode(string inputString, ParserNode* rNode)
 {
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
@@ -73,7 +82,7 @@ void parser::createNode(string inputString, ParserNode* rNode)
 		cout << atoi(tempStr.c_str()) << endl;
 }
 
-void parser::createEdge(string inputString, unsigned int edgeID, ParserEdge* rEdge)
+void sparser::createEdge(string inputString, unsigned int edgeID, ParserEdge* rEdge)
 {
 	//Variablen zum iterieren über den Eingabestring
 	string::iterator itr1;
@@ -124,7 +133,7 @@ void parser::createEdge(string inputString, unsigned int edgeID, ParserEdge* rEd
 		cout << (unsigned int) ((atof(tempStr.c_str()))*100) << endl; 
 }
 
-parser::parser(string graphdata)
+sparser::sparser(string graphdata)
 {
 	string buffer;
 //	unsigned int currentline = 1;
@@ -145,7 +154,7 @@ parser::parser(string graphdata)
 	}
 }
 
-void parser::getNodesAndEdges(ParserNode* n, ParserEdge* e)
+void sparser::getNodesAndEdges(ParserNode* n, ParserEdge* e)
 {
 	string buffer;
 //	unsigned int currentline = 1;
@@ -184,31 +193,31 @@ void parser::getNodesAndEdges(ParserNode* n, ParserEdge* e)
 	}
 }
 
-unsigned int parser::getNodeCount()
+unsigned int sparser::getNodeCount()
 {
 	cout << NodeCount << endl;
 	return NodeCount;
 }
 
-unsigned int parser::getEdgeCount()
+unsigned int sparser::getEdgeCount()
 {
 	cout << EdgeCount << endl;
 	return EdgeCount;
 }
 
-ParserNode* parser::getNodes()
+ParserNode* sparser::getNodes()
 {
 	return graphNodes;
 }
 
-ParserEdge* parser::getEdges()
+ParserEdge* sparser::getEdges()
 {
 	return graphEdges;
 }
 
 int main(int argc, char* argv[]){
 
-	parser p = parser(string(argv[1]));
+	sparser p = sparser(string(argv[1]));
 
 	p.getNodeCount();
 	p.getEdgeCount();
