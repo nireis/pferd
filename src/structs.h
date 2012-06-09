@@ -484,6 +484,7 @@ struct conf{
 	// std::vector<double> typeCapacity;
 	bool showVis;
 	bool playSound;
+	bool chConstVerbose;
 
 	/* traffic options */
 	int mode;
@@ -506,7 +507,6 @@ struct conf{
 	/* per hand eingefügte daten beachten */
 	std::vector< travelCircle > manual_targets;
 
-	bool chConstVerbose;
 };
 
 #endif
