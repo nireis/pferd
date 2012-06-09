@@ -11,6 +11,7 @@
 #include "CHConstruction.h"
 #include "structs.h"
 #include "openGLrender.h"
+#include "visStructs.h"
  
 class vis {
 	private:

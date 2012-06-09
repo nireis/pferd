@@ -1,5 +1,5 @@
-#ifndef structs_h
-#define structs_h
+#ifndef visStructs_h
+#define visStructs_h
 
 //freeglut and glew
 #include <GL/glew.h>
@@ -76,8 +76,6 @@ struct openGL_Cluster{
 	float color;
 };
 
-#endif
-
 //Basic Visualization Entity
 struct openGL_Entity{
 	openGL_Entity() : vbo_handler(0), shader_program(0), texture(0), world_position(glm::vec3(0.0)),
@@ -95,3 +93,6 @@ struct openGL_Entity{
 	glm::vec3 world_position;
 	bool visabilty;
 };
+
+#endif
+
