@@ -1,6 +1,8 @@
 #ifndef structs_h
 #define structs_h
 
+#include <vector>
+
 /*
  * vom Parser zu setzende Strukturen, 
  * wie sie aus der Datei gelesen werden können
@@ -513,6 +515,12 @@ class compare_uint_pair{
 		bool operator()(uint_pair& one, uint_pair& two){
 			return one.key > two.key;
 		}
+};
+
+struct conf{
+	// std::vector<double> typeCapacity;
+	bool showVis;
+	bool playSound;
 };
 
 #endif
