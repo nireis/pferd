@@ -139,12 +139,12 @@ GLuint openGLrender::initShaderProgram(char* fragment, char* vertex, char** attr
 	return program;
 }
 
-bool openGLrender::initOpenGL_Node_3d(GLuint vbo, openGL_Node_3d* nodeData, int size)
+bool openGLrender::initOpenGL_Node_3d(GLuint* vbo, openGL_Node_3d* nodeData, int size)
 {
-	glGenVertexArrays(1, &vbo);
-	glBindVertexArray(vbo);
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glGenVertexArrays(1, vbo);
+	glBindVertexArray(*vbo);
+	glGenBuffers(1, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*size, nodeData, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),NULL);
@@ -355,9 +355,10 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 bool openGLrender::initGraphVis()
 {
-	entityCount = 1;
+	entityCount = 3;
 	sceneEntities = new openGL_Entity[entityCount];
 
+	//init edges
 	sceneEntities[0] = openGL_Entity();
 	initOpenGL_Edge_Node(&(sceneEntities[0].vbo_handler),edgeArray,edgeCount);
 	sceneEntities[0].geometryType = GL_LINES;
@@ -371,6 +372,34 @@ bool openGLrender::initGraphVis()
 	sceneEntities[0].texture = NULL;
 	sceneEntities[0].visabilty = true;
 	sceneEntities[0].world_position = glm::vec3(0.0);
+
+	//init nodes
+	sceneEntities[1] = openGL_Entity();
+	initOpenGL_Node_3d(&(sceneEntities[1].vbo_handler),nodeArray,nodeCount);
+	sceneEntities[1].geometryType = GL_POINTS;
+	sceneEntities[1].numElements = nodeCount;
+	char* atrb1[2];
+	atrb[0] = "in_position";
+	atrb[1] = "in_color";
+	sceneEntities[1].shader_program = initShaderProgram("pferdFragment.glsl", "pferdVertex.glsl", atrb1, 2);
+	glLinkProgram(sceneEntities[1].shader_program);
+	sceneEntities[1].texture = NULL;
+	sceneEntities[1].visabilty = true;
+	sceneEntities[1].world_position = glm::vec3(0.0);
+
+	//init shortcuts
+	sceneEntities[2] = openGL_Entity();
+	initOpenGL_Node_3d(&(sceneEntities[2].vbo_handler),shortcutArray,shortcutCount);
+	sceneEntities[2].geometryType = GL_LINES;
+	sceneEntities[2].numElements = shortcutCount;
+	char* atrb2[2];
+	atrb[0] = "in_position";
+	atrb[1] = "in_color";
+	sceneEntities[2].shader_program = initShaderProgram("pferdEdgeFragment.glsl", "pferdVertex.glsl", atrb2, 2);
+	glLinkProgram(sceneEntities[2].shader_program);
+	sceneEntities[2].texture = NULL;
+	sceneEntities[2].visabilty = true;
+	sceneEntities[2].world_position = glm::vec3(0.0);
 
 	return true;
 }
@@ -485,23 +514,23 @@ void openGLrender::keyboard (unsigned char key, int x, int y)
 		case '-':
 			cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
 			glutPostRedisplay();
-			break;/*
+			break;
 		case 'n':
-			showNodes = !showNodes;
+			sceneEntities[1].visabilty = ! sceneEntities[1].visabilty;
 			glutPostRedisplay();
 			break;
 		case 'e':
-			showEdges = !showEdges;
+			sceneEntities[0].visabilty = ! sceneEntities[0].visabilty;
 			glutPostRedisplay();
-			break;
+			break;/*
 		case 'm':
 			showMap = !showMap;
 			glutPostRedisplay();
-			break;
+			break;*/
 		case 's':
-			showShortcuts = !showShortcuts;
+			sceneEntities[2].visabilty = ! sceneEntities[2].visabilty;
 			glutPostRedisplay();
-			break;
+			break;/*
 		case 'c':
 			showCluster = !showCluster;
 			glutPostRedisplay();
@@ -562,6 +591,7 @@ void openGLrender::display()
 
 	glEnable(GL_DEPTH_TEST);
 	glLineWidth(2.0);
+	glPointSize(4.0);
 
 	for(int i=0; i<entityCount; i++)
 	{
@@ -573,7 +603,7 @@ void openGLrender::display()
 			glDrawArrays(sceneEntities[i].geometryType, 0, sceneEntities[i].numElements);
 		}
 	}
-
+	
 	glutSwapBuffers();
 }
 
