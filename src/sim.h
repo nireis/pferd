@@ -6,6 +6,7 @@
 #include "clust.h"
 #include "ch.h"
 #include "vis.h"
+#include "structs.h"
 #include <thread>
 #include <mutex>
 
@@ -70,6 +71,21 @@ class simulation {
 		void run();
 };
 
+class sim{
+	private:
+		Graph* base_g;
+		SCGraph* sim_g;
+		travelers* trav;
+		CH* ch;
+		CHDijkstra* chd;
+		conf* cfg;
+		void simTravelers();
+		void recalcEdgevals();
+	public:
+		sim(Graph* g, travelers* t, conf* c);
+		void calcOneRound();
+		bool eqFound();
+};
 
 #endif
 

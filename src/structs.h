@@ -457,6 +457,7 @@ class compare_uint_pair{
 struct pendler {
 	std::vector<unsigned int> source;
 	std::vector<unsigned int> target;
+	unsigned int weight;
 };
 
 struct travelers {
@@ -475,6 +476,7 @@ struct conf{
 	// std::vector<double> typeCapacity;
 	bool showVis;
 	bool playSound;
+	bool chConstVerbose;
 };
 
 #endif
