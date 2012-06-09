@@ -117,10 +117,3 @@ void simulation::runVis(bool graph0_scgraph1){
 //}
 //void simulation::launchVisThread(SCGraph* g, std::list<openGL_Cluster>* clist){
 //}
-
-
-
-
-
-
-

@@ -3,11 +3,13 @@
 
 #include "graph.h"
 #include "chdijkstra.h"
+#include "dijkstra.h"
 #include "clust.h"
 #include "ch.h"
 #include "vis.h"
 #include <thread>
 #include <mutex>
+#include <iostream>
 
 struct simpletraffic {
 	unsigned int src;
@@ -70,6 +72,59 @@ class simulation {
 		void run();
 };
 
+// Andrés Simulation!
+
+template <typename G, typename D>
+class sim{
+	private:
+		Graph* base_g;
+		G* sim_g;
+		D* dij;
+		travelers* trav;
+		CH* ch;
+		bool simWithCH;
+		template <typename S>
+		/*
+		 * Startet die Simulation "s".
+		 */
+		static void calcSim(S s);
+
+	public:
+		sim(Graph* g, travelers* t, bool simWithCH);
+		/*
+		 * Die Funktion, mit welcher die Simulation initialisiert wird
+		 * und welche dann eine Simulation mit oder ohne CH (je nach 
+		 * Parameter "simWithCH") startet. Der Typ der erstellten Simulation
+		 * wird dann "calcSim" als Template-Parameter übergeben.
+		 */
+		static void initSim(Graph* g, travelers* t, bool simWithCH);
+
+};
+
+template <typename G, typename D>
+sim<G, D>::sim(Graph* g, travelers* t, bool swch):
+	base_g(g),
+	trav(t),
+	simWithCH(swch){}
+
+
+template <typename G, typename D>
+void sim<G, D>::initSim(Graph* g, travelers* t, bool simWithCH){
+   if(simWithCH){
+      sim<SCGraph, CHDijkstra>::calcSim< sim<SCGraph, CHDijkstra> >(
+            sim<SCGraph, CHDijkstra>(g, t, simWithCH));
+   }   
+   else{
+      sim<Graph, Dijkstra>::calcSim< sim<Graph, Dijkstra> >(
+            sim<Graph, Dijkstra>(g, t, simWithCH));
+   }   
+}
+
+template <typename G, typename D>
+template <typename S>
+void sim<G, D>::calcSim(S s){ 
+	sim_g = new G
+}
 
 #endif
 
