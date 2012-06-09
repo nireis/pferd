@@ -455,26 +455,57 @@ class compare_uint_pair{
 };
 
 struct pendler {
+	pendler() : source(), target(), weight(0) {}
+
 	std::vector<unsigned int> source;
 	std::vector<unsigned int> target;
+	unsigned int weight;
 };
 
 struct travelers {
+	travelers() : traffic(), circles() {}
+
 	std::vector<pendler> traffic;
 	std::list<openGL_Cluster> circles;
 };
 
-struct float_2d {
-	float_2d(float one, float two) : x(one), y(two) {}
+struct travelCircle {
+	travelCircle(float one, float two, float r, unsigned int c) : 
+		x(one), y(two), radius(r), count(c) {}
 
 	float x;
 	float y;
+
+	float radius;
+	unsigned int count;
 };
 
 struct conf{
 	// std::vector<double> typeCapacity;
 	bool showVis;
 	bool playSound;
+
+	/* traffic options */
+	int mode;
+	unsigned int max_travelers;
+	unsigned int source_count;
+	unsigned int target_count;
+
+	unsigned int weight_lower_bound;
+	unsigned int weight_upper_bound;
+	
+	/* cluster options */
+	double clust_step;
+	unsigned int clust_count_top_clusters;
+	double clust_top_percentage;
+	unsigned int clust_top_uppers;
+	unsigned int clust_top_lowers;
+	unsigned int clust_top_upper_nodecount_per_cluster;
+	unsigned int clust_top_lower_nodecount_per_cluster;
+
+	/* per hand eingefügte daten beachten */
+	std::vector< travelCircle > manual_targets;
+
 };
 
 #endif

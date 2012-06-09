@@ -12,6 +12,7 @@
 #include "dijkstra.h"
 #include "sim.h"
 #include "conf.h"
+#include "travel.h"
 
 #include <thread>
 
@@ -126,6 +127,7 @@ int main(int argc, char *argv[]){
 	/* male per cluster ein paar gebiete an */
 	list<unsigned int> starts;
 	list<unsigned int> targets;
+	list<openGL_Cluster> clist;
 	{
 		cout << "> Erstelle Cluster und starte Pendler" << endl;
 		double step = 0.01/32.0;
@@ -152,8 +154,8 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		cl.getNodesUpper(1,upper, &targets);
-		cl.getNodesLower(68,(count-upper), &starts);
+		cl.getNodesUpper(1,upper, &targets, &clist);
+		cl.getNodesLower(68,(count-upper), &starts, &clist);
 
 		/* starte Dijkstras von starts zu targets */
 		cout << "> Starte Dijkstras " << endl;
@@ -176,7 +178,6 @@ int main(int argc, char *argv[]){
 	sim.setSCGraph(&scg);
 	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
 
-	list<openGL_Cluster> clist;
 	for(list<unsigned int>::iterator it = targets.begin(); 
 			it != targets.end(); it++)
 	{
@@ -188,6 +189,10 @@ int main(int argc, char *argv[]){
 			(float)scg.getNodeData(*it).id / (float)scg.getNodeCount() /* Colour == NodeID */
 			) );
 	}
+
+	travelers* tr = 0;
+	conf* co = 0;
+	travelCenter tc = travelCenter(&g, tr, co);
 	
 	if( startVis ){
 		//thread t = thread(&startVisThread, &scg);

@@ -193,7 +193,8 @@ void cluster::getNodes(unsigned int count,
 
 void cluster::getNodesLower(unsigned int count, 
 		unsigned int lower,
-		std::list<unsigned int>* nodes)
+		std::list<unsigned int>* nodes,
+		std::list< openGL_Cluster >* cluster)
 {
 	for(unsigned int i = mostPopSize-lower; i < mostPopSize; i++){
 		unsigned int x = (unsigned int)mostPop[i].x;
@@ -205,12 +206,20 @@ void cluster::getNodesLower(unsigned int count,
 			it++;
 			counter++;
 		}
+		if(nodes->empty()){
+			float x = g->getNodeData(nodes->front()).lon ;
+			float y = g->getNodeData(nodes->front()).lat ;
+			float r = step/1.0 ;
+			float c = 0.25 + (0.0) ;
+			cluster->push_front( openGL_Cluster(x, y, r, c) );
+		}
 	}
 }
 
 void cluster::getNodesUpper(unsigned int count, 
 		unsigned int upper,
-		std::list<unsigned int>* nodes)
+		std::list<unsigned int>* nodes,
+		std::list< openGL_Cluster >* cluster)
 {
 	for(unsigned int i = 0; i < (upper); i++){
 		unsigned int x = (unsigned int)mostPop[i].x;
@@ -221,6 +230,13 @@ void cluster::getNodesUpper(unsigned int count,
 			nodes->push_front(*it);
 			it++;
 			counter++;
+		}
+		if(nodes->empty()){
+			float x = g->getNodeData(nodes->front()).lon ;
+			float y = g->getNodeData(nodes->front()).lat ;
+			float r = step/1.0 ;
+			float c = 0.75 + (0.0) ;
+			cluster->push_front( openGL_Cluster(x, y, r, c) );
 		}
 	}
 }

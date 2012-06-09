@@ -59,10 +59,12 @@ class cluster {
 				std::vector< std::vector<unsigned int> >* nodes);
 		void getNodesUpper(unsigned int count, 
 				unsigned int upper, 
-				std::list<unsigned int>* nodes);
+				std::list<unsigned int>* nodes,
+				std::list< openGL_Cluster >* cluster);
 		void getNodesLower(unsigned int count, 
 				unsigned int lower, 
-				std::list<unsigned int>* nodes);
+				std::list<unsigned int>* nodes,
+				std::list< openGL_Cluster >* cluster);
 
 };
 
