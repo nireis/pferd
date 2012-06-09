@@ -78,11 +78,11 @@ struct openGL_Cluster{
 
 //Basic Visualization Entity
 struct openGL_Entity{
-	openGL_Entity() : vbo_handler(0), shader_program(0), texture(0), world_position(glm::vec3(0.0)),
-					visabilty(false), numElements(0), geometryType(0) {}
-	openGL_Entity(GLuint vbo, GLuint shader, GLuint tex, glm::vec3 pos, bool v, int num, GLenum type) :
-					vbo_handler(vbo), shader_program(shader), texture(tex), world_position(pos),
-					visabilty(v), numElements(num), geometryType(type) {}
+	openGL_Entity() : vbo_handler(0), geometryType(0), numElements(0), shader_program(0), texture(0),
+					world_position(glm::vec3(0.0)), visabilty(false)  {}
+	openGL_Entity(GLuint vbo, GLenum type, int num, GLuint shader, GLuint tex, glm::vec3 pos, bool v) :
+					vbo_handler(vbo), geometryType(type), numElements(num), shader_program(shader), texture(tex),
+					world_position(pos), visabilty(v) {}
 	//Geometry
 	GLuint vbo_handler;
 	GLenum geometryType;
@@ -94,5 +94,5 @@ struct openGL_Entity{
 	bool visabilty;
 };
 
-#endif
 
+#endif

@@ -124,9 +124,9 @@ private:
 	//loads & compiles shader sources
 	GLint loadShader(const char*, GLenum);
 	//initializes shader programs
-	GLuint initShaderProgram(char* , char*, char**, int);
+	GLuint initShaderProgram(const char* , const char*, const char**, int);
 	//loads node/shortcut type geometry
-	bool initOpenGL_Node_3d(GLuint, openGL_Node_3d*, int);
+	bool initOpenGL_Node_3d(GLuint*, openGL_Node_3d*, int);
 	//loads edge type geometry
 	bool initOpenGL_Edge_Node(GLuint*, openGL_Edge_Node* , int);
 	//TODO loads cluster type geometry
