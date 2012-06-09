@@ -174,3 +174,9 @@ void sim::simTravelers(){
 		}
 	}
 }
+
+sim::~sim(){
+	delete sim_g;
+	delete ch;
+	delete chd;
+}

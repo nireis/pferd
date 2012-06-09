@@ -83,6 +83,7 @@ class sim{
 		void recalcEdgevals();
 	public:
 		sim(Graph* g, travelers* t, conf* c);
+		~sim();
 		void calcOneRound();
 		bool eqFound();
 };
