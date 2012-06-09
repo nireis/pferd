@@ -123,6 +123,9 @@ class vis {
 		void init();
 		void init(std::list<openGL_Cluster>* circs);
 
+		float merkatorX(float);
+		float merkatorY(float);
+
 	public: 
 		vis(Graph* g, std::list<openGL_Cluster>* circs);
 		vis(SCGraph* g, std::list<openGL_Cluster>* circs);

@@ -31,7 +31,6 @@ void openGLrender::setShortcutEdgeArray(openGL_Node_3d *in_Edges)
 
 void openGLrender::setClusterArray(openGL_Cluster *in_Clusters)
 {
-	//shortcutArray = new openGL_Node_3d[edgeCount];
 	clusterArray = in_Clusters;
 }
 
@@ -175,8 +174,33 @@ bool openGLrender::initOpenGL_Edge_Node(GLuint *vbo, openGL_Edge_Node* nodeData,
 	return true;
 }
 
-bool openGLrender::initCluster()
+bool openGLrender::initOpenGL_Cluster(GLuint *vbo, openGL_Cluster clusterData)
 {
+
+	openGL_Node_3d tempVertData[10];
+	tempVertData[0] = openGL_Node_3d(0.0,0.0,clusterData.color);
+
+	for(int i=0; i<9; i++)
+	{	
+		tempVertData[i+1] =
+			openGL_Node_3d( clusterData.radius*glm::cos(((float)i/4.0)*3.141592),
+							clusterData.radius*glm::sin(((float)i/4.0)*3.141592),
+							clusterData.color);
+
+	}
+
+	glGenVertexArrays(1, vbo);
+	glBindVertexArray(*vbo);
+	glGenBuffers(1, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(openGL_Node_3d)*10, tempVertData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(openGL_Node_3d),(GLvoid*) (sizeof(float)+sizeof(float)));
+
+	glBindVertexArray(0);
+
 	return true;
 }
 
@@ -355,7 +379,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 bool openGLrender::initGraphVis()
 {
-	entityCount = 3;
+	entityCount = 3 + clusterCount;
 	sceneEntities = new openGL_Entity[entityCount];
 
 	//init edges
@@ -396,12 +420,31 @@ bool openGLrender::initGraphVis()
 	const char* atrb2[] = { "in_position", "in_color" };
 	// [0]: Fragment, [1] Vertex
 	const char* shader2[] = 
-		{ "pferdEdgeFragment.glsl", "pferdVertex.glsl" };
+		{ "pferdShortcutFragment.glsl", "pferdShortcutVertex.glsl" };
 	sceneEntities[2].shader_program = initShaderProgram(shader2[0] , shader2[1], atrb2, 2);
 	glLinkProgram(sceneEntities[2].shader_program);
 	sceneEntities[2].texture = 0;
 	sceneEntities[2].visabilty = true;
 	sceneEntities[2].world_position = glm::vec3(0.0);
+
+
+	for(int i=0; i<clusterCount; i++)
+	{
+		//init cluster-highlight
+		sceneEntities[i+3] = openGL_Entity();
+		initOpenGL_Cluster(&(sceneEntities[i+3].vbo_handler),clusterArray[i]);
+		sceneEntities[i+3].geometryType = GL_TRIANGLE_FAN;
+		sceneEntities[i+3].numElements = 10;
+		const char* atrb3[] = { "in_position", "in_color" };
+		// [0]: Fragment, [1] Vertex
+		const char* shader3[] = 
+			{ "pferdClusterFragment.glsl", "pferdClusterVertex.glsl" };
+		sceneEntities[i+3].shader_program = initShaderProgram(shader3[0] , shader3[1], atrb3, 2);
+		glLinkProgram(sceneEntities[i+3].shader_program);
+		sceneEntities[i+3].texture = 0;
+		sceneEntities[i+3].visabilty = true;
+		sceneEntities[i+3].world_position = glm::vec3(clusterArray[i].xCenter,clusterArray[i].yCenter,0.0);
+	}
 
 	return true;
 }
@@ -595,10 +638,17 @@ void openGLrender::display()
 	glLineWidth(2.0);
 	glPointSize(4.0);
 
+	
 	for(int i=0; i<entityCount; i++)
 	{
 		if(sceneEntities[i].visabilty)
 		{
+			
+			//set model matrix
+			modelMX = glm::translate(glm::mat4(1.0f), sceneEntities[i].world_position);
+			//set model_view_projection matrix
+			glm::mat4 mvpMX = projMX * viewMX * modelMX;
+
 			glUseProgram(sceneEntities[i].shader_program);
 			glUniformMatrix4fv(glGetUniformLocation(sceneEntities[i].shader_program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
 			glBindVertexArray(sceneEntities[i].vbo_handler);

@@ -130,7 +130,7 @@ private:
 	//loads edge type geometry
 	bool initOpenGL_Edge_Node(GLuint*, openGL_Edge_Node* , int);
 	//TODO loads cluster type geometry
-	bool initCluster();
+	bool initOpenGL_Cluster(GLuint*, openGL_Cluster);
 
 	bool initGraphVis();
 
