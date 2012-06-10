@@ -84,6 +84,65 @@ private:
 	static void idleCallback();
 	static void resizeCallback(int, int);
 
+	//boolean used to switch between graph and volume rendering
+	bool render_mode;
+	//transformation matrixes
+	glm::mat4 projMX, modelMX, viewMX;
+	//window size
+	int wWidth;
+	int wHeight;
+
+	//used to read the shader source code - needs to be replaced
+	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
+	//for the code
+	char* file_read(const char*);
+	//loads & compiles shader sources
+	GLint loadShader(const char*, GLenum);
+	//initializes shader programs
+	GLuint initShaderProgram(const char* , const char*, const char**, int);
+
+	//renders geometry on the screen
+	void display();
+	//idle function, called if GLUT eventqueue is empty
+	void idle();
+	//handles window resizing
+	void resize(int, int);
+
+
+	/*
+	*	private variables and functions used for volume-rendering
+	*/
+
+	//used for camera test during rendering
+	bool cam_BBtest;
+	// bounding box dimensions
+	glm::vec3 dimension;
+	// transformation matrixes
+	glm::mat4 texMX;
+	// buffer object
+	GLuint vbo_boundingBox;
+	// 3d texture
+	GLuint tex_3D;
+	//shader programs
+	GLuint frontface_prgm;
+	GLuint backface_prgm;
+	//initializes bounding box geometry
+	bool initBoundingBox(glm::vec3);
+	//initializes a 3D volumetexture
+	bool init3DTex(glm::vec3, char*);
+	bool init3Dto2DTex(glm::vec3);
+	//initializes volume rendering
+	bool initVolumeVis();
+	//displays volume - this function gets called in the display() function when render mode is set to volume
+	void displayVolume();
+	//clean up
+	void uninitVolume();
+
+
+	/*
+	*	private variables and functios used for graph-rendering
+	*/
+
 	//local reference of the data in the system memory
 	unsigned int nodeCount;
 	unsigned int edgeCount;
@@ -95,8 +154,6 @@ private:
 	openGL_Cluster *clusterArray;
 
 	//stuff needed for openGL
-	int wWidth;
-	int wHeight;
 	glm::vec3 cameraPos;
 	float camZoom;
 	int mouse_delta_x0;
@@ -106,9 +163,6 @@ private:
 	bool swap;
 	bool mouse_mode;
 
-	//transformation matrixes
-	glm::mat4 projMX, modelMX, viewMX;
-
 	//Entities
 	openGL_Entity *sceneEntities;
 	int entityCount;
@@ -117,22 +171,16 @@ private:
 	GLuint *map_textures;
 	int mapCount;
 
-	//used to read the shader source code - needs to be replaced
-	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
-	//for the code
-	char* file_read(const char*);
-	//loads & compiles shader sources
-	GLint loadShader(const char*, GLenum);
-	//initializes shader programs
-	GLuint initShaderProgram(const char* , const char*, const char**, int);
 	//loads node/shortcut type geometry
 	bool initOpenGL_Node_3d(GLuint*, openGL_Node_3d*, int);
 	//loads edge type geometry
 	bool initOpenGL_Edge_Node(GLuint*, openGL_Edge_Node* , int);
-	//TODO loads cluster type geometry
+	//loads cluster type geometry
 	bool initOpenGL_Cluster(GLuint*, openGL_Cluster);
-
+	//initializes all scene entities used for graph rendering
 	bool initGraphVis();
+	//displays graph - this function gets called in the display() function when render mode is set to graph
+	void displayGraph();
 
 	/*
 	//loads map geometry
@@ -144,7 +192,7 @@ private:
 	*/
 
 	//clean up
-	void uninit();
+	void uninitGraph();
 	
 	//manages mouse input
 	void mouse(int, int);
@@ -152,12 +200,6 @@ private:
 	//manages keyboard input
 	void keyboard(unsigned char, int, int);
 	void keyboardArrows(int, int, int);
-	//renders geometry on the screen
-	void display();
-	//idle function, called if GLUT eventqueue is empty
-	void idle();
-	//handles window resizing
-	void resize(int, int);
 
 public:
 	//default Constructor/Destructor

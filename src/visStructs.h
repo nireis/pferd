@@ -56,6 +56,15 @@ struct openGL_Edge_Node {
 	float normal_z;
 };
 
+//Vertextype for volumerendering
+struct vertex {
+	vertex() : x(0), y(0), z(0), r(0), g(0), b(0) {}
+	vertex(float x_coord, float y_coord, float z_coord, float r_value, float g_value, float b_value) :
+	x(x_coord), y(y_coord), z(z_coord), r(r_value), g(g_value), b(b_value) {}
+	float x,y,z;
+	float r,g,b;
+};
+
 //Map-tiles
 struct openGL_quad {
 	openGL_quad() : vert1(), vert2(), vert3(), vert4() {}
@@ -69,7 +78,7 @@ struct openGL_quad {
 struct openGL_Cluster{
 	openGL_Cluster() : xCenter(0), yCenter(0), radius(0), color(0) {}
 	openGL_Cluster(float x, float y, float r, float c) :
-		xCenter(x), yCenter(y), radius(r), color(c) {}
+	xCenter(x), yCenter(y), radius(r), color(c) {}
 	float xCenter;
 	float yCenter;
 	float radius;
