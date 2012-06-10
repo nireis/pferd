@@ -158,12 +158,10 @@ void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(m_found_by[target] != -1){
 			//...schon gefunden wurde...
-			(*targets)[i] = dist[target];
 			tmpfoundby = m_found_by[target];
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
-				(*targets)[i] = U.top().distance;
 				tmpfoundby = (int)U.top().eid;
 				//...erst gerade gefunden wurde...
 				if(target == targets->back()){
@@ -174,12 +172,11 @@ void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 			}
 			else{
 				//...oder garnicht gefunden wurde.
-				(*targets)[i] = numeric_limits<unsigned int>::max();
 				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
 		// Backtracing der Knoten.
-		if((*targets)[i] != numeric_limits<unsigned int>::max()){
+		if(dist[target] != numeric_limits<unsigned int>::max()){
 			// cout << "=== Node " << target << " ===" << endl;
 			// ersten Knoten
 			tmpnode = target;
@@ -246,12 +243,10 @@ void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(m_found_by[target] != -1){
 			//...schon gefunden wurde...
-			(*sources)[i] = dist[target];
 			tmpfoundby = m_found_by[target];
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
-				(*sources)[i] = U.top().distance;
 				tmpfoundby = (int)U.top().eid;
 				//...erst gerade gefunden wurde...
 				if(target == sources->back()){
@@ -262,12 +257,11 @@ void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 			}
 			else{
 				//...oder garnicht gefunden wurde.
-				(*sources)[i] = numeric_limits<unsigned int>::max();
 				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
 		// Backtracing der Knoten.
-		if((*sources)[i] != numeric_limits<unsigned int>::max()){
+		if(dist[target] != numeric_limits<unsigned int>::max()){
 			// ersten Knoten
 			tmpnode = target;
 			if(tmpnode != node_id0){
