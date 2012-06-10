@@ -26,6 +26,8 @@ void travelCenter::workConf(conf* c)
 	max_travelers = c->max_travelers;
 	source_count = c->source_count;
 	target_count = c->target_count;
+	weight_lower_bound = c->weight_lower_bound;
+	weight_upper_bound = c->weight_upper_bound;
 	clust_step = c->clust_step;
 	clust_count_top_clusters = c->clust_count_top_clusters;
 	clust_top_percentage = c->clust_top_percentage;
@@ -43,9 +45,10 @@ void travelCenter::clearStuff(){
 }
 void travelCenter::mode1(){
 	/* all to all */
-	t->traffic.reserve(1);
-	t->traffic[0].source.reserve(g->getNodeCount());
-	t->traffic[0].target.reserve(g->getNodeCount());
+	t->traffic.resize(1);
+	//t->traffic.push_back(pendler());
+	t->traffic[0].source.resize(g->getNodeCount());
+	t->traffic[0].target.resize(g->getNodeCount());
 	for(unsigned int i = 0; i < g->getNodeCount(); i++){
 		t->traffic[0].source[i] = i;
 		t->traffic[0].target[i] = i;
@@ -64,10 +67,11 @@ void travelCenter::mode2(){
 	/* random to random , max_travelers pairs */
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.reserve(max_travelers);
+	t->traffic.resize(max_travelers);
 	for(unsigned int i = 0; i < max_travelers; i++){
-		t->traffic[i].target.reserve(1);
-		t->traffic[i].source.reserve(1);
+		//t->traffic.push_back(pendler());
+		t->traffic[i].target.resize(1);
+		t->traffic[i].source.resize(1);
 	}
 	/* sources */
 	for(unsigned int i = 0; i < max_travelers; i++){
@@ -105,10 +109,11 @@ void travelCenter::mode3(){
 	/* random max_travelers to all */
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.reserve(max_travelers);
+	t->traffic.resize(max_travelers);
 	for(unsigned int i = 0; i < max_travelers; i++){
-		t->traffic[i].target.reserve(nc);
-		t->traffic[i].source.reserve(1);
+		//t->traffic.push_back(pendler());
+		t->traffic[i].target.resize(nc);
+		t->traffic[i].source.resize(1);
 	}
 	/* sources */
 	for(unsigned int i = 0; i < max_travelers; i++){
@@ -147,7 +152,6 @@ void travelCenter::mode4(){
 	 *	clust_top_{lower,upper}_nodecount_per_cluster
 	 *	many nodes per lower/upper cluster
 	 */
-	delete cl;
 	cl = new cluster(g, clust_step);
 
 	cl->setMostPopulatedCells( clust_count_top_clusters );
@@ -181,7 +185,13 @@ void travelCenter::mode4(){
 		&(t->circles)
 		);
 
-	t->traffic.reserve( 1 );
+	std::cout << "starts size "<< starts.size() << std::endl;
+	std::cout << "targets size "<< targets.size() << std::endl;
+	std::cout << "circles size "<< (t->circles).size() << std::endl;
+	std::cin.get();
+
+	t->traffic.resize( 1 );
+	//t->traffic.push_back(pendler());
 	t->traffic[0].source.reserve(starts.size());
 	t->traffic[0].target.reserve(targets.size());
 
@@ -189,11 +199,14 @@ void travelCenter::mode4(){
 	copy(targets.begin(), targets.end(), t->traffic[0].target.begin());
 
 	/* random weights */
+	std::srand((unsigned)std::time(0));
 	unsigned int r = rand();
 	while( r > rand_upper_bound){
 		r = rand();
 	}
-	t->traffic[0].weight = weight_lower_bound + (r % rand_range);
+	t->traffic[0].weight = 1;//weight_lower_bound + (r % rand_range);
+
+	delete cl; cl = 0;
 }
 void travelCenter::mode5(){
 	/*	use manual_targets as targets, for each

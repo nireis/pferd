@@ -206,7 +206,7 @@ void cluster::getNodesLower(unsigned int count,
 			it++;
 			counter++;
 		}
-		if(nodes->empty()){
+		if(! nodes->empty()){
 			float x = g->getNodeData(nodes->front()).lon ;
 			float y = g->getNodeData(nodes->front()).lat ;
 			float r = step/1.0 ;
@@ -231,7 +231,7 @@ void cluster::getNodesUpper(unsigned int count,
 			it++;
 			counter++;
 		}
-		if(nodes->empty()){
+		if(! nodes->empty()){
 			float x = g->getNodeData(nodes->front()).lon ;
 			float y = g->getNodeData(nodes->front()).lat ;
 			float r = step/1.0 ;
