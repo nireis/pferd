@@ -455,17 +455,25 @@ bool openGLrender::init3DTex(glm::vec3 dim, char* filename)
 {
 	FILE *pFile;
 
-	int size = dim.x * dim.y * dim.z;
+	int size = 3* dim.x *dim.y *dim.z;
 
-	pFile = fopen (filename, "rb");
+	pFile = fopen ("pferd.raw", "rb");
 	if (pFile==NULL) {return false;}
 
 	
-	GLfloat *vol = NULL;
-	vol = new GLfloat[size];
+	GLubyte *vol = NULL;
+	vol = new GLubyte[size];
 	if (vol == NULL) {return false;}
 
-	fread(vol,sizeof(GLfloat),size,pFile);
+	GLubyte *buffer = NULL;
+	int buffersize = (3 * dim.x *dim.y);
+	buffer = new GLubyte[buffersize];
+	fread(buffer,sizeof(GLubyte),buffersize,pFile);
+	
+	for(int i=0; i<size; i++)
+	{
+		vol[(size-1) - i] = buffer[i%buffersize];
+	}
 	
 	glGenTextures(1, &tex_3D);
 	glBindTexture(GL_TEXTURE_3D, tex_3D);
@@ -474,7 +482,7 @@ bool openGLrender::init3DTex(glm::vec3 dim, char* filename)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage3D(GL_TEXTURE_3D,0,GL_INTENSITY,dim.x,dim.y,dim.z,0,GL_LUMINANCE,GL_FLOAT,vol);
+	glTexImage3D(GL_TEXTURE_3D,0,GL_RGB,dim.x,dim.y,dim.z,0,GL_RGB,GL_UNSIGNED_BYTE,vol);
 	delete [] vol;
 
 	return true;
@@ -484,24 +492,31 @@ bool openGLrender::init3Dto2DTex(glm::vec3 dim)
 {
 	FILE *pFile;
 
-	int size = dim.x *dim.y *dim.z;
+	int size = 3* dim.x *dim.y *dim.z;
 
-	pFile = fopen ("room.raw", "rb");
+	pFile = fopen ("pferd.raw", "rb");
 	if (pFile==NULL) {return false;}
 
 	
-	GLfloat *vol = NULL;
-	vol = new GLfloat[size];
-	GLfloat *buffer;
+	GLubyte *vol = NULL;
+	vol = new GLubyte[size];
 	if (vol == NULL) {return false;}
 
-	fread(vol,sizeof(GLfloat),size,pFile);
+	GLubyte *buffer = NULL;
+	int buffersize = (3 * dim.x *dim.y);
+	buffer = new GLubyte[buffersize];
+	fread(buffer,sizeof(GLubyte),buffersize,pFile);
+	
+	for(int i=0; i<size; i++)
+	{
+		vol[(size-1) -i] = buffer[i%buffersize];
+	}
 	
 	glGenTextures(1, &tex_3D);
 	glBindTexture(GL_TEXTURE_2D, tex_3D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_INTENSITY,dim.x,dim.y*dim.z,0,GL_LUMINANCE,GL_FLOAT,vol);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,dim.x,dim.y*dim.z,0,GL_RGB,GL_UNSIGNED_BYTE,vol);
 	delete [] vol;
 
 	return true;
@@ -509,7 +524,10 @@ bool openGLrender::init3Dto2DTex(glm::vec3 dim)
 
 bool openGLrender::initVolumeVis()
 {
-	dimension = glm::vec3(91.0,46.0,91.0);
+	cam_alpha = 0.0;
+	cam_beta = 0.0;
+	cam_dist = 2.0;
+	dimension = glm::vec3(256.0,256.0,32.0);
 	initBoundingBox(dimension);
 	init3Dto2DTex(dimension);
 	const char* atrb0[] = { "in_position", "in_color"};
@@ -526,9 +544,7 @@ bool openGLrender::initVolumeVis()
 
 void openGLrender::displayVolume()
 {
-	float cam_alpha(0.0);
-	float cam_beta(0.0);
-	float cam_dist(5.0);
+	cam_alpha = cam_alpha + 0.1;
 	//calculate camera position
 	//note that glm functions use radian values
 	float cam_alpha_r = cam_alpha * (2.0*3.14/360.0);
@@ -538,18 +554,13 @@ void openGLrender::displayVolume()
 	cameraPos.z = glm::cos(cam_alpha_r) * temp + (dimension.z/dimension.x)/2.0;
 	cameraPos.x = glm::sin(cam_alpha_r) * temp + 0.5;
 
-	cameraPos.x = -2.0;
-	cameraPos.y = 1.0;
-	cameraPos.z = 5.0;
-
 	//set projection matrix
 	float fnear = 0.001f;
 	float fov = 60;
 	float aspect = float(wWidth) / float(wHeight);
 	projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
 	//set view matrix
-	//viewMX = glm::lookAt(cameraPos,glm::vec3(0.5,(dimension.y/dimension.x)/2.0,(dimension.z/dimension.x)/2.0), glm::vec3(0.0f, 1.0f, 0.0f));
-	viewMX = glm::lookAt(cameraPos,glm::vec3(0.0), glm::vec3(0.0f, 1.0f, 0.0f));
+	viewMX = glm::lookAt(cameraPos,glm::vec3(0.5,(dimension.y/dimension.x)/2.0,(dimension.z/dimension.x)/2.0), glm::vec3(0.0f, 1.0f, 0.0f));
 	//set model matrix
 	modelMX = glm::mat4(1.0f);
 	//set model-view-projection matrix
@@ -618,7 +629,7 @@ void openGLrender::uninitVolume()
 }
 
 /*
-*	General purpose methos
+*	General purpose methods
 */
 char* openGLrender::file_read(const char* filename)
 {
@@ -697,48 +708,51 @@ GLuint openGLrender::initShaderProgram(const char* fragment, const char* vertex,
 
 void openGLrender::mouse(int x, int y)
 {
-	if(mouse_mode)
+	if(render_mode == 0)
 	{
-		if(swap)
+		if(mouse_mode)
 		{
-			mouse_delta_x1 = x;
-			mouse_delta_y1 = y;
+			if(swap)
+			{
+				mouse_delta_x1 = x;
+				mouse_delta_y1 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y0)/(4000.0*camZoom)), cameraPos.z);
+				cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y0)/(4000.0*camZoom)), cameraPos.z);
 
-			swap = false;
-			glutPostRedisplay();
+				swap = false;
+				glutPostRedisplay();
+			}
+			else
+			{
+				mouse_delta_x0 = x;
+				mouse_delta_y0 = y;
+			
+				cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y1)/(4000.0*camZoom)), cameraPos.z);
+
+				swap = true;
+				glutPostRedisplay();
+			}
 		}
 		else
 		{
-			mouse_delta_x0 = x;
-			mouse_delta_y0 = y;
+			if(swap)
+			{
+				mouse_delta_y1 = y;
 			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y1)/(4000.0*camZoom)), cameraPos.z);
+				camZoom = camZoom - ((float)(y-mouse_delta_y0)/150.0)*camZoom;
 
-			swap = true;
-			glutPostRedisplay();
-		}
-	}
-	else
-	{
-		if(swap)
-		{
-			mouse_delta_y1 = y;
+				swap = false;
+				glutPostRedisplay();
+			}
+			else
+			{
+				mouse_delta_y0 = y;
 			
-			camZoom = camZoom - ((float)(y-mouse_delta_y0)/150.0)*camZoom;
+				camZoom = camZoom - ((float)(y-mouse_delta_y1)/150.0)*camZoom;
 
-			swap = false;
-			glutPostRedisplay();
-		}
-		else
-		{
-			mouse_delta_y0 = y;
-			
-			camZoom = camZoom - ((float)(y-mouse_delta_y1)/150.0)*camZoom;
-
-			swap = true;
-			glutPostRedisplay();
+				swap = true;
+				glutPostRedisplay();
+			}
 		}
 	}
 
@@ -751,33 +765,36 @@ void openGLrender::mouseCallback(int x, int y)
 
 void openGLrender::mouseClick(int button, int state, int x, int y)
 {
-	if(state== GLUT_DOWN)
+	if(render_mode == 0)
 	{
-		if(button == GLUT_LEFT_BUTTON)
+		if(state== GLUT_DOWN)
 		{
-			if(swap)
+			if(button == GLUT_LEFT_BUTTON)
 			{
-				mouse_delta_x0 = x;
-				mouse_delta_y0 = y;
+				if(swap)
+				{
+					mouse_delta_x0 = x;
+					mouse_delta_y0 = y;
+				}
+				else
+				{
+					mouse_delta_x1 = x;
+					mouse_delta_y1 = y;
+				}
+				mouse_mode = true;
 			}
-			else
+			if(button == GLUT_RIGHT_BUTTON)
 			{
-				mouse_delta_x1 = x;
-				mouse_delta_y1 = y;
+				if(swap)
+				{
+					mouse_delta_y0 = y;
+				}
+				else
+				{
+					mouse_delta_y1 = y;
+				}
+				mouse_mode = false;
 			}
-			mouse_mode = true;
-		}
-		if(button == GLUT_RIGHT_BUTTON)
-		{
-			if(swap)
-			{
-				mouse_delta_y0 = y;
-			}
-			else
-			{
-				mouse_delta_y1 = y;
-			}
-			mouse_mode = false;
 		}
 	}
 }
@@ -789,62 +806,77 @@ void openGLrender::mouseClickCallback(int button, int state, int x, int y)
 
 void openGLrender::keyboard (unsigned char key, int x, int y)
 {
-	switch( key ) 
+	if(render_mode == 0)
 	{
-        case 'q': case 'Q':
-            glutLeaveMainLoop();
-            break;
-		case '+':
-			cameraPos = cameraPos - glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
-			glutPostRedisplay();
-			break;
-		case '-':
-			cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
-			glutPostRedisplay();
-			break;
-		case 'n':
-			sceneEntities[1].visabilty = ! sceneEntities[1].visabilty;
-			glutPostRedisplay();
-			break;
-		case 'e':
-			sceneEntities[0].visabilty = ! sceneEntities[0].visabilty;
-			glutPostRedisplay();
-			break;/*
-		case 'm':
-			showMap = !showMap;
-			glutPostRedisplay();
-			break;*/
-		case 's':
-			sceneEntities[2].visabilty = ! sceneEntities[2].visabilty;
-			glutPostRedisplay();
-			break;/*
-		case 'c':
-			showCluster = !showCluster;
-			glutPostRedisplay();
-			break;*/
+		switch( key ) 
+		{
+			case 'q': case 'Q':
+				glutLeaveMainLoop();
+				break;
+			case '+':
+				cameraPos = cameraPos - glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
+				glutPostRedisplay();
+				break;
+			case '-':
+				cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
+				glutPostRedisplay();
+				break;
+			case 'n':
+				sceneEntities[1].visabilty = ! sceneEntities[1].visabilty;
+				glutPostRedisplay();
+				break;
+			case 'e':
+				sceneEntities[0].visabilty = ! sceneEntities[0].visabilty;
+				glutPostRedisplay();
+				break;/*
+			case 'm':
+				showMap = !showMap;
+				glutPostRedisplay();
+				break;*/
+			case 's':
+				sceneEntities[2].visabilty = ! sceneEntities[2].visabilty;
+				glutPostRedisplay();
+				break;/*
+			case 'c':
+				showCluster = !showCluster;
+				glutPostRedisplay();
+				break;*/
+		}
+	}
+	else
+	{
+		switch( key ) 
+		{
+			case 'q': case 'Q':
+				glutLeaveMainLoop();
+				break;
+		}
 	}
 }
 
 void openGLrender::keyboardArrows(int key, int x, int y)
 {
-	switch(key)
+	if(render_mode == 0)
 	{
-	case GLUT_KEY_LEFT:
-		cameraPos = cameraPos - glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_RIGHT:
-		cameraPos = cameraPos + glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_UP:
-		cameraPos = cameraPos + glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_DOWN:
-		cameraPos = cameraPos - glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
-		glutPostRedisplay();
-		break;
+		switch(key)
+		{
+		case GLUT_KEY_LEFT:
+			cameraPos = cameraPos - glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_RIGHT:
+			cameraPos = cameraPos + glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_UP:
+			cameraPos = cameraPos + glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_DOWN:
+			cameraPos = cameraPos - glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		}
 	}
 }
 
@@ -855,7 +887,7 @@ void openGLrender::keyboardCallback(unsigned char key, int x, int y)
 
 void openGLrender::keyboardArrowsCallback(int key, int x, int y)
 {
-	currentInstance -> keyboardArrows(key, x, y);
+		currentInstance -> keyboardArrows(key, x, y);
 }
 
 void openGLrender::display()
@@ -937,11 +969,6 @@ bool openGLrender::start(int argc, char* argv[])
 	if(render_mode == 0)
 	{
 		initGraphVis();
-
-		glutMotionFunc(mouseCallback);
-		glutMouseFunc(mouseClickCallback);
-		glutKeyboardFunc(keyboardCallback);
-		glutSpecialFunc(keyboardArrowsCallback);
 	}
 	else
 	{
@@ -952,6 +979,10 @@ bool openGLrender::start(int argc, char* argv[])
 	glutDisplayFunc(displayCallback);
 	glutIdleFunc(idleCallback);
 	glutReshapeFunc(resizeCallback);
+	glutMotionFunc(mouseCallback);
+	glutMouseFunc(mouseClickCallback);
+	glutKeyboardFunc(keyboardCallback);
+	glutSpecialFunc(keyboardArrowsCallback);
 	glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutMainLoop();

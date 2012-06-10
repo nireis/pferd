@@ -108,11 +108,20 @@ private:
 	//handles window resizing
 	void resize(int, int);
 
+	//manages mouse input
+	void mouse(int, int);
+	void mouseClick(int, int, int, int);
+	//manages keyboard input
+	void keyboard(unsigned char, int, int);
+	void keyboardArrows(int, int, int);
+
 
 	/*
 	*	private variables and functions used for volume-rendering
 	*/
 
+	//camera position
+	float cam_alpha, cam_beta, cam_dist;
 	//used for camera test during rendering
 	bool cam_BBtest;
 	// bounding box dimensions
@@ -194,12 +203,6 @@ private:
 	//clean up
 	void uninitGraph();
 	
-	//manages mouse input
-	void mouse(int, int);
-	void mouseClick(int, int, int, int);
-	//manages keyboard input
-	void keyboard(unsigned char, int, int);
-	void keyboardArrows(int, int, int);
 
 public:
 	//default Constructor/Destructor

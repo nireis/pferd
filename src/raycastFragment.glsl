@@ -24,10 +24,10 @@ vec4 transferFunction(in vec4 color)
 	*/
 
 	
-	vec3 v0 = vec3(1.0,0.0,0.0);
-	vec3 v1 = vec3(0.0,0.0,1.0);
+	vec3 v0 = vec3(0.0,0.0,0.0);
+	vec3 v1 = vec3(1.0,1.0,1.0);
 	
-	float opacity = color.w;
+	float opacity = color.x;
 	
 	return vec4(mix(v0,v1,color.z), opacity);
 }
@@ -96,4 +96,7 @@ void main(void)
 	
 	//Output accumulated color
 	gl_FragColor = out_color;
+	
+	//debug output
+	//gl_FragColor = texture2D(Tex3D,color.xy);
 }
