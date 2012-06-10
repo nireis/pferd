@@ -3,8 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-
-
+#include <math.h>
 
 travelCenter::travelCenter(Graph* gr, travelers* tr, conf* c) : 
 	g(gr), t(tr) 
@@ -200,6 +199,7 @@ void travelCenter::mode4(){
 
 	/* random weights */
 	std::srand((unsigned)std::time(0));
+	// TODO Die Scheiße hier umcoden!
 	unsigned int r = rand();
 	while( r > rand_upper_bound){
 		r = rand();
@@ -211,8 +211,35 @@ void travelCenter::mode4(){
 void travelCenter::mode5(){
 	/*	use manual_targets as targets, for each
 	 * use given radius and count to determine
-	 * sources
+	 * sources.
 	 */
+	for(unsigned int i=0; i<manual_targets->size(); i++){
+		unsigned int node_id = (*manual_targets)[i].node_id;
+		unsigned int radius = (*manual_targets)[i].radius;
+		unsigned int count = (*manual_targets)[i].count;
+		std::vector<unsigned int> candidates;
+		// Finde alle Knoten in dem Radius
+		getNeighbours(g, node_id, radius, &candidates);
+		if(candidates.size() > count){
+			// Zufällig <count> Knoten an den Anfang des Vektors setzen und dann
+			// den Vektor auf die Größe zuschneiden.
+			for(unsigned int i=0; i<count; i++){
+				// Eine random number aus dem Bereich [i, #candidates] holen.
+				unsigned int r = (rand()/RAND_MAX)*(candidates.size()-i);
+				unsigned int dummy = candidates[r];
+				candidates[r] = candidates[i];
+				candidates[i] = dummy;
+			}
+			candidates.resize(count);
+		}
+		// Pendler hinzufügen.
+		if(!candidates.empty()){
+			t->traffic.push_back(pendler(
+						std::vector<unsigned int>(1, node_id),
+						candidates,
+						1));
+		}
+	}
 }
 bool travelCenter::run(){
 	clearStuff();

@@ -214,7 +214,7 @@ void sim::simTravelers(){
 		vector<unsigned int>* tgt = &tmp_pendler->target;
 		unsigned int srcsize = src->size();
 		unsigned int tgtsize = tgt->size();
-		/*
+		
 		if(srcsize > tgtsize){
 			for(unsigned int j=0; j<tgtsize; j++){
 				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
@@ -233,12 +233,12 @@ void sim::simTravelers(){
 				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
 			}
 		}
-		*/
-		for(unsigned int i = 0; i< srcsize; i++){
-			for(unsigned int j = 0; j < tgtsize; j++){
-				chd->oneToOne((*src)[i], (*tgt)[j], tmp_pendler->weight);
-			}
-		}
+		
+//		for(unsigned int i = 0; i< srcsize; i++){
+//			for(unsigned int j = 0; j < tgtsize; j++){
+//				chd->oneToOne((*src)[i], (*tgt)[j], tmp_pendler->weight);
+//			}
+//		}
 		
 	}
 }
