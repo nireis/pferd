@@ -110,17 +110,17 @@ int main(int argc, char *argv[]){
 //	osim.setEdgeValues(g.getEdgeDataPointer(), g.getEdgeCount());
 //	g.updateEdgeValues();
 //
-	cout << "Erstelle neuen Graph: " << endl;
-	start = clock();
-	SCGraph scg = SCGraph(&g);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "SCGraph erstellt in zeit: : " << time << endl;
+	//cout << "Erstelle neuen Graph: " << endl;
+	//start = clock();
+	//SCGraph scg = SCGraph(&g);
+	//finish = clock();
+	//time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	//cout << "SCGraph erstellt in zeit: : " << time << endl;
 
-	cout << "> Berechne CH auf SCGraph" << endl;
-	CH hy(&g, &scg);
-	//hy.calcCHverbose();
-	hy.calcCH(chverbose);
+	//cout << "> Berechne CH auf SCGraph" << endl;
+	//CH hy(&g, &scg);
+	////hy.calcCHverbose();
+	//hy.calcCH(chverbose);
 //
 //	//CHDijkstraTest(&g, &scg, 149909);
 //	
@@ -190,44 +190,44 @@ int main(int argc, char *argv[]){
 //			) );
 //	}
 
+
+
+//list<unsigned int> starts;
+//list<unsigned int> targets;
+//list<openGL_Cluster> clist;
+//double step = 0.01/12.0;
+//	cout << "> Erstelle Cluster und starte Pendler" << endl;
+//	cluster cl(&g, step);
+//	/* zweites Argument ist die Randlänge einer Zelle
+//	 * in einer unbestimmten Einheit
+//	 */
+//
+//	unsigned int count = 14;
+//	cl.setMostPopulatedCells( count );
+//
+//	double perc = 0.2;
+//	unsigned int upper = (unsigned int)(((double)count)*perc);
+//
+//	cl.getNodesUpper(1,upper, &targets, &clist);
+//	cl.getNodesLower(40,(count-upper), &starts, &clist);
+//
+//	tr.traffic.push_back(pendler());
+//	tr.traffic[0].weight = 1;
+//	while( ! starts.empty() ){
+//		tr.traffic[0].source.push_back( starts.front() );
+//		starts.pop_front();
+//	}
+//	while( ! targets.empty() ){
+//		tr.traffic[0].target.push_back( targets.front() );
+//		targets.pop_front();
+//	}
+//
+//	while( ! clist.empty() ){
+//		tr.circles.push_back( clist.front() );
+//		clist.pop_front();
+//	}
+
 	travelers tr = travelers();
-
-
-list<unsigned int> starts;
-list<unsigned int> targets;
-list<openGL_Cluster> clist;
-double step = 0.01/12.0;
-	cout << "> Erstelle Cluster und starte Pendler" << endl;
-	cluster cl(&g, step);
-	/* zweites Argument ist die Randlänge einer Zelle
-	 * in einer unbestimmten Einheit
-	 */
-
-	unsigned int count = 14;
-	cl.setMostPopulatedCells( count );
-
-	double perc = 0.2;
-	unsigned int upper = (unsigned int)(((double)count)*perc);
-
-	cl.getNodesUpper(1,upper, &targets, &clist);
-	cl.getNodesLower(40,(count-upper), &starts, &clist);
-
-	tr.traffic.push_back(pendler());
-	tr.traffic[0].weight = 1;
-	while( ! starts.empty() ){
-		tr.traffic[0].source.push_back( starts.front() );
-		starts.pop_front();
-	}
-	while( ! targets.empty() ){
-		tr.traffic[0].target.push_back( targets.front() );
-		targets.pop_front();
-	}
-
-	while( ! clist.empty() ){
-		tr.circles.push_back( clist.front() );
-		clist.pop_front();
-	}
-
 
 	conf co = conf();
 	cout << "1. " << endl;
@@ -238,7 +238,7 @@ double step = 0.01/12.0;
 
 	/* traffic options */
 	co.mode = 4;
-	co.max_travelers = 90;
+	co.max_travelers = 190;
 	co.source_count = 10; // ??
 	co.target_count = 10; // ??
 
@@ -246,16 +246,16 @@ double step = 0.01/12.0;
 	co.weight_upper_bound = 40;
 	
 	/* cluster options */
-	co.clust_step = step;
+	co.clust_step = 0.01/10.0;
 	co.clust_top_percentage = 0.1;
-	co.clust_count_top_clusters = 10;
+	co.clust_count_top_clusters = 20;
 	co.clust_top_uppers = 1;
 	co.clust_top_lowers = 5;
 	co.clust_top_upper_nodecount_per_cluster = 1;
-	co.clust_top_lower_nodecount_per_cluster = 20;
+	co.clust_top_lower_nodecount_per_cluster = 55;
 
-	//travelCenter tc = travelCenter(&g, &tr, &co);
-	//tc.run();
+	travelCenter tc = travelCenter(&g, &tr, &co);
+	tc.run();
 	cout << "2. " << endl;
 	sim s(&g, &tr, &co);
 	cout << "3. " << endl;

@@ -184,18 +184,20 @@ void travelCenter::mode4(){
 		&(t->circles)
 		);
 
-	std::cout << "starts size "<< starts.size() << std::endl;
-	std::cout << "targets size "<< targets.size() << std::endl;
-	std::cout << "circles size "<< (t->circles).size() << std::endl;
-	std::cin.get();
-
 	t->traffic.resize( 1 );
 	//t->traffic.push_back(pendler());
 	t->traffic[0].source.reserve(starts.size());
 	t->traffic[0].target.reserve(targets.size());
 
-	copy(starts.begin(), starts.end(), t->traffic[0].source.begin());
-	copy(targets.begin(), targets.end(), t->traffic[0].target.begin());
+	while(! starts.empty()){
+		t->traffic[0].source.push_back( starts.front() );
+		starts.pop_front();
+
+	}
+	while(! targets.empty()){
+		t->traffic[0].target.push_back( targets.front() );
+		targets.pop_front();
+	}
 
 	/* random weights */
 	std::srand((unsigned)std::time(0));

@@ -406,10 +406,6 @@ void sim::paintEdges(){
 		if( tmpcolour > 1.0 )
 			tmpcolour = 1.0;
 
-
-		if(ed[i].load != 0 && tmpcolour != 0.0 && tmpcolour != 1.0)
-			cout << tmpcolour << endl;
-
 		ed[i].colour = tmpcolour;
 	}
 }
