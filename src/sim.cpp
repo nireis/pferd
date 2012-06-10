@@ -259,31 +259,31 @@ void sim::initArrays(){
 	smallTypes[12] = 50;
 
 	// 130
-	functionParameter[0][0] = -130.0/400.0;//0.3;
+	functionParameter[0][0] = -130.0/40.0;//0.3;
 	functionParameter[0][1] = 0.0;//0.0013;
 	// 120
-	functionParameter[1][0] = -120.0/350.0;//0.3;
+	functionParameter[1][0] = -120.0/35.0;//0.3;
 	functionParameter[1][1] = 0.0;//0.0013;
 	// 100
-	functionParameter[2][0] = -100.0/250.0;//0.3;
+	functionParameter[2][0] = -100.0/25.0;//0.3;
 	functionParameter[2][1] = 0.0;//0.003;
 	// 80
-	functionParameter[3][0] = -80.0/200.0;//0.5;
+	functionParameter[3][0] = -80.0/20.0;//0.5;
 	functionParameter[3][1] = 0.0;//0.003;
 	// 70
-	functionParameter[4][0] = -70.0/150.0;//0.5;
+	functionParameter[4][0] = -70.0/15.0;//0.5;
 	functionParameter[4][1] = 0.0;//0.0035;
 	// 50
-	functionParameter[5][0] = -50.0/100.0;//1.0;
+	functionParameter[5][0] = -50.0/10.0;//1.0;
 	functionParameter[5][1] = 0.0;//0.0065;
 	// 45
-	functionParameter[6][0] = -45.0/80.0;//1.0;
+	functionParameter[6][0] = -45.0/8.0;//1.0;
 	functionParameter[6][1] = 0.0;//0.0065;
 	//30
-	functionParameter[7][0] = -30.0/40.0;//0.7;
+	functionParameter[7][0] = -30.0/4.0;//0.7;
 	functionParameter[7][1] = 0.0;//0.016;
 	// 10
-	functionParameter[8][0] = -10.0/10.0;//0.0005;
+	functionParameter[8][0] = -10.0/1.0;//0.0005;
 	functionParameter[8][1] = 0.0;//0.15;
 	
 }
@@ -380,15 +380,13 @@ double sim::weightEdge(unsigned int type, unsigned int load){
 	double v = (double)type;
 	double x = (double)load;
 	double res =  /* TODO lineare funktion testweise */
-		//v - ((v * a) / (a + ((v-a)*exp(-b*x))));
-		v + a*x
+		v - ((v * a) / (a + ((v-a)*exp(-b*x))));
+		//v - a*x;
 		;
 	if( res < 0.0 ) 
 		res = 0.0;
 	if(res > type)
 		res = type;
-	if(load == 0)
-		res = v;
 
 	return res;
 }
@@ -396,20 +394,21 @@ void sim::paintEdges(){
 	EdgeData* ed = base_g->getEdgeDataPointer();
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		double tmpcolour =  0.0 ;
-			
-		tmpcolour = 1.0 - (( (double)ed[i].value )/ (double)ed[i].type);
+		
+		if(ed[i].load != 0){
+			tmpcolour = (double)ed[i].load / (double)cfg->max_travelers;
+		}
 
-		//if(ed[i].load != 0)
+		//if(ed[i].load == 0.0)
+		//	tmpcolour = 0.0;
+		//if(ed[i].load != 0.0)
 		//	tmpcolour = 1.0;
-
-		if(tmpcolour > 1.0){
+		if( tmpcolour > 1.0 )
 			tmpcolour = 1.0;
-			cout << "reducing color" << endl;
-		}
-		if(tmpcolour < 0.0){
-			tmpcolour = 0.0;
-			cout << "increasing color" << endl;
-		}
+
+
+		if(ed[i].load != 0 && tmpcolour != 0.0 && tmpcolour != 1.0)
+			cout << tmpcolour << endl;
 
 		ed[i].colour = tmpcolour;
 	}

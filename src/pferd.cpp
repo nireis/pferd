@@ -196,21 +196,21 @@ int main(int argc, char *argv[]){
 list<unsigned int> starts;
 list<unsigned int> targets;
 list<openGL_Cluster> clist;
-double step = 0.01/32.0;
+double step = 0.01/12.0;
 	cout << "> Erstelle Cluster und starte Pendler" << endl;
 	cluster cl(&g, step);
 	/* zweites Argument ist die Randlänge einer Zelle
 	 * in einer unbestimmten Einheit
 	 */
 
-	unsigned int count = 10;
+	unsigned int count = 14;
 	cl.setMostPopulatedCells( count );
 
-	double perc = 0.1;
+	double perc = 0.2;
 	unsigned int upper = (unsigned int)(((double)count)*perc);
 
-	cl.getNodesUpper(10,upper, &targets, &clist);
-	cl.getNodesLower(10,(count-upper), &starts, &clist);
+	cl.getNodesUpper(1,upper, &targets, &clist);
+	cl.getNodesLower(40,(count-upper), &starts, &clist);
 
 	tr.traffic.push_back(pendler());
 	tr.traffic[0].weight = 1;
@@ -238,7 +238,7 @@ double step = 0.01/32.0;
 
 	/* traffic options */
 	co.mode = 4;
-	co.max_travelers = 20;
+	co.max_travelers = 90;
 	co.source_count = 10; // ??
 	co.target_count = 10; // ??
 
@@ -246,7 +246,7 @@ double step = 0.01/32.0;
 	co.weight_upper_bound = 40;
 	
 	/* cluster options */
-	co.clust_step = 0.01/32.0;
+	co.clust_step = step;
 	co.clust_top_percentage = 0.1;
 	co.clust_count_top_clusters = 10;
 	co.clust_top_uppers = 1;
