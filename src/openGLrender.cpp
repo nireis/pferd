@@ -11,6 +11,9 @@ openGLrender::~openGLrender()
 {
 }
 
+/*
+*	Graph rendering methods
+*/
 void openGLrender::setNodeArray(openGL_Node_3d *in_Nodes)
 {
 	//nodeArray = new openGL_Node_3d[nodeCount];
@@ -63,81 +66,6 @@ void openGLrender::setCamera(float x,float y,float z)
 	cameraPos = glm::vec3(x_mercator,y_mercator,z);
 }
 
-char* openGLrender::file_read(const char* filename)
-{
-  FILE* in = fopen(filename, "rb");
-  if (in == NULL) return NULL;
-
-  int res_size = BUFSIZ;
-  char* res = (char*)malloc(res_size);
-  int nb_read_total = 0;
-
-  while (!feof(in) && !ferror(in)) {
-    if (nb_read_total + BUFSIZ > res_size) {
-      if (res_size > 10*1024*1024) break;
-      res_size = res_size * 2;
-      res = (char*)realloc(res, res_size);
-    }
-    char* p_res = res + nb_read_total;
-    nb_read_total += fread(p_res, 1, BUFSIZ, in);
-  }
-  
-  fclose(in);
-  res = (char*)realloc(res, nb_read_total + 1);
-  res[nb_read_total] = '\0';
-  return res;
-}
-
-GLint openGLrender::loadShader(const char* filename, GLenum type)
-{
-	const GLchar* shaderSource = file_read(filename);
-	if (shaderSource == NULL)
-	{
-		fprintf(stderr, "Couldn't read shader sourcefile \" %s \" \n",filename);
-		return false;
-	}
-
-	GLuint shader = glCreateShader(type);
-	glShaderSource(shader, 1, &shaderSource, NULL);
-	free((void*)shaderSource);
-
-	glCompileShader(shader);
-	GLint compile_ok = GL_FALSE;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_ok);
-	if(compile_ok == GL_FALSE)
-	{
-		fprintf(stderr, "Couldn't compile shader %s \n",filename);
-		glDeleteShader(shader);
-		return false;
-	}
-
-	return shader;
-}
-
-GLuint openGLrender::initShaderProgram(const char* fragment, const char* vertex, const char** attributes, int attributeCount)
-{
-	//nodes shader program
-	GLuint vShader;
-	GLuint fShader;
-	GLuint program;
-
-	if ((fShader = loadShader(fragment, GL_FRAGMENT_SHADER)) == 0)
-	{ return false; };
-	if ((vShader = loadShader(vertex, GL_VERTEX_SHADER)) == 0)
-	{ return false; };
-
-	program = glCreateProgram();
-	glAttachShader(program, vShader);
-	glAttachShader(program, fShader);
-
-	for(int i=0; i< attributeCount; i++)
-	{
-		glBindAttribLocation(program, i, attributes[i]);
-	}
-
-	return program;
-}
-
 bool openGLrender::initOpenGL_Node_3d(GLuint* vbo, openGL_Node_3d* nodeData, int size)
 {
 	glGenVertexArrays(1, vbo);
@@ -186,7 +114,6 @@ bool openGLrender::initOpenGL_Cluster(GLuint *vbo, openGL_Cluster clusterData)
 			openGL_Node_3d( clusterData.radius*glm::cos(((float)i/4.0)*3.141592),
 							clusterData.radius*glm::sin(((float)i/4.0)*3.141592),
 							clusterData.color);
-
 	}
 
 	glGenVertexArrays(1, vbo);
@@ -427,7 +354,6 @@ bool openGLrender::initGraphVis()
 	sceneEntities[2].visabilty = true;
 	sceneEntities[2].world_position = glm::vec3(0.0);
 
-
 	for(int i=0; i<clusterCount; i++)
 	{
 		//init cluster-highlight
@@ -449,183 +375,12 @@ bool openGLrender::initGraphVis()
 	return true;
 }
 
-void openGLrender::uninit()
+void openGLrender::displayGraph()
 {
-}
-
-void openGLrender::mouse(int x, int y)
-{
-	if(mouse_mode)
-	{
-		if(swap)
-		{
-			mouse_delta_x1 = x;
-			mouse_delta_y1 = y;
-			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y0)/(4000.0*camZoom)), cameraPos.z);
-
-			swap = false;
-			glutPostRedisplay();
-		}
-		else
-		{
-			mouse_delta_x0 = x;
-			mouse_delta_y0 = y;
-			
-			cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y1)/(4000.0*camZoom)), cameraPos.z);
-
-			swap = true;
-			glutPostRedisplay();
-		}
-	}
-	else
-	{
-		if(swap)
-		{
-			mouse_delta_y1 = y;
-			
-			camZoom = camZoom - ((float)(y-mouse_delta_y0)/150.0)*camZoom;
-
-			swap = false;
-			glutPostRedisplay();
-		}
-		else
-		{
-			mouse_delta_y0 = y;
-			
-			camZoom = camZoom - ((float)(y-mouse_delta_y1)/150.0)*camZoom;
-
-			swap = true;
-			glutPostRedisplay();
-		}
-	}
-
-}
-
-void openGLrender::mouseCallback(int x, int y)
-{
-	currentInstance->mouse(x, y);
-}
-
-void openGLrender::mouseClick(int button, int state, int x, int y)
-{
-	if(state== GLUT_DOWN)
-	{
-		if(button == GLUT_LEFT_BUTTON)
-		{
-			if(swap)
-			{
-				mouse_delta_x0 = x;
-				mouse_delta_y0 = y;
-			}
-			else
-			{
-				mouse_delta_x1 = x;
-				mouse_delta_y1 = y;
-			}
-			mouse_mode = true;
-		}
-		if(button == GLUT_RIGHT_BUTTON)
-		{
-			if(swap)
-			{
-				mouse_delta_y0 = y;
-			}
-			else
-			{
-				mouse_delta_y1 = y;
-			}
-			mouse_mode = false;
-		}
-	}
-}
-
-void openGLrender::mouseClickCallback(int button, int state, int x, int y)
-{
-	currentInstance->mouseClick(button, state, x, y);
-}
-
-void openGLrender::keyboard (unsigned char key, int x, int y)
-{
-	switch( key ) 
-	{
-        case 'q': case 'Q':
-            exit( EXIT_SUCCESS );
-            break;
-		case '+':
-			cameraPos = cameraPos - glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
-			glutPostRedisplay();
-			break;
-		case '-':
-			cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
-			glutPostRedisplay();
-			break;
-		case 'n':
-			sceneEntities[1].visabilty = ! sceneEntities[1].visabilty;
-			glutPostRedisplay();
-			break;
-		case 'e':
-			sceneEntities[0].visabilty = ! sceneEntities[0].visabilty;
-			glutPostRedisplay();
-			break;/*
-		case 'm':
-			showMap = !showMap;
-			glutPostRedisplay();
-			break;*/
-		case 's':
-			sceneEntities[2].visabilty = ! sceneEntities[2].visabilty;
-			glutPostRedisplay();
-			break;/*
-		case 'c':
-			showCluster = !showCluster;
-			glutPostRedisplay();
-			break;*/
-	}
-}
-
-void openGLrender::keyboardArrows(int key, int x, int y)
-{
-	switch(key)
-	{
-	case GLUT_KEY_LEFT:
-		cameraPos = cameraPos - glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_RIGHT:
-		cameraPos = cameraPos + glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_UP:
-		cameraPos = cameraPos + glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_DOWN:
-		cameraPos = cameraPos - glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
-		glutPostRedisplay();
-		break;
-	}
-}
-
-void openGLrender::keyboardCallback(unsigned char key, int x, int y)
-{
-	currentInstance -> keyboard(key,x,y);
-}
-
-void openGLrender::keyboardArrowsCallback(int key, int x, int y)
-{
-	currentInstance -> keyboardArrows(key, x, y);
-}
-
-void openGLrender::display()
-{
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
 	//set projection matrix
 	float fnear = 0.00001f;
 	float ffar = 10000.0f;
-	float fov = 45;
-	float aspect = float(wWidth) / float(wHeight);
-   //projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
+	//projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
 	projMX = glm::ortho(-(float)wWidth/(8000.0f*camZoom),(float)wWidth/(8000.0f*camZoom),-(float)wHeight/(8000.0f*camZoom),(float)wHeight/(8000.0f*camZoom),fnear,ffar);
 	//set view matrix
 	viewMX = glm::lookAt(cameraPos,cameraPos - glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -638,12 +393,10 @@ void openGLrender::display()
 	glLineWidth(2.0);
 	glPointSize(4.0);
 
-	
 	for(int i=0; i<entityCount; i++)
 	{
 		if(sceneEntities[i].visabilty)
 		{
-			
 			//set model matrix
 			modelMX = glm::translate(glm::mat4(1.0f), sceneEntities[i].world_position);
 			//set model_view_projection matrix
@@ -655,7 +408,503 @@ void openGLrender::display()
 			glDrawArrays(sceneEntities[i].geometryType, 0, sceneEntities[i].numElements);
 		}
 	}
+}
+
+void openGLrender::uninitGraph()
+{
+}
+
+/*
+*	Volume rendering methods
+*/
+bool openGLrender::initBoundingBox(glm::vec3 dim)
+{
+	vertex *vArray = new vertex[14];
+
+	vArray[0] = vertex(1.0, dim.y/dim.x, dim.z/dim.x,1.0,1.0,1.0);
+	vArray[1] = vertex(0.0, dim.y/dim.x, dim.z/dim.x,0.0,1.0,1.0);
+	vArray[2] = vertex(1.0, 0.0, dim.z/dim.x,1.0,0.0,1.0);
+	vArray[3] = vertex(0.0, 0.0, dim.z/dim.x,0.0,0.0,1.0);
+	vArray[4] = vertex(0.0, 0.0, 0.0,0.0,0.0,0.0);
+	vArray[5] = vertex(0.0, dim.y/dim.x, dim.z/dim.x,0.0,1.0,1.0);
+	vArray[6] = vertex(0.0, dim.y/dim.x, 0.0,0.0,1.0,0.0);
+	vArray[7] = vertex(1.0, dim.y/dim.x, dim.z/dim.x,1.0,1.0,1.0);
+	vArray[8] = vertex(1.0, dim.y/dim.x, 0.0,1.0,1.0,0.0);
+	vArray[9] = vertex(1.0, 0.0, dim.z/dim.x,1.0,0.0,1.0);
+	vArray[10] = vertex(1.0, 0.0, 0.0,1.0,0.0,0.0);
+	vArray[11] = vertex(0.0, 0.0, 0.0,0.0,0.0,0.0);
+	vArray[12] = vertex(1.0, dim.y/dim.x, 0.0,1.0,1.0,0.0);
+	vArray[13] = vertex(0.0, dim.y/dim.x, 0.0,0.0,1.0,0.0);
+
+	glGenVertexArrays(1, &vbo_boundingBox);
+	glBindVertexArray(vbo_boundingBox);
+	glGenBuffers(1, &vbo_boundingBox);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_boundingBox);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*14, vArray, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),(GLvoid*) (sizeof(float)+sizeof(float)+sizeof(float)));
+
+	glBindVertexArray(0);
+
+	return true;
+}
+
+bool openGLrender::init3DTex(glm::vec3 dim, char* filename)
+{
+	FILE *pFile;
+
+	int size = 3* dim.x *dim.y *dim.z;
+
+	pFile = fopen ("pferd.raw", "rb");
+	if (pFile==NULL) {return false;}
+
 	
+	GLubyte *vol = NULL;
+	vol = new GLubyte[size];
+	if (vol == NULL) {return false;}
+
+	GLubyte *buffer = NULL;
+	int buffersize = (3 * dim.x *dim.y);
+	buffer = new GLubyte[buffersize];
+	fread(buffer,sizeof(GLubyte),buffersize,pFile);
+	
+	for(int i=0; i<size; i++)
+	{
+		vol[(size-1) - i] = buffer[i%buffersize];
+	}
+	
+	glGenTextures(1, &tex_3D);
+	glBindTexture(GL_TEXTURE_3D, tex_3D);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage3D(GL_TEXTURE_3D,0,GL_RGB,dim.x,dim.y,dim.z,0,GL_RGB,GL_UNSIGNED_BYTE,vol);
+	delete [] vol;
+
+	return true;
+}
+
+bool openGLrender::init3Dto2DTex(glm::vec3 dim)
+{
+	FILE *pFile;
+
+	int size = 3* dim.x *dim.y *dim.z;
+
+	pFile = fopen ("pferd.raw", "rb");
+	if (pFile==NULL) {return false;}
+
+	
+	GLubyte *vol = NULL;
+	vol = new GLubyte[size];
+	if (vol == NULL) {return false;}
+
+	GLubyte *buffer = NULL;
+	int buffersize = (3 * dim.x *dim.y);
+	buffer = new GLubyte[buffersize];
+	fread(buffer,sizeof(GLubyte),buffersize,pFile);
+	
+	for(int i=0; i<size; i++)
+	{
+		vol[(size-1) -i] = buffer[i%buffersize];
+	}
+	
+	glGenTextures(1, &tex_3D);
+	glBindTexture(GL_TEXTURE_2D, tex_3D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,dim.x,dim.y*dim.z,0,GL_RGB,GL_UNSIGNED_BYTE,vol);
+	delete [] vol;
+
+	return true;
+}
+
+bool openGLrender::initVolumeVis()
+{
+	cam_alpha = 0.0;
+	cam_beta = 0.0;
+	cam_dist = 2.0;
+	dimension = glm::vec3(256.0,256.0,32.0);
+	initBoundingBox(dimension);
+	init3Dto2DTex(dimension);
+	const char* atrb0[] = { "in_position", "in_color"};
+	const char* shader0[] = { "raycastFragment.glsl", "raycastVertex.glsl" };
+	frontface_prgm = initShaderProgram(shader0[0],shader0[1],atrb0,2);
+	glLinkProgram(frontface_prgm);
+	const char* atrb1[] = { "in_position", "in_color"};
+	const char* shader1[] = { "raycastFragment2.glsl", "raycastVertex2.glsl" };
+	backface_prgm = initShaderProgram(shader1[0],shader1[1],atrb1,2);
+	glLinkProgram(backface_prgm);
+
+	return true;
+}
+
+void openGLrender::displayVolume()
+{
+	cam_alpha = cam_alpha + 0.1;
+	//calculate camera position
+	//note that glm functions use radian values
+	float cam_alpha_r = cam_alpha * (2.0*3.14/360.0);
+	float cam_beta_r = cam_beta * (2.0*3.14/360.0);
+	cameraPos.y = (glm::sin(cam_beta_r) * cam_dist) + (dimension.y/dimension.x)/2.0;
+	float temp = (glm::cos(cam_beta_r) * cam_dist);
+	cameraPos.z = glm::cos(cam_alpha_r) * temp + (dimension.z/dimension.x)/2.0;
+	cameraPos.x = glm::sin(cam_alpha_r) * temp + 0.5;
+
+	//set projection matrix
+	float fnear = 0.001f;
+	float fov = 60;
+	float aspect = float(wWidth) / float(wHeight);
+	projMX = glm::perspective(fov, aspect, fnear, 10000.0f);
+	//set view matrix
+	viewMX = glm::lookAt(cameraPos,glm::vec3(0.5,(dimension.y/dimension.x)/2.0,(dimension.z/dimension.x)/2.0), glm::vec3(0.0f, 1.0f, 0.0f));
+	//set model matrix
+	modelMX = glm::mat4(1.0f);
+	//set model-view-projection matrix
+	glm::mat4 mvpMX = projMX * viewMX * modelMX;
+	//set transformation to texture coordinates of the bounding box
+	texMX = glm::scale(glm::mat4(1.0), glm::vec3(1.0,1.0/(dimension.y/dimension.x),1.0/(dimension.z/dimension.x)));
+
+	// check whether the camera is inside the bounding box
+	glm::vec4 camPosTexCoord = texMX * glm::vec4(cameraPos,1.0);
+	if(camPosTexCoord.x <= 1.0
+		&& camPosTexCoord.y <= 1.0
+		&& camPosTexCoord.z <= 1.0
+		&& camPosTexCoord.x >= 0.0
+		&& camPosTexCoord.y >= 0.0
+		&& camPosTexCoord.z >= 0.0)
+	{
+		cam_BBtest = false;
+	}
+	else
+	{
+		cam_BBtest = true;
+	}
+
+	if(cam_BBtest)
+	{
+		// Render frontfaces of the Bounding Box 
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glUseProgram(frontface_prgm);
+		glUniformMatrix4fv(glGetUniformLocation(frontface_prgm, "mvp_matrix"), 1, GL_FALSE, glm::value_ptr(mvpMX));
+		glUniformMatrix4fv(glGetUniformLocation(frontface_prgm, "tex_matrix"), 1, GL_FALSE, glm::value_ptr(texMX));
+		glUniform3fv(glGetUniformLocation(frontface_prgm, "camera_pos"), 1, glm::value_ptr(cameraPos));
+		glUniform3fv(glGetUniformLocation(frontface_prgm, "tex3D_dim"), 1, glm::value_ptr(dimension));
+		
+		glEnable(GL_TEXTURE_2D);
+		glUniform1i(glGetUniformLocation(frontface_prgm, "Tex3D"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex_3D);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glBindVertexArray(vbo_boundingBox);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	}
+	else
+	{
+		// Render backfaces of the Bounding Box
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glUseProgram(backface_prgm);
+		glUniformMatrix4fv(glGetUniformLocation(backface_prgm, "mvp_matrix"), 1, GL_FALSE, glm::value_ptr(mvpMX));
+		glUniformMatrix4fv(glGetUniformLocation(backface_prgm, "tex_matrix"), 1, GL_FALSE, glm::value_ptr(texMX));
+		glUniform3fv(glGetUniformLocation(backface_prgm, "camera_pos"), 1, glm::value_ptr(cameraPos));
+		glUniform3fv(glGetUniformLocation(backface_prgm, "tex3D_dim"), 1, glm::value_ptr(dimension));
+			
+		glEnable(GL_TEXTURE_2D);
+		glUniform1i(glGetUniformLocation(backface_prgm, "Tex3D"), 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex_3D);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glBindVertexArray(vbo_boundingBox);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	}
+}
+
+void openGLrender::uninitVolume()
+{
+}
+
+/*
+*	General purpose methods
+*/
+char* openGLrender::file_read(const char* filename)
+{
+  FILE* in = fopen(filename, "rb");
+  if (in == NULL) return NULL;
+
+  int res_size = BUFSIZ;
+  char* res = (char*)malloc(res_size);
+  int nb_read_total = 0;
+
+  while (!feof(in) && !ferror(in)) {
+    if (nb_read_total + BUFSIZ > res_size) {
+      if (res_size > 10*1024*1024) break;
+      res_size = res_size * 2;
+      res = (char*)realloc(res, res_size);
+    }
+    char* p_res = res + nb_read_total;
+    nb_read_total += fread(p_res, 1, BUFSIZ, in);
+  }
+  
+  fclose(in);
+  res = (char*)realloc(res, nb_read_total + 1);
+  res[nb_read_total] = '\0';
+  return res;
+}
+
+GLint openGLrender::loadShader(const char* filename, GLenum type)
+{
+	const GLchar* shaderSource = file_read(filename);
+	if (shaderSource == NULL)
+	{
+		fprintf(stderr, "Couldn't read shader sourcefile \" %s \" \n",filename);
+		return false;
+	}
+
+	GLuint shader = glCreateShader(type);
+	glShaderSource(shader, 1, &shaderSource, NULL);
+	free((void*)shaderSource);
+
+	glCompileShader(shader);
+	GLint compile_ok = GL_FALSE;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_ok);
+	if(compile_ok == GL_FALSE)
+	{
+		fprintf(stderr, "Couldn't compile shader %s \n",filename);
+		glDeleteShader(shader);
+		return false;
+	}
+
+	return shader;
+}
+
+GLuint openGLrender::initShaderProgram(const char* fragment, const char* vertex, const char** attributes, int attributeCount)
+{
+	//nodes shader program
+	GLuint vShader;
+	GLuint fShader;
+	GLuint program;
+
+	if ((fShader = loadShader(fragment, GL_FRAGMENT_SHADER)) == 0)
+	{ return false; };
+	if ((vShader = loadShader(vertex, GL_VERTEX_SHADER)) == 0)
+	{ return false; };
+
+	program = glCreateProgram();
+	glAttachShader(program, vShader);
+	glAttachShader(program, fShader);
+
+	for(int i=0; i< attributeCount; i++)
+	{
+		glBindAttribLocation(program, i, attributes[i]);
+	}
+
+	return program;
+}
+
+void openGLrender::mouse(int x, int y)
+{
+	if(render_mode == 0)
+	{
+		if(mouse_mode)
+		{
+			if(swap)
+			{
+				mouse_delta_x1 = x;
+				mouse_delta_y1 = y;
+			
+				cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x0-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y0)/(4000.0*camZoom)), cameraPos.z);
+
+				swap = false;
+				glutPostRedisplay();
+			}
+			else
+			{
+				mouse_delta_x0 = x;
+				mouse_delta_y0 = y;
+			
+				cameraPos = glm::vec3(cameraPos.x + ((float)(mouse_delta_x1-x)/(4000.0*camZoom)), cameraPos.y + ((float)(y-mouse_delta_y1)/(4000.0*camZoom)), cameraPos.z);
+
+				swap = true;
+				glutPostRedisplay();
+			}
+		}
+		else
+		{
+			if(swap)
+			{
+				mouse_delta_y1 = y;
+			
+				camZoom = camZoom - ((float)(y-mouse_delta_y0)/150.0)*camZoom;
+
+				swap = false;
+				glutPostRedisplay();
+			}
+			else
+			{
+				mouse_delta_y0 = y;
+			
+				camZoom = camZoom - ((float)(y-mouse_delta_y1)/150.0)*camZoom;
+
+				swap = true;
+				glutPostRedisplay();
+			}
+		}
+	}
+
+}
+
+void openGLrender::mouseCallback(int x, int y)
+{
+	currentInstance->mouse(x, y);
+}
+
+void openGLrender::mouseClick(int button, int state, int x, int y)
+{
+	if(render_mode == 0)
+	{
+		if(state== GLUT_DOWN)
+		{
+			if(button == GLUT_LEFT_BUTTON)
+			{
+				if(swap)
+				{
+					mouse_delta_x0 = x;
+					mouse_delta_y0 = y;
+				}
+				else
+				{
+					mouse_delta_x1 = x;
+					mouse_delta_y1 = y;
+				}
+				mouse_mode = true;
+			}
+			if(button == GLUT_RIGHT_BUTTON)
+			{
+				if(swap)
+				{
+					mouse_delta_y0 = y;
+				}
+				else
+				{
+					mouse_delta_y1 = y;
+				}
+				mouse_mode = false;
+			}
+		}
+	}
+}
+
+void openGLrender::mouseClickCallback(int button, int state, int x, int y)
+{
+	currentInstance->mouseClick(button, state, x, y);
+}
+
+void openGLrender::keyboard (unsigned char key, int x, int y)
+{
+	if(render_mode == 0)
+	{
+		switch( key ) 
+		{
+			case 'q': case 'Q':
+				glutLeaveMainLoop();
+				break;
+			case '+':
+				cameraPos = cameraPos - glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
+				glutPostRedisplay();
+				break;
+			case '-':
+				cameraPos = cameraPos + glm::vec3(0.0f,0.0f,cameraPos.z/40.0f);
+				glutPostRedisplay();
+				break;
+			case 'n':
+				sceneEntities[1].visabilty = ! sceneEntities[1].visabilty;
+				glutPostRedisplay();
+				break;
+			case 'e':
+				sceneEntities[0].visabilty = ! sceneEntities[0].visabilty;
+				glutPostRedisplay();
+				break;/*
+			case 'm':
+				showMap = !showMap;
+				glutPostRedisplay();
+				break;*/
+			case 's':
+				sceneEntities[2].visabilty = ! sceneEntities[2].visabilty;
+				glutPostRedisplay();
+				break;/*
+			case 'c':
+				showCluster = !showCluster;
+				glutPostRedisplay();
+				break;*/
+		}
+	}
+	else
+	{
+		switch( key ) 
+		{
+			case 'q': case 'Q':
+				glutLeaveMainLoop();
+				break;
+		}
+	}
+}
+
+void openGLrender::keyboardArrows(int key, int x, int y)
+{
+	if(render_mode == 0)
+	{
+		switch(key)
+		{
+		case GLUT_KEY_LEFT:
+			cameraPos = cameraPos - glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_RIGHT:
+			cameraPos = cameraPos + glm::vec3(cameraPos.z/100.0f,0.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_UP:
+			cameraPos = cameraPos + glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_DOWN:
+			cameraPos = cameraPos - glm::vec3(0.0f,cameraPos.z/100.0f,0.0f);
+			glutPostRedisplay();
+			break;
+		}
+	}
+}
+
+void openGLrender::keyboardCallback(unsigned char key, int x, int y)
+{
+	currentInstance -> keyboard(key,x,y);
+}
+
+void openGLrender::keyboardArrowsCallback(int key, int x, int y)
+{
+		currentInstance -> keyboardArrows(key, x, y);
+}
+
+void openGLrender::display()
+{
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	
+	//render_mode == 0 for graph rendering
+	if(render_mode == 0)
+	{
+		displayGraph();
+	}
+	//render_mode == 1 for volume rendering
+	else
+	{
+		displayVolume();
+	}
+
 	glutSwapBuffers();
 }
 
@@ -699,6 +948,7 @@ bool openGLrender::start(int argc, char* argv[])
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Pferd");
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION);
 
 	GLenum glew_status = glewInit();
 	if (glew_status != GLEW_OK)
@@ -706,7 +956,24 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	initGraphVis();
+	if(argv[0] == "graph")
+	{
+		render_mode = 0;
+	}
+	else
+	{
+		render_mode = 1;
+	}
+	
+
+	if(render_mode == 0)
+	{
+		initGraphVis();
+	}
+	else
+	{
+		initVolumeVis();
+	}
 
 	setInstance(this);
 	glutDisplayFunc(displayCallback);
@@ -720,6 +987,14 @@ bool openGLrender::start(int argc, char* argv[])
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutMainLoop();
 
-	uninit();
+	if(render_mode == 0)
+	{
+		uninitGraph();
+	}
+	else
+	{
+		uninitVolume();
+	}
+	
 	return true;
 }
