@@ -3,6 +3,7 @@
 
 #include "structs.h"
 #include "clust.h"
+#include "graphalgs.h"
 #include <vector>
 #include <list>
 

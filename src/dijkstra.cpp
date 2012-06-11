@@ -53,7 +53,6 @@ unsigned int Dijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 				U.push(U_element_bi(
 					currentEdge->value,currentEdge->other_node,currentEdge->id,i));
 			}
-			// numEdges++;
 		}
 	}
 	dist[node_id0] = 0;
@@ -65,7 +64,6 @@ unsigned int Dijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		int i = U.top().found_by;
 		tmpid = U.top().id;
 		if(o_found_by[i][tmpid] == -1){
-			// numNodes++;
 			o_found_by[i][tmpid] = (int)U.top().eid;
 			o_reset_found_by[i].push_back(tmpid);
 			unsigned int tmp_min_path_length = dist[tmpid] + U.top().distance;
@@ -84,7 +82,6 @@ unsigned int Dijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 					U.push(U_element_bi(
 						currentEdge->value+dist[tmpid],currentEdge->other_node,currentEdge->id,i));
 				}
-				// numEdges++;
 			}
 		}
 		U.pop();
@@ -98,18 +95,12 @@ unsigned int Dijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 		for(int i=0; i<2; i++){
 			unsigned int tmpid = min_path_center;
 			while(tmpid != node_id[i]){
-//				cout << tmpid << endl;
 				int takenedge = o_found_by[i][tmpid];
-				// path->push_front(takenedge);
 				g->addEdgeLoad(takenedge, weight);
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}
 	}
-
-	//cout << "numNodes: " << numNodes << endl;
-	//cout << "numEdges: " << numEdges << endl;
-	//cout << "===" << endl;
 
 	resetOne();
 	return min_path_length;
@@ -167,12 +158,10 @@ void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(m_found_by[target] != -1){
 			//...schon gefunden wurde...
-			(*targets)[i] = dist[target];
 			tmpfoundby = m_found_by[target];
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
-				(*targets)[i] = U.top().distance;
 				tmpfoundby = (int)U.top().eid;
 				//...erst gerade gefunden wurde...
 				if(target == targets->back()){
@@ -183,12 +172,11 @@ void Dijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 			}
 			else{
 				//...oder garnicht gefunden wurde.
-				(*targets)[i] = numeric_limits<unsigned int>::max();
 				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
 		// Backtracing der Knoten.
-		if((*targets)[i] != numeric_limits<unsigned int>::max()){
+		if(dist[target] != numeric_limits<unsigned int>::max()){
 			// cout << "=== Node " << target << " ===" << endl;
 			// ersten Knoten
 			tmpnode = target;
@@ -255,12 +243,10 @@ void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 		// Die Distanz des Knotens setzen, je nachdem ob er...
 		if(m_found_by[target] != -1){
 			//...schon gefunden wurde...
-			(*sources)[i] = dist[target];
 			tmpfoundby = m_found_by[target];
 		}
 		else{
 			if(!U.empty() && U.top().id == target){
-				(*sources)[i] = U.top().distance;
 				tmpfoundby = (int)U.top().eid;
 				//...erst gerade gefunden wurde...
 				if(target == sources->back()){
@@ -271,12 +257,11 @@ void Dijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 			}
 			else{
 				//...oder garnicht gefunden wurde.
-				(*sources)[i] = numeric_limits<unsigned int>::max();
 				dist[target] = numeric_limits<unsigned int>::max();
 			}
 		}
 		// Backtracing der Knoten.
-		if((*sources)[i] != numeric_limits<unsigned int>::max()){
+		if(dist[target] != numeric_limits<unsigned int>::max()){
 			// ersten Knoten
 			tmpnode = target;
 			if(tmpnode != node_id0){
@@ -299,5 +284,56 @@ void Dijkstra::resetMany(){
 	while(!m_reset_found_by.empty()){
 		m_found_by[m_reset_found_by.back()] = -1;
 		m_reset_found_by.pop_back();
+	}
+}
+
+void Dijkstra::getNeighbours(Graph* g, unsigned int node_id, unsigned int radius,
+		vector<unsigned int>* nbrs){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	EdgesIterator it = g->getOutEdgesIt(node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+	Edge* currentEdge;
+	vector<bool> n_found(nr_of_nodes,false);
+
+	// Den ersten Knoten abarbeiten
+	n_found[node_id] = true;
+	while(it.hasNext()){
+		currentEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(currentEdge->value,currentEdge->other_node,currentEdge->id));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	unsigned int tmpdist;
+	while(!U.empty() && U.top().distance <= radius){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		tmpid = U.top().id;
+		if(!n_found[tmpid]){
+			nbrs->push_back(tmpid);
+			tmpdist = U.top().distance;
+			n_found[tmpid] = true;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!n_found[currentEdge->other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge->value+tmpdist,currentEdge->other_node,currentEdge->id));
+				}
+			}
+		}
+		U.pop();
+	}
+	resetNeigh(nbrs, node_id);
+}
+
+void Dijkstra::resetNeigh(vector<unsigned int>* n_reset_found, unsigned int node_id){
+	n_found[node_id] = false;
+	for(unsigned int i=0; i<n_reset_found->size(); i++){
+		n_found[(*n_reset_found)[i]] = false;
 	}
 }

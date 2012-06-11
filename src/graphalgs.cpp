@@ -112,6 +112,54 @@ void DijkstraFunc(Graph* g, unsigned int node_id){
 //	}
 }
 
+void getNeighbours(Graph* g, unsigned int node_id, unsigned int radius, vector<unsigned int>* nbrs){
+	// Iterator für die ausgehenden Kanten eines Knotens
+	EdgesIterator it = g->getOutEdgesIt(node_id);
+	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
+	std::priority_queue<U_element, std::vector<U_element>, Compare_U_element> U;
+
+	Edge* currentEdge;
+
+	unsigned int nr_of_nodes = g->getNodeCount();
+	vector<bool> found(nr_of_nodes,false);
+
+	vector<unsigned int> in_edge_id(nr_of_nodes);
+
+	// Den ersten Knoten abarbeiten
+	found[node_id] = true;
+	while(it.hasNext()){
+		currentEdge = it.getNext();
+		// Die Knoten mit ihrer Distanz in U stecken
+		U.push(U_element(currentEdge->value,currentEdge->other_node,currentEdge->id));
+	}
+
+	// Die restlichen Knoten abarbeiten
+	unsigned int tmpid;
+	unsigned int tmpdist;
+	while(!U.empty() && U.top().distance <= radius){
+		// Die Distanz Eintragen, wenn der kürzeste gefunden wurde (und weiter suchen)
+		tmpid = U.top().id;
+		if(!found[tmpid]){
+			nbrs->push_back(tmpid);
+			tmpdist = U.top().distance;
+			found[tmpid] = true;
+			in_edge_id[tmpid] = U.top().eid;
+			// Die ausgehenden Kanten durchgehen und in U werfen
+			it = g->getOutEdgesIt(tmpid);
+			while(it.hasNext()){
+				currentEdge = it.getNext();
+				// Wenn sie noch nicht gefunden wurde...
+				if(!found[currentEdge->other_node]){
+					// ...tu sie in U
+					U.push(U_element(
+								currentEdge->value+tmpdist,currentEdge->other_node,currentEdge->id));
+				}
+			}
+		}
+		U.pop();
+	}
+}
+
 bool DijkstraFunc(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 		unsigned int over_node_id){
 	// Iterator für die ausgehenden Kanten eines Knotens

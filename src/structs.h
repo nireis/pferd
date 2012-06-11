@@ -455,7 +455,12 @@ class compare_uint_pair{
 };
 
 struct pendler {
-	pendler() : source(), target(), weight(0) {}
+	pendler() : 
+		source(0), 
+		target(0), 
+		weight(1) {}
+	pendler(std::vector<unsigned int> s, std::vector<unsigned int> t, unsigned int w):
+		source(s), target(t), weight(0) {}
 
 	std::vector<unsigned int> source;
 	std::vector<unsigned int> target;
@@ -463,20 +468,18 @@ struct pendler {
 };
 
 struct travelers {
-	travelers() : traffic(), circles() {}
+	travelers() : traffic(0), circles(0) {}
 
 	std::vector<pendler> traffic;
 	std::list<openGL_Cluster> circles;
 };
 
 struct travelCircle {
-	travelCircle(float one, float two, float r, unsigned int c) : 
-		x(one), y(two), radius(r), count(c) {}
+	travelCircle(unsigned int id, unsigned int r, unsigned int c) : 
+		node_id(id), radius(r), count(c) {}
 
-	float x;
-	float y;
-
-	float radius;
+	unsigned int node_id;
+	unsigned int radius;
 	unsigned int count;
 };
 

@@ -101,105 +101,194 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
 
-	/* erstelle Simulation und i
-	 * lasse Kantengewichte an 
-	 * Reisezeit des Kantentyps anpassen 
-	 */
-	cout << "> Erstelle Simulation und passe Kantengewichte an" << endl;
-	simulation sim(&g);
-	sim.setEdgeValues(g.getEdgeDataPointer(), g.getEdgeCount());
-	g.updateEdgeValues();
+//	/* erstelle Simulation und i
+//	 * lasse Kantengewichte an 
+//	 * Reisezeit des Kantentyps anpassen 
+//	 */
+//	cout << "> Erstelle Simulation und passe Kantengewichte an" << endl;
+//	simulation osim(&g);
+//	osim.setEdgeValues(g.getEdgeDataPointer(), g.getEdgeCount());
+//	g.updateEdgeValues();
+//
+	//cout << "Erstelle neuen Graph: " << endl;
+	//start = clock();
+	//SCGraph scg = SCGraph(&g);
+	//finish = clock();
+	//time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	//cout << "SCGraph erstellt in zeit: : " << time << endl;
 
-	cout << "Erstelle neuen Graph: " << endl;
-	start = clock();
-	SCGraph scg = SCGraph(&g);
-	finish = clock();
-	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "SCGraph erstellt in zeit: : " << time << endl;
+	//cout << "> Berechne CH auf SCGraph" << endl;
+	//CH hy(&g, &scg);
+	////hy.calcCHverbose();
+	//hy.calcCH(chverbose);
+//
+//	//CHDijkstraTest(&g, &scg, 149909);
+//	
+//	/* male per cluster ein paar gebiete an */
+//	list<unsigned int> starts;
+//	list<unsigned int> targets;
+//	list<openGL_Cluster> clist;
+//	double step = 0.01/32.0;
+//	{
+//		cout << "> Erstelle Cluster und starte Pendler" << endl;
+//		cluster cl(&g, step);
+//		/* zweites Argument ist die Randlänge einer Zelle
+//		 * in einer unbestimmten Einheit
+//		 */
+//
+//		unsigned int count = 40;
+//		cl.setMostPopulatedCells( count );
+//
+//		double perc = 0.1;
+//		unsigned int upper = (unsigned int)(((double)count)*perc);
+//		
+//		//cl.getNodesLower(5,(count-upper), &starts);
+//
+//		while( ! starts.empty()){
+//			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
+//			starts.pop_front();
+//			while(it.hasNext()){
+//				Edge* e = it.getNext();
+//				if( ! scg.isShortcut(e->id) )
+//					scg.addEdgeLoad(e->id,1);
+//			}
+//		}
+//
+//		cl.getNodesUpper(1,upper, &targets, &clist);
+//		cl.getNodesLower(68,(count-upper), &starts, &clist);
+//
+//		/* starte Dijkstras von starts zu targets */
+//		cout << "> Starte Dijkstras " << endl;
+//		CHDijkstra chd(&scg);
+//		for(list<unsigned int>::iterator it = targets.begin(); 
+//				it != targets.end(); it++)
+//		{
+//			for(list<unsigned int>::iterator it2 = starts.begin();
+//					it2 != starts.end(); it2++)
+//			{
+//				chd.oneToOne(*it2, *it, 1);
+//			}
+//		}
+//		
+//	scg.updateEdgeLoads();
+//	scg.shareShortcutLoads();
+//	}
+//	
+//
+//	osim.setSCGraph(&scg);
+//	osim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
+//
+//	for(list<unsigned int>::iterator it = targets.begin(); 
+//			it != targets.end(); it++)
+//	{
+//		clist.push_front( 
+//			openGL_Cluster(
+//			scg.getNodeData(*it).lon, /* X */
+//			scg.getNodeData(*it).lat, /* Y */
+//			step, /* Radius == Step Size */
+//			1.0 /* Colour == NodeID */
+//			) );
+//	}
 
-	cout << "> Berechne CH auf SCGraph" << endl;
-	CH hy(&g, &scg);
-	//hy.calcCHverbose();
-	hy.calcCH(chverbose);
 
-	//CHDijkstraTest(&g, &scg, 149909);
+
+//list<unsigned int> starts;
+//list<unsigned int> targets;
+//list<openGL_Cluster> clist;
+//double step = 0.01/12.0;
+//	cout << "> Erstelle Cluster und starte Pendler" << endl;
+//	cluster cl(&g, step);
+//	/* zweites Argument ist die Randlänge einer Zelle
+//	 * in einer unbestimmten Einheit
+//	 */
+//
+//	unsigned int count = 14;
+//	cl.setMostPopulatedCells( count );
+//
+//	double perc = 0.2;
+//	unsigned int upper = (unsigned int)(((double)count)*perc);
+//
+//	cl.getNodesUpper(1,upper, &targets, &clist);
+//	cl.getNodesLower(40,(count-upper), &starts, &clist);
+//
+//	tr.traffic.push_back(pendler());
+//	tr.traffic[0].weight = 1;
+//	while( ! starts.empty() ){
+//		tr.traffic[0].source.push_back( starts.front() );
+//		starts.pop_front();
+//	}
+//	while( ! targets.empty() ){
+//		tr.traffic[0].target.push_back( targets.front() );
+//		targets.pop_front();
+//	}
+//
+//	while( ! clist.empty() ){
+//		tr.circles.push_back( clist.front() );
+//		clist.pop_front();
+//	}
+
+	travelers tr = travelers();
+
+	conf co = conf();
+	cout << "1. " << endl;
+
+	co.showVis = true;
+	co.playSound = true;
+	co.chConstVerbose = false;
+
+	/* traffic options */
+	co.mode = 4;
+	co.max_travelers = 190;
+	co.source_count = 10; // ??
+	co.target_count = 10; // ??
+
+	co.weight_lower_bound = 20;
+	co.weight_upper_bound = 40;
 	
-	/* male per cluster ein paar gebiete an */
-	list<unsigned int> starts;
-	list<unsigned int> targets;
-	list<openGL_Cluster> clist;
-	double step = 0.01/32.0;
-	{
-		cout << "> Erstelle Cluster und starte Pendler" << endl;
-		cluster cl(&g, step);
-		/* zweites Argument ist die Randlänge einer Zelle
-		 * in einer unbestimmten Einheit
-		 */
+	/* cluster options */
+	co.clust_step = 0.01/10.0;
+	co.clust_top_percentage = 0.1;
+	co.clust_count_top_clusters = 20;
+	co.clust_top_uppers = 1;
+	co.clust_top_lowers = 5;
+	co.clust_top_upper_nodecount_per_cluster = 1;
+	co.clust_top_lower_nodecount_per_cluster = 55;
 
-		unsigned int count = 40;
-		cl.setMostPopulatedCells( count );
-
-		double perc = 0.1;
-		unsigned int upper = (unsigned int)(((double)count)*perc);
-		
-		//cl.getNodesLower(5,(count-upper), &starts);
-
-		while( ! starts.empty()){
-			EdgesIterator it = scg.getOutEdgesIt( starts.front() );
-			starts.pop_front();
-			while(it.hasNext()){
-				Edge* e = it.getNext();
-				if( ! scg.isShortcut(e->id) )
-					scg.addEdgeLoad(e->id,1);
-			}
-		}
-
-		cl.getNodesUpper(1,upper, &targets, &clist);
-		cl.getNodesLower(68,(count-upper), &starts, &clist);
-
-		/* starte Dijkstras von starts zu targets */
-		cout << "> Starte Dijkstras " << endl;
-		CHDijkstra chd(&scg);
-		for(list<unsigned int>::iterator it = targets.begin(); 
-				it != targets.end(); it++)
-		{
-			for(list<unsigned int>::iterator it2 = starts.begin();
-					it2 != starts.end(); it2++)
-			{
-				chd.oneToOne(*it2, *it, 1);
-			}
-		}
-		
-	scg.updateEdgeLoads();
-	scg.shareShortcutLoads();
-	}
+	travelCenter tc = travelCenter(&g, &tr, &co);
+	tc.run();
+	cout << "2. " << endl;
+	sim s(&g, &tr, &co);
+	cout << "3. " << endl;
+	s.calcOneRound();
+	cout << "4. " << endl;
 	
-
-	sim.setSCGraph(&scg);
-	sim.setEdgeColours(scg.getEdgeDataPointer(), scg.getEdgeCount());
-
-	for(list<unsigned int>::iterator it = targets.begin(); 
-			it != targets.end(); it++)
-	{
-		clist.push_front( 
-			openGL_Cluster(
-			scg.getNodeData(*it).lon, /* X */
-			scg.getNodeData(*it).lat, /* Y */
-			step, /* Radius == Step Size */
-			1.0 /* Colour == NodeID */
-			) );
-	}
-
-	travelers* tr = 0;
-	conf* co = 0;
-	travelCenter tc = travelCenter(&g, tr, co);
-	
-	if( startVis ){
-		//thread t = thread(&startVisThread, &scg);
-		//t.join();
-		cout << "> Starte Visualisierung" << endl;
-		vis anzeige(&scg, &clist); anzeige.start();
-	}
+//	CHDijkstra* chd = new CHDijkstra(&scg);
+//	
+//		for(unsigned int i = 0; i<tr.traffic[0].source.size() ; i++){
+//			for(unsigned int j = 0; j <tr.traffic[0].target.size() ; j++){
+//				chd->oneToOne(tr.traffic[0].source[i], tr.traffic[0].target[j], tr.traffic[0].weight);
+//			}
+//		}
+//
+//	delete chd; chd = 0;
+//	
+//	scg.updateEdgeLoads();
+//	scg.shareShortcutLoads();
+//	g.getEdgeLoads(&scg);
+//	g.updateEdgeLoads();
+//
+//	for(unsigned int i = 0; i < g.getEdgeCount(); i++){
+//		EdgeData* ed = g.getEdgeDataPointer();
+//		if(ed[i].load != 0)
+//			ed[i].colour = 1.0;
+//	}
+//	
+//	if( startVis ){
+//		//thread t = thread(&startVisThread, &scg);
+//		//t.join();
+//		cout << "> Starte Visualisierung" << endl;
+//		vis anzeige(&g, &(tr.circles)); anzeige.start();
+//	}
 
 
 	cout << "> Exit Pferd" << endl;

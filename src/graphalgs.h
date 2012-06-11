@@ -87,4 +87,10 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
  */
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxnode);
 
+/*
+ *	Sucht alle Nachbarn im Radius "radius" von node_id aus und speichert diese in nbrs.
+ *	Der Radius ist dabei die Distanz des Weges auf dem Graph.
+ */
+void getNeighbours(Graph* g, unsigned int node_id, unsigned int radius, vector<unsigned int>* nbrs);
+
 #endif

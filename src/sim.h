@@ -79,6 +79,17 @@ class sim{
 		CH* ch;
 		CHDijkstra* chd;
 		conf* cfg;
+
+		int graphtype;
+		unsigned int smallTypes[13];
+		double functionParameter[9][2];
+		void initArrays();
+		void findGraphEdgesTypes();
+		void setGraphTypesRight();
+
+		double weightEdge(unsigned int type, unsigned int load);
+		void paintEdges();
+
 		void simTravelers();
 		void recalcEdgevals();
 	public:
