@@ -13,14 +13,13 @@
 #include "sim.h"
 #include "conf.h"
 #include "travel.h"
-
 #include <thread>
 
 using namespace std;
 
-void startVisThread(SCGraph* g){
+void startVisThread(){
 	cout << "> Starte Visualisierung" << endl;
-	vis anzeige(g); anzeige.start();
+	vis anzeige; anzeige.start();
 }
 
 
@@ -88,6 +87,20 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 
+	// Lese pferdrc
+
+	cout << "> Lese die Konfigurationsdatei \"pferdrc\"." << endl;
+	conf co = conf();
+	readConf("pferdrc", &co);
+
+	// Starte Visualisierung
+
+	thread* t;
+	if(co.showVis){
+		cout << "> Starte Visualisierung" << endl;
+		t = new thread(&startVisThread);
+	}
+
 	clock_t start,finish;
 	double time;
 
@@ -101,12 +114,9 @@ int main(int argc, char *argv[]){
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "> Zeit zum Initialisieren des Graphen: " << time << endl;
 
-
 	// starte simulationssachen ab hier
 	
 	travelers tr = travelers();
-	conf co = conf();
-	readConf("pferdrc", &co);
 
 	/* traffic options */
 //	co.mode = 2;
@@ -133,6 +143,7 @@ int main(int argc, char *argv[]){
 
 	s.calcOneRoundCH();
 
+	t->join();
 	cout << "> Exit Pferd" << endl;
 	return 0;
 }
@@ -283,11 +294,4 @@ int main(int argc, char *argv[]){
 //		EdgeData* ed = g.getEdgeDataPointer();
 //		if(ed[i].load != 0)
 //			ed[i].colour = 1.0;
-//	}
-//	
-//	if( startVis ){
-//		//thread t = thread(&startVisThread, &scg);
-//		//t.join();
-//		cout << "> Starte Visualisierung" << endl;
-//		vis anzeige(&g, &(tr.circles)); anzeige.start();
 //	}
