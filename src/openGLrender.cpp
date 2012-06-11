@@ -956,7 +956,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if(argv[0] == "graph")
+	if(std::string(argv[0]) == "graph")
 	{
 		render_mode = 0;
 	}
