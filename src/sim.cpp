@@ -154,7 +154,7 @@ void sim::recalcEdgevals(){
 }
 
 void sim::simTravelers(){
-	std::cout << ">starting Dijkstras" << std::endl;
+	std::cout << "> starte Dijkstras" << std::endl;
 	// Alle Traveler fahren lassen.
 	weights_sum = 0;
 

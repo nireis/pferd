@@ -143,9 +143,13 @@ int main(int argc, char *argv[]){
 
 	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
+	cout << "> Warte auf Runde." << endl;
 	s.calcOneRoundCH();
 
-	t.join();
+	cout << "> Warte auf Thread: join()" << endl;
+	if(co.showVis){
+		t.join();
+	}
 	cout << "> Exit Pferd" << endl;
 	return 0;
 }

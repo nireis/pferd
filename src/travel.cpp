@@ -10,10 +10,6 @@ travelCenter::travelCenter(Graph* gr, travelers* tr, conf* c) :
 {
 	if(c)
 		workConf(c);
-	rand_range = weight_upper_bound - weight_lower_bound + 1; 
-	rand_upper_bound = RAND_MAX - (RAND_MAX % rand_range);
-
-	cl = new cluster(g, clust_step);
 }
 travelCenter::~travelCenter(){
 	g = 0;
@@ -26,6 +22,7 @@ void travelCenter::workConf(conf* c)
 	string str(c->tConfFile);
 	tconfreader* tcr = new tconfreader(str);
 	tcfg = tcr->readConf();
+	delete tcr; tcr = 0;
 	/*
 	mode = c->mode;
 	max_travelers = 1;
@@ -257,6 +254,7 @@ void travelCenter::mode5(){
 	}
 }
 bool travelCenter::run(){
+
 	clearStuff();
 	for(unsigned int i=0;i<tcfg->size();i++){
 		mode = (*tcfg)[i].mode;
@@ -278,10 +276,18 @@ bool travelCenter::run(){
 		 radius = (*tcfg)[i].radius;
 		 
 		//manual_targets = &((*tcfg)[i].manual_targets);
-		
+		rand_range = weight_upper_bound - weight_lower_bound + 1; 
+		rand_upper_bound = RAND_MAX - (RAND_MAX % rand_range);
+
+		if(i == 4)
+		cl = new cluster(g, clust_step);
 		
 		run(i);
+
+		if(i == 4)
+		delete cl; cl = 0;
 	}
+	delete tcfg; tcfg = 0;
 	return true;
 }
 bool travelCenter::run(unsigned int i){
