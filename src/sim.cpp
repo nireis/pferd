@@ -28,55 +28,48 @@ sim::~sim(){
 	trav = 0;
 	cfg = 0;
 }
-
+void sim::resetGraph(){
+	base_g->updateEdgeLoads();
+	EdgeData* ed = base_g->getEdgeDataPointer();
+	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
+		ed[i].load = 0;
+	}
+	recalcEdgevals();
+	base_g->updateEdgeValues();
+}
 void sim::calcOneRoundNormal(){
-	
-	sim_g = new SCGraph(base_g);
-
-	ch = new CH(base_g, sim_g);
-	ch->calcCH(cfg->chConstVerbose);
-
-	chd = new CHDijkstra(sim_g);
+	d = new Dijkstra(base_g);
+	chd = 0;
 
 	simTravelers();
 
-	// graph übernimmt EdgeLoads vom simulationsgraph
-	sim_g->updateEdgeLoads();
+	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
-
-	sim_g->shareShortcutLoads();
-	base_g->getEdgeLoads(sim_g);
 
 	recalcEdgevals();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
 
-	// vis bescheid sagen, base_g zu malen?
-	// vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
-	// delete anzeige; anzeige = 0;
+	// vis bescheid sagen
+	pokeVis();
 
 	// aufräumen der graphen und ch ?
-	delete sim_g; sim_g = 0;
-	delete ch; ch = 0;
-	delete chd; chd = 0;
-
+	delete d; d = 0;
 }
 void sim::calcOneRoundCH(){
-	
 	sim_g = new SCGraph(base_g);
 
 	ch = new CH(base_g, sim_g);
 	ch->calcCH(cfg->chConstVerbose);
 
 	chd = new CHDijkstra(sim_g);
+	d = 0;
 
 	simTravelers();
 
-	// graph übernimmt EdgeLoads vom simulationsgraph
+	// graph übernimmt EdgeLoads
 	sim_g->updateEdgeLoads();
-	base_g->updateEdgeLoads();
-
 	sim_g->shareShortcutLoads();
 	base_g->getEdgeLoads(sim_g);
 
@@ -85,21 +78,53 @@ void sim::calcOneRoundCH(){
 	// einfärben der kanten im base_g Graph
 	paintEdges();
 
-	// vis bescheid sagen, base_g zu malen?
-	// vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
-	// delete anzeige; anzeige = 0;
+	// vis bescheid sagen
+	pokeVis();
 
 	// aufräumen der graphen und ch ?
 	delete sim_g; sim_g = 0;
 	delete ch; ch = 0;
 	delete chd; chd = 0;
-
 }
+void sim::calcOneRoundBoth(){
 
+	sim_g = new SCGraph(base_g);
+	
+	ch = new CH(base_g, sim_g);
+	ch->calcCH(cfg->chConstVerbose);
+	
+	chd = new CHDijkstra(sim_g);
+	d = new Dijkstra(base_g);
+
+	simTravelers();
+
+	// graph übernimmt EdgeLoads
+	
+	// TODO welcher graph der beiden wird angezeigt ?
+	//base_g->updateEdgeLoads();
+	sim_g->updateEdgeLoads();
+	sim_g->shareShortcutLoads();
+	base_g->getEdgeLoads(sim_g);
+
+	recalcEdgevals();
+
+	// einfärben der kanten im base_g Graph
+	paintEdges();
+
+	// vis bescheid sagen
+	pokeVis();
+
+	// aufräumen der graphen und ch ?
+	delete d; d = 0;
+	delete sim_g; sim_g = 0;
+	delete ch; ch = 0;
+	delete chd; chd = 0;
+}
+void sim::pokeVis(){
+}
 bool sim::eqFound(){
 	return false;
 }
-
 void sim::recalcEdgevals(){
 	// der graph kopiert die temporären
 	// edge_loads der dijkstras ins eine EdgeData
@@ -129,46 +154,156 @@ void sim::recalcEdgevals(){
 }
 
 void sim::simTravelers(){
+	std::cout << ">starting Dijkstras" << std::endl;
 	// Alle Traveler fahren lassen.
 	weights_sum = 0;
-	for(unsigned int i=0; i<trav->traffic.size(); i++){
-		// Schauen welche Art weniger Dijkstras benötigt bzw. ob
-		// es ein one to one ist.
-		pendler* tmp_pendler = &(trav->traffic)[i];
-		vector<unsigned int>* src = &tmp_pendler->source;
-		vector<unsigned int>* tgt = &tmp_pendler->target;
-		unsigned int srcsize = src->size();
-		unsigned int tgtsize = tgt->size();
-		
-		if(srcsize > tgtsize){
-			for(unsigned int j=0; j<tgtsize; j++){
-				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
-				weights_sum += tmp_pendler->weight * src->size();
+
+	clock_t start, finish;
+	double timer;
+
+	if(chd != 0){
+		many2one_chdcounter = 0;
+		one2many_chdcounter = 0;
+		one2one_chdcounter = 0;
+		many2one_chdtimer = 0.0;
+		one2many_chdtimer = 0.0;
+		one2one_chdtimer = 0.0;
+
+		for(unsigned int i=0; i<trav->traffic.size(); i++){
+			// Schauen welche Art weniger Dijkstras benötigt bzw. ob
+			// es ein one to one ist.
+			pendler* tmp_pendler = &(trav->traffic)[i];
+			vector<unsigned int>* src = &tmp_pendler->source;
+			vector<unsigned int>* tgt = &tmp_pendler->target;
+			unsigned int srcsize = src->size();
+			unsigned int tgtsize = tgt->size();
+			if(srcsize > tgtsize){
+				for(unsigned int j=0; j<tgtsize; j++){
+						start = clock();
+					chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					many2one_chdtimer += timer;
+					many2one_chdcounter ++;
+					weights_sum += tmp_pendler->weight * src->size();
+				}
+			}
+			else if(srcsize < tgtsize){
+				for(unsigned int j=0; j<srcsize; j++){
+						start = clock();
+					chd->oneToMany((*src)[j], tgt, tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					one2many_chdtimer += timer;
+					one2many_chdcounter ++;
+					weights_sum += tmp_pendler->weight * tgt->size();
+				}
+			}
+			else if(srcsize == 1){ // Beide sizes sind 1.
+				weights_sum += tmp_pendler->weight;
+					start = clock();
+				chd->oneToOne((*src)[0], (*tgt)[0], tmp_pendler->weight);
+					finish = clock();
+					timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+				one2one_chdtimer += timer;
+				one2one_chdcounter ++;
+			}
+			else{ // Die sizes sind gleich, aber ungleich 1.
+				for(unsigned int j=0; j<tgtsize; j++){
+						start = clock();
+					chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					weights_sum += tmp_pendler->weight * src->size();
+					many2one_chdtimer += timer;
+					many2one_chdcounter ++;
+				}
 			}
 		}
-		else if(srcsize < tgtsize){
-			for(unsigned int j=0; j<srcsize; j++){
-				chd->oneToMany((*src)[j], tgt, tmp_pendler->weight);
-				weights_sum += tmp_pendler->weight * tgt->size();
+		std::cout 
+			<< "Many to One CHDijkstras: " << many2one_chdcounter 
+			<< ", insg. Zeit: " << many2one_chdtimer 
+			<< ", Zeit durchschnittlich: " << many2one_chdtimer/many2one_chdcounter << std::endl;
+		std::cout 
+			<< "One to Many CHDijkstras: " << one2many_chdcounter 
+			<< ", insg. Zeit: " << one2many_chdtimer 
+			<< ", Zeit durchschnittlich: " << one2many_chdtimer/one2many_chdcounter << std::endl;
+		std::cout 
+			<< "One to One CHDijkstras: " << one2one_chdcounter 
+			<< ", insg. Zeit: " << one2one_chdtimer << ", Zeit durchschnittlich: " 
+			<< one2one_chdtimer/one2one_chdcounter << std::endl;
+	}
+	if(d != 0){
+		many2one_dcounter = 0;
+		one2many_dcounter = 0;
+		one2one_dcounter = 0;
+		many2one_dtimer = 0.0;
+		one2many_dtimer = 0.0;
+		one2one_dtimer = 0.0;
+
+		for(unsigned int i=0; i<trav->traffic.size(); i++){
+			// Schauen welche Art weniger Dijkstras benötigt bzw. ob
+			// es ein one to one ist.
+			pendler* tmp_pendler = &(trav->traffic)[i];
+			vector<unsigned int>* src = &tmp_pendler->source;
+			vector<unsigned int>* tgt = &tmp_pendler->target;
+			unsigned int srcsize = src->size();
+			unsigned int tgtsize = tgt->size();
+			if(srcsize > tgtsize){
+				for(unsigned int j=0; j<tgtsize; j++){
+						start = clock();
+					d->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					many2one_dtimer += timer;
+					many2one_dcounter ++;
+					weights_sum += tmp_pendler->weight * src->size();
+				}
+			}
+			else if(srcsize < tgtsize){
+				for(unsigned int j=0; j<srcsize; j++){
+						start = clock();
+					d->oneToMany((*src)[j], tgt, tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					one2many_dtimer += timer;
+					one2many_dcounter ++;
+					weights_sum += tmp_pendler->weight * tgt->size();
+				}
+			}
+			else if(srcsize == 1){ // Beide sizes sind 1.
+				weights_sum += tmp_pendler->weight;
+					start = clock();
+				d->oneToOne((*src)[0], (*tgt)[0], tmp_pendler->weight);
+					finish = clock();
+					timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+				one2one_dtimer += timer;
+				one2one_dcounter ++;
+			}
+			else{ // Die sizes sind gleich, aber ungleich 1.
+				for(unsigned int j=0; j<tgtsize; j++){
+						start = clock();
+					d->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+						finish = clock();
+						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+					weights_sum += tmp_pendler->weight * src->size();
+					many2one_dtimer += timer;
+					many2one_dcounter ++;
+				}
 			}
 		}
-		else if(srcsize == 1){ // Beide sizes sind 1.
-			weights_sum += tmp_pendler->weight;
-			chd->oneToOne((*src)[0], (*tgt)[0], tmp_pendler->weight);
-		}
-		else{ // Die sizes sind gleich, aber ungleich 1.
-			for(unsigned int j=0; j<tgtsize; j++){
-				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
-				weights_sum += tmp_pendler->weight * src->size();
-			}
-		}
-		
-//		for(unsigned int i = 0; i< srcsize; i++){
-//			for(unsigned int j = 0; j < tgtsize; j++){
-//				chd->oneToOne((*src)[i], (*tgt)[j], tmp_pendler->weight);
-//			}
-//		}
-		
+		std::cout 
+			<< "Many to One Dijkstras: " << many2one_dcounter 
+			<< ", insg. Zeit: " << many2one_dtimer 
+			<< ", Zeit durchschnittlich: " << many2one_dtimer/many2one_dcounter << std::endl;
+		std::cout 
+			<< "One to Many Dijkstras: " << one2many_dcounter 
+			<< ", insg. Zeit: " << one2many_dtimer 
+			<< ", Zeit durchschnittlich: " << one2many_dtimer/one2many_dcounter << std::endl;
+		std::cout 
+			<< "One to One Dijkstras: " << one2one_dcounter 
+			<< ", insg. Zeit: " << one2one_dtimer << ", Zeit durchschnittlich: " 
+			<< one2one_dtimer/one2one_dcounter << std::endl;
 	}
 }
 

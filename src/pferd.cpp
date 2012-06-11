@@ -95,11 +95,11 @@ int main(int argc, char *argv[]){
 
 	// Starte Visualisierung
 
-	thread* t;
+	thread t;
 	bool active;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t = new thread(&startVisThread, &active);
+		t = thread(&startVisThread, &active);
 	}
 
 	clock_t start,finish;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]){
 	sim s(&g, &tr, &co);
 	s.calcOneRoundCH();
 
-	t->join();
+	t.join();
 	cout << "> Exit Pferd" << endl;
 	return 0;
 }
