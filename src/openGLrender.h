@@ -83,6 +83,7 @@ private:
 	static void keyboardArrowsCallback(int, int, int);
 	static void idleCallback();
 	static void resizeCallback(int, int);
+	static void timerCallback(int);
 
 	//boolean used to switch between graph and volume rendering
 	bool render_mode;
@@ -107,6 +108,8 @@ private:
 	void idle();
 	//handles window resizing
 	void resize(int, int);
+	//timer function for camera rotation
+	void timer();
 
 	//manages mouse input
 	void mouse(int, int);

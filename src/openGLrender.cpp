@@ -544,7 +544,7 @@ bool openGLrender::initVolumeVis()
 
 void openGLrender::displayVolume()
 {
-	cam_alpha = cam_alpha + 0.1;
+	//cam_alpha = cam_alpha + 0.1;
 	//calculate camera position
 	//note that glm functions use radian values
 	float cam_alpha_r = cam_alpha * (2.0*3.14/360.0);
@@ -935,6 +935,19 @@ void openGLrender::resizeCallback(int w, int h)
 	currentInstance->resize(w,h);
 }
 
+void openGLrender::timer()
+{
+	cam_alpha = cam_alpha + 0.5;
+	glutPostRedisplay();
+}
+
+void openGLrender::timerCallback(int value)
+{
+	currentInstance->timer();
+
+	glutTimerFunc(16,timerCallback,1);
+}
+
 openGLrender* openGLrender::currentInstance = 0;
 
 void openGLrender::setInstance(openGLrender* instance)
@@ -983,6 +996,7 @@ bool openGLrender::start(int argc, char* argv[])
 	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(keyboardArrowsCallback);
+	glutTimerFunc(16,timerCallback,1);
 	glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutMainLoop();
