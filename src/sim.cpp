@@ -47,13 +47,14 @@ void sim::calcOneRoundNormal(){
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 	normal_rounds_time = timer;
-	cout << "Dijkstra Round, initialisierung: " << normal_rounds_time << endl;
+	cout << "Dijkstra Round, initialisierung Zeit: " << normal_rounds_time << endl;
 
 	chd = 0;
 
 	simTravelers();
 
 	cout << "Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
+	cout << "> >> " << endl;
 
 	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
@@ -109,6 +110,7 @@ void sim::calcOneRoundCH(){
 	cout << "CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
 	ch_rounds_time += timer;
 	cout << "CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
+	cout << "> >> " << endl;
 
 	recalcEdgevals();
 
