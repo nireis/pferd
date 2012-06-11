@@ -83,77 +83,6 @@ private:
 	static void keyboardArrowsCallback(int, int, int);
 	static void idleCallback();
 	static void resizeCallback(int, int);
-	static void timerCallback(int);
-
-	//boolean used to switch between graph and volume rendering
-	bool render_mode;
-	//transformation matrixes
-	glm::mat4 projMX, modelMX, viewMX;
-	//window size
-	int wWidth;
-	int wHeight;
-
-	//used to read the shader source code - needs to be replaced
-	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
-	//for the code
-	char* file_read(const char*);
-	//loads & compiles shader sources
-	GLint loadShader(const char*, GLenum);
-	//initializes shader programs
-	GLuint initShaderProgram(const char* , const char*, const char**, int);
-
-	//renders geometry on the screen
-	void display();
-	//idle function, called if GLUT eventqueue is empty
-	void idle();
-	//handles window resizing
-	void resize(int, int);
-	//timer function for camera rotation
-	void timer();
-
-	//manages mouse input
-	void mouse(int, int);
-	void mouseClick(int, int, int, int);
-	//manages keyboard input
-	void keyboard(unsigned char, int, int);
-	void keyboardArrows(int, int, int);
-
-
-	/*
-	*	private variables and functions used for volume-rendering
-	*/
-
-	//camera position
-	float cam_alpha, cam_beta, cam_dist;
-	//used for camera test during rendering
-	bool cam_BBtest;
-	// bounding box dimensions
-	glm::vec3 dimension;
-	// transformation matrixes
-	glm::mat4 texMX;
-	// buffer object
-	GLuint vbo_boundingBox;
-	// 3d texture
-	GLuint tex_3D;
-	//shader programs
-	GLuint frontface_prgm;
-	GLuint backface_prgm;
-	//initializes bounding box geometry
-	bool initBoundingBox(glm::vec3);
-	//initializes a 3D volumetexture
-	bool init3DTex(glm::vec3, char*);
-	bool init3Dto2DTex(glm::vec3);
-	//initializes volume rendering
-	bool initVolumeVis();
-	//displays volume - this function gets called in the display() function when render mode is set to volume
-	void displayVolume();
-	//clean up
-	void uninitVolume();
-
-
-	/*
-	*	private variables and functios used for graph-rendering
-	*/
 
 	//local reference of the data in the system memory
 	unsigned int nodeCount;
@@ -166,6 +95,13 @@ private:
 	openGL_Cluster *clusterArray;
 
 	//stuff needed for openGL
+	bool showNodes;
+	bool showEdges;
+	bool showShortcuts;
+	bool showMap;
+	bool showCluster;
+	int wWidth;
+	int wHeight;
 	glm::vec3 cameraPos;
 	float camZoom;
 	int mouse_delta_x0;
@@ -175,37 +111,65 @@ private:
 	bool swap;
 	bool mouse_mode;
 
-	//Entities
-	openGL_Entity *sceneEntities;
-	int entityCount;
+	//transformation matrixes
+	glm::mat4 projMX, modelMX, viewMX;
+
+	//openGL buffer objects
+	GLuint vbo_map;
+	GLuint vbo_nodes;
+	GLuint vbo_edges;
+	GLuint vbo_shortcuts;
+	GLuint vbo_cluster;
 
 	//openGL textures
 	GLuint *map_textures;
 	int mapCount;
 
-	//loads node/shortcut type geometry
-	bool initOpenGL_Node_3d(GLuint*, openGL_Node_3d*, int);
-	//loads edge type geometry
-	bool initOpenGL_Edge_Node(GLuint*, openGL_Edge_Node* , int);
-	//loads cluster type geometry
-	bool initOpenGL_Cluster(GLuint*, openGL_Cluster);
-	//initializes all scene entities used for graph rendering
-	bool initGraphVis();
-	//displays graph - this function gets called in the display() function when render mode is set to graph
-	void displayGraph();
+	//shader program
+	GLuint program;
+	GLuint program1;
+	GLuint program2;
+	GLuint program3;
+	GLuint program4;
 
-	/*
+	//used to read the shader source code - needs to be replaced
+	//till then, thanks to http://en.wikibooks.org/wiki/OpenGL_Programming
+	//for the code
+	char* file_read(const char*);
+
+	//loads & compiles shader sources
+	GLint loadShader(const char*, GLenum);
+	//initializes shader programs
+	bool initShaderProgram();
+	//loads all nodes
+	bool initNodes();
+	//loads all edge geometry
+	bool initEdges();
+	//loads all shortcut geometry
+	bool initShortcuts();
+	//loads all circle geometry
+	bool initCluster();
 	//loads map geometry
 	bool initMap();
 	//loads map textures and actually heavily relies on SOIL to do all the nasty stuff
 	bool initTextures();
 	//draw node label
 	bool drawText(glm::mat4);
-	*/
-
 	//clean up
-	void uninitGraph();
+	void uninit();
 	
+	//manages mouse input
+	void mouse(int, int);
+	void mouseClick(int, int, int, int);
+	//manages keyboard input
+	void keyboard(unsigned char, int, int);
+	void keyboardArrows(int, int, int);
+	//renders geometry on the screen
+	void display();
+	//idle function, called if GLUT eventqueue is empty
+	void idle();
+	//handles window resizing
+	void resize(int, int);
 
 public:
 	//default Constructor/Destructor

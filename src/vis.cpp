@@ -22,43 +22,25 @@ vis::~vis(){
 	delete[] circles; circles = 0;
 }
 
-float vis::merkatorX(float in_x)
-{
-	float pi = 3.141592;
-	float x_mercator = (pi/180.0)*in_x;
-
-	return x_mercator;
-}
-
-float vis::merkatorY(float in_y)
-{
-	float pi = 3.141592;
-	float pos_radian = (pi/180.0)*in_y;
-	float y_mercator = log((1.0 + sin(pos_radian))/cos(pos_radian));
-
-	return y_mercator;
-}
 
 void vis::init(){
 	init(0);
 }
 
-void vis::init(std::list<openGL_Cluster>* circs)
-{
+void vis::init(std::list<openGL_Cluster>* circs){
 	nodes = new openGL_Node_3d[p.getNodeCount()];
 	edges = new openGL_Edge_Node[2 * ( p.getEdgeCount() )];
 	shortcut_edges = new openGL_Node_3d[2 * ( p.getShortcutCount() )];
 
 	NodeData* node_data = p.getNodeDataPointer();
 
-	for(unsigned int i = 0; i < p.getNodeCount(); i++)
-	{
-		nodes[i] = openGL_Node_3d(merkatorX(node_data[i].lon), merkatorY(node_data[i].lat), 0.0 );
+	for(unsigned int i = 0; i < p.getNodeCount(); i++){
+		nodes[i] = openGL_Node_3d( node_data[i].lon , node_data[i].lat , 0.0 );
 	}
 
 	unsigned int index = 0;
 	unsigned int s_index = 0;
-	float COLOUR = 0.0; 
+	float LOAD = 0.0; 
 	// setze load in [0.0, 1.0] für färbung der kanten
 	for(unsigned int i = 0; i < p.getNodeCount() ; i++){
 		EdgesIterator it = p.getOutEdgesIt(i);
@@ -67,35 +49,25 @@ void vis::init(std::list<openGL_Cluster>* circs)
 				/*
 				 * kante färben
 				 */
-			COLOUR = p.getEdgeData(e.id).colour;
-			if( p.isShortcut( e.id ))
-			{
-				shortcut_edges[s_index] = openGL_Node_3d(	merkatorX((float) node_data[ i ].lon),
-															merkatorY((float) node_data[ i ].lat),
-															COLOUR );
+				if(p.getEdgeData(e.id).load != 0){
+					LOAD = 1.0;
+				} else {
+					LOAD = 0.0;
+				}
+			if( p.isShortcut( e.id )){
+				shortcut_edges[s_index] = 
+					openGL_Node_3d( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD );
 				s_index++;
-				shortcut_edges[s_index] = openGL_Node_3d(	merkatorX((float) node_data[ e.other_node ].lon),
-															merkatorY((float) node_data[ e.other_node ].lat),
-															COLOUR );
+				shortcut_edges[s_index] = 
+					openGL_Node_3d( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD );
 				s_index++;
-			}
-			else
-			{
+			} else {
+
 				edges[index] = 
-					openGL_Edge_Node(	merkatorX((float) node_data[ i ].lon),
-										merkatorY((float) node_data[ i ].lat),
-										COLOUR,
-										((float)-(node_data[ i ].lat - node_data[ e.other_node ].lat)),
-										((float) (node_data[ i ].lon - node_data[ e.other_node ].lon)),
-										0.0  );
+					openGL_Edge_Node( (float) node_data[ i ].lon, (float) node_data[ i ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0  );
 				index++;
 				edges[index] = 
-					openGL_Edge_Node(	merkatorX((float) node_data[ e.other_node ].lon),
-										merkatorY((float) node_data[ e.other_node ].lat), 
-										COLOUR,
-										((float)-(node_data[ i ].lat - node_data[ e.other_node ].lat)),
-										((float) (node_data[ i ].lon - node_data[ e.other_node ].lon)),
-										0.0 );
+					openGL_Edge_Node( (float) node_data[ e.other_node ].lon, (float) node_data[ e.other_node ].lat, LOAD, (float)-(node_data[ i ].lat - node_data[ e.other_node ].lat),(float) (node_data[ i ].lon - node_data[ e.other_node ].lon),0.0 );
 				index++;
 			}
 		}
@@ -120,8 +92,6 @@ void vis::init(std::list<openGL_Cluster>* circs)
 		{
 			circles[ counter ] = circs->front();
 			circs->pop_front();
-			circles[ counter ].xCenter = merkatorX(circles[ counter ].xCenter);
-			circles[ counter ].yCenter = merkatorY(circles[ counter ].yCenter);
 			counter++;
 		}
 	}
@@ -131,9 +101,7 @@ void vis::init(std::list<openGL_Cluster>* circs)
 	node_data = 0;
 }
 
-bool vis::start()
-{
-	char* argument[] = { "volume" };
-	return render.start(0,argument);
+bool vis::start(){
+	return render.start(0,0);
 }
 

@@ -11,7 +11,6 @@
 #include "CHConstruction.h"
 #include "structs.h"
 #include "openGLrender.h"
-#include "visStructs.h"
  
 class vis {
 	private:
@@ -122,9 +121,6 @@ class vis {
 
 		void init();
 		void init(std::list<openGL_Cluster>* circs);
-
-		float merkatorX(float);
-		float merkatorY(float);
 
 	public: 
 		vis(Graph* g, std::list<openGL_Cluster>* circs);
