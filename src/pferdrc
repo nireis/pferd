@@ -1,2 +1,4 @@
-showVis false
-playSound false
+showVis true
+playSound true
+chConstVerbose false
+tConfFile tGen.conf

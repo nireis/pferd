@@ -76,6 +76,15 @@ void parseLine(string* line, conf* cfg){
 			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
 		}
 	}
+	else if(key == "tConfFile"){
+		if(value.size() == 1){
+			cfg->tConfFile = value[0];
+		}
+		else{
+			cout << "Fehler beim Einlesen des Wertes von \"tConfFile\":" << endl;
+			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
+		}
+	}
 	else{
 		cout << "Fehler beim lesen eines keys. Die Option \"" << key << "\" ist unbekannt." << endl;
 	}
@@ -89,4 +98,25 @@ bool toBool(string* s){
 		cout << "Kann \"" << *s << "\" nicht von string nach bool parsen." << endl;
 	}
 	return false;
+}
+
+int toInt(string* s){
+	stringstream ss(*s);
+	int i;
+	ss >> i;
+	return i;
+}
+
+unsigned int toUInt(string* s){
+	stringstream ss(*s);
+	unsigned int i;
+	ss >> i;
+	return i;
+}
+
+double toDouble(string* s){
+	stringstream ss(*s);
+	double i;
+	ss >> i;
+	return i;
 }

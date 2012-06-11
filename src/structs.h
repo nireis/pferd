@@ -4,6 +4,7 @@
 #include "visStructs.h"
 #include <vector>
 #include <list>
+#include <string>
 
 /*
  * vom Parser zu setzende Strukturen, 
@@ -488,28 +489,7 @@ struct conf{
 	bool showVis;
 	bool playSound;
 	bool chConstVerbose;
-
-	/* traffic options */
-	int mode;
-	unsigned int max_travelers;
-	unsigned int source_count;
-	unsigned int target_count;
-
-	unsigned int weight_lower_bound;
-	unsigned int weight_upper_bound;
-	
-	/* cluster options */
-	double clust_step;
-	unsigned int clust_count_top_clusters;
-	double clust_top_percentage;
-	unsigned int clust_top_uppers;
-	unsigned int clust_top_lowers;
-	unsigned int clust_top_upper_nodecount_per_cluster;
-	unsigned int clust_top_lower_nodecount_per_cluster;
-
-	/* per hand eingefügte daten beachten */
-	std::vector< travelCircle > manual_targets;
-
+	std::string tConfFile;
 };
 
 #endif

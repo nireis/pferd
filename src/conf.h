@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <vector>
 using namespace std;
 
@@ -24,5 +25,20 @@ void parseLine(string* line, conf* cfg);
  * Cast von string nach bool.
  */
 bool toBool(string* s);
+
+/*
+ * Cast von string nach int.
+ */
+int toInt(string* s);
+
+/*
+ * Cast von string nach unsigned int.
+ */
+unsigned int toUInt(string* s);
+
+/*
+ * Cast von string nach int.
+ */
+double toDouble(string* s);
 
 #endif

@@ -106,28 +106,25 @@ int main(int argc, char *argv[]){
 	
 	travelers tr = travelers();
 	conf co = conf();
-
-	co.showVis = true;
-	co.playSound = true;
-	co.chConstVerbose = false;
+	readConf("pferdrc", &co);
 
 	/* traffic options */
-	co.mode = 2;
-	co.max_travelers = 50;
-	co.source_count = 10; // ??
-	co.target_count = 10; // ??
-
-	co.weight_lower_bound = 20;
-	co.weight_upper_bound = 40;
-	
-	/* cluster options */
-	co.clust_step = 0.01/8.0;
-	co.clust_top_percentage = 0.1;
-	co.clust_count_top_clusters = 20;
-	co.clust_top_uppers = 2;
-	co.clust_top_lowers = 8;
-	co.clust_top_upper_nodecount_per_cluster = 3;
-	co.clust_top_lower_nodecount_per_cluster = 20000;
+//	co.mode = 2;
+//	co.max_travelers = 50;
+//	co.source_count = 10; // ??
+//	co.target_count = 10; // ??
+//
+//	co.weight_lower_bound = 20;
+//	co.weight_upper_bound = 40;
+//	
+//	/* cluster options */
+//	co.clust_step = 0.01/8.0;
+//	co.clust_top_percentage = 0.1;
+//	co.clust_count_top_clusters = 20;
+//	co.clust_top_uppers = 2;
+//	co.clust_top_lowers = 8;
+//	co.clust_top_upper_nodecount_per_cluster = 3;
+//	co.clust_top_lower_nodecount_per_cluster = 20000;
 
 	travelCenter tc = travelCenter(&g, &tr, &co);
 	tc.run();
