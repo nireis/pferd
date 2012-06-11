@@ -38,10 +38,22 @@ void sim::resetGraph(){
 	base_g->updateEdgeValues();
 }
 void sim::calcOneRoundNormal(){
+	clock_t start, finish;
+	double timer;
+
+		start = clock();
 	d = new Dijkstra(base_g);
+		finish = clock();
+		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+
+	normal_rounds_time = timer;
+	cout << "Dijkstra Round, initialisierung: " << normal_rounds_time << endl;
+
 	chd = 0;
 
 	simTravelers();
+
+	cout << "Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
 
 	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
@@ -55,20 +67,45 @@ void sim::calcOneRoundNormal(){
 	delete d; d = 0;
 }
 void sim::calcOneRoundCH(){
-	sim_g = new SCGraph(base_g);
+	clock_t start, finish;
+	double timer;
 
+		start = clock();
+	sim_g = new SCGraph(base_g);
+		finish = clock();
+		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+
+	ch_rounds_time = timer;
+	cout << "CHDijkstra Round SCGraph init. Zeit: " << ch_rounds_time << endl;
+
+		start = clock();
 	ch = new CH(base_g, sim_g);
 	ch->calcCH(cfg->chConstVerbose);
+		finish = clock();
+		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "CHDijkstra Round CH Konstruktion Zeit: " << timer << endl;
+	ch_rounds_time += timer;
 
+		start = clock();
 	chd = new CHDijkstra(sim_g);
+		finish = clock();
+		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "CHDijkstra Round, CHDijkstras initialisierung Zeit: " << timer << endl;
+	ch_rounds_time += timer;
 	d = 0;
 
 	simTravelers();
 
 	// graph übernimmt EdgeLoads
 	sim_g->updateEdgeLoads();
+		start = clock();
 	sim_g->shareShortcutLoads();
 	base_g->getEdgeLoads(sim_g);
+		finish = clock();
+		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
+	cout << "CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
+	ch_rounds_time += timer;
+	cout << "CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
 
 	recalcEdgevals();
 
@@ -221,6 +258,7 @@ void sim::simTravelers(){
 			<< "One to One CHDijkstras: " << one2one_chdcounter 
 			<< ", insg. Zeit: " << one2one_chdtimer << ", Zeit durchschnittlich: " 
 			<< one2one_chdtimer/one2one_chdcounter << std::endl;
+		ch_rounds_time += one2one_chdtimer + many2one_chdtimer + one2many_chdtimer;
 	}
 	if(d != 0){
 		many2one_dcounter = 0;
@@ -293,6 +331,7 @@ void sim::simTravelers(){
 			<< "One to One Dijkstras: " << one2one_dcounter 
 			<< ", insg. Zeit: " << one2one_dtimer << ", Zeit durchschnittlich: " 
 			<< one2one_dtimer/one2one_dcounter << std::endl;
+		normal_rounds_time += one2one_dtimer + many2one_dtimer + one2many_dtimer;
 	}
 }
 
