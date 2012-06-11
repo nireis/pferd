@@ -28,7 +28,7 @@ void travelCenter::workConf(conf* c)
 	tcfg = tcr->readConf();
 	/*
 	mode = c->mode;
-	max_travelers = c->max_travelers;
+	max_travelers = 1;
 	source_count = c->source_count;
 	target_count = c->target_count;
 	weight_lower_bound = c->weight_lower_bound;
