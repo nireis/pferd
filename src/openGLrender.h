@@ -53,7 +53,7 @@
 #ifdef _WIN32
 	#include "SOIL.h"
 #else
-	#include <SOIL/SOIL.h>
+	#include <SOIL.h>
 #endif
 
 //stores the vertex data structes
