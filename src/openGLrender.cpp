@@ -354,7 +354,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[2].visabilty = true;
 	sceneEntities[2].world_position = glm::vec3(0.0);
 
-	for(int i=0; i<clusterCount; i++)
+	for(unsigned int i=0; i<clusterCount; i++)
 	{
 		//init cluster-highlight
 		sceneEntities[i+3] = openGL_Entity();
@@ -400,7 +400,7 @@ void openGLrender::displayGraph()
 			//set model matrix
 			modelMX = glm::translate(glm::mat4(1.0f), sceneEntities[i].world_position);
 			//set model_view_projection matrix
-			glm::mat4 mvpMX = projMX * viewMX * modelMX;
+			mvpMX = projMX * viewMX * modelMX;
 
 			glUseProgram(sceneEntities[i].shader_program);
 			glUniformMatrix4fv(glGetUniformLocation(sceneEntities[i].shader_program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
