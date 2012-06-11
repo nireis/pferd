@@ -321,7 +321,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[0].shader_program = initShaderProgram(shader0[0] , shader0[1], atrb0, 3);
 	glLinkProgram(sceneEntities[0].shader_program);
 	sceneEntities[0].texture = 0;
-	sceneEntities[0].visabilty = false;
+	sceneEntities[0].visabilty = true;
 	sceneEntities[0].world_position = glm::vec3(0.0);
 
 	//init nodes
@@ -336,7 +336,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[1].shader_program = initShaderProgram(shader1[0] , shader1[1], atrb1, 2);
 	glLinkProgram(sceneEntities[1].shader_program);
 	sceneEntities[1].texture = 0;
-	sceneEntities[1].visabilty = true;
+	sceneEntities[1].visabilty = false;
 	sceneEntities[1].world_position = glm::vec3(0.0);
 
 	//init shortcuts
