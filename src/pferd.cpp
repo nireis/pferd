@@ -17,9 +17,9 @@
 
 using namespace std;
 
-void startVisThread(){
+void startVisThread(bool* active){
 	cout << "> Starte Visualisierung" << endl;
-	vis anzeige; anzeige.start();
+	vis anzeige; anzeige.start(active, true);
 }
 
 
@@ -37,8 +37,8 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 	string file;
-	bool startVis = false;
-	bool chverbose = false;
+	// bool startVis = false;
+	// bool chverbose = false;
 
 	if(argc < 2 || argc > 5){
 		cout << "---" << endl 
@@ -61,11 +61,11 @@ int main(int argc, char *argv[]){
 				}
 			} else
 			if( string(argv[i]) == "-v"){
-				startVis = true;
+				// startVis = true;
 				i++;
 			} else
 			if( string(argv[i]) == "-chv"){
-					chverbose = true;
+					// chverbose = true;
 					i++;
 			} else {
 				/* check if argv[i] existing file */
@@ -96,9 +96,10 @@ int main(int argc, char *argv[]){
 	// Starte Visualisierung
 
 	thread* t;
+	bool active;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t = new thread(&startVisThread);
+		t = new thread(&startVisThread, &active);
 	}
 
 	clock_t start,finish;

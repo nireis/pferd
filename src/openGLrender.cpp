@@ -412,6 +412,11 @@ void openGLrender::displayGraph()
 
 void openGLrender::uninitGraph()
 {
+	for(int i=0; i<entityCount; i++)
+	{
+		glDeleteBuffers(1, &(sceneEntities[i].vbo_handler));
+		glDeleteVertexArrays(1, &(sceneEntities[i].vbo_handler));
+	}
 }
 
 /*
@@ -626,11 +631,19 @@ void openGLrender::displayVolume()
 
 void openGLrender::uninitVolume()
 {
+	glDeleteBuffers(1, &vbo_boundingBox);
+	glDeleteVertexArrays(1, &vbo_boundingBox);
+	glDeleteTextures(1, &tex_3D);
 }
 
 /*
 *	General purpose methods
 */
+void openGLrender::setActivePointer(bool *active)
+{
+	this->run = active;
+}
+
 char* openGLrender::file_read(const char* filename)
 {
   FILE* in = fopen(filename, "rb");
@@ -915,7 +928,14 @@ void openGLrender::displayCallback()
 
 void openGLrender::idle()
 {
-	glutPostRedisplay();
+	if(*run)
+	{
+		glutPostRedisplay();
+	}
+	else
+	{
+		glutLeaveMainLoop();
+	}
 }
 
 void openGLrender::idleCallback()

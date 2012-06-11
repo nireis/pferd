@@ -3,16 +3,18 @@
 using namespace std;
 
 vis::vis(Graph* g, std::list<openGL_Cluster>* circs) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), p(g){
-	init(circs);
+	initRenderer(circs);
 }
 vis::vis(SCGraph* g, std::list<openGL_Cluster>* circs) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), p(g){
-	init(circs);
+	initRenderer(circs);
 }
 vis::vis(SCGraph* g) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), p(g){
 	init();
 }
 vis::vis(Graph* g) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), p(g){
 	init();
+}
+vis::vis() : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), p(){
 }
 
 vis::~vis(){
@@ -21,6 +23,7 @@ vis::~vis(){
 	delete[] shortcut_edges; shortcut_edges = 0;
 	delete[] circles; circles = 0;
 }
+
 
 float vis::merkatorX(float in_x)
 {
@@ -39,11 +42,39 @@ float vis::merkatorY(float in_y)
 	return y_mercator;
 }
 
-void vis::init(){
-	init(0);
+void vis::initVis(Graph* g, std::list<openGL_Cluster>* circs)
+{
+	p.graph = g;
+	p.scgraph = 0;
+	initRenderer(circs);
 }
 
-void vis::init(std::list<openGL_Cluster>* circs)
+void vis::initVis(SCGraph* g, std::list<openGL_Cluster>* circs)
+{
+	p.graph = 0;
+	p.scgraph = g;
+	initRenderer(circs);
+}
+
+void vis::initVis(Graph* g)
+{
+	p.graph = g;
+	p.scgraph = 0;
+	initRenderer(0);
+}
+
+void vis::initVis(SCGraph* g)
+{
+	p.graph = 0;
+	p.scgraph = g;
+	initRenderer(0);
+}
+
+void vis::init(){
+	initRenderer(0);
+}
+
+void vis::initRenderer(std::list<openGL_Cluster>* circs)
 {
 	nodes = new openGL_Node_3d[p.getNodeCount()];
 	edges = new openGL_Edge_Node[2 * ( p.getEdgeCount() )];
@@ -131,9 +162,19 @@ void vis::init(std::list<openGL_Cluster>* circs)
 	node_data = 0;
 }
 
-bool vis::start()
+bool vis::start(bool* active, bool render_mode)
 {
-	char* argument[] = { "grapha" };
-	return render.start(0,argument);
+	if(render_mode)
+	{
+		char* argument[] = { "volume" };
+		render.setActivePointer(active);
+		return render.start(0,argument);
+	}
+	else
+	{
+		char* argument[] = { "graph" };
+		render.setActivePointer(active);
+		return render.start(0,argument);
+	}
 }
 

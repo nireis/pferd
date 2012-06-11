@@ -53,8 +53,8 @@ void sim::calcOneRoundNormal(){
 	paintEdges();
 
 	// vis bescheid sagen, base_g zu malen?
-	vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
-	delete anzeige; anzeige = 0;
+	// vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
+	// delete anzeige; anzeige = 0;
 
 	// aufräumen der graphen und ch ?
 	delete sim_g; sim_g = 0;
@@ -86,8 +86,8 @@ void sim::calcOneRoundCH(){
 	paintEdges();
 
 	// vis bescheid sagen, base_g zu malen?
-	vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
-	delete anzeige; anzeige = 0;
+	// vis* anzeige = new vis(base_g, &(trav->circles)); anzeige->start();
+	// delete anzeige; anzeige = 0;
 
 	// aufräumen der graphen und ch ?
 	delete sim_g; sim_g = 0;
