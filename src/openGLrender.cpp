@@ -321,7 +321,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[0].shader_program = initShaderProgram(shader0[0] , shader0[1], atrb0, 3);
 	glLinkProgram(sceneEntities[0].shader_program);
 	sceneEntities[0].texture = 0;
-	sceneEntities[0].visabilty = true;
+	sceneEntities[0].visabilty = false;
 	sceneEntities[0].world_position = glm::vec3(0.0);
 
 	//init nodes
@@ -957,7 +957,7 @@ void openGLrender::resizeCallback(int w, int h)
 
 void openGLrender::timer()
 {
-	cam_alpha = cam_alpha + 0.5;
+	cam_alpha = cam_alpha + 1.0;
 	glutPostRedisplay();
 }
 
@@ -965,7 +965,7 @@ void openGLrender::timerCallback(int value)
 {
 	currentInstance->timer();
 
-	glutTimerFunc(16,timerCallback,1);
+	glutTimerFunc(33,timerCallback,1);
 }
 
 openGLrender* openGLrender::currentInstance = 0;
@@ -989,7 +989,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if(std::string(argv[0]) == "graph")
+	if(argv[0] == "graph")
 	{
 		render_mode = 0;
 	}
@@ -1016,7 +1016,7 @@ bool openGLrender::start(int argc, char* argv[])
 	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(keyboardArrowsCallback);
-	glutTimerFunc(16,timerCallback,1);
+	glutTimerFunc(33,timerCallback,1);
 	glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutMainLoop();
