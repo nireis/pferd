@@ -1,6 +1,7 @@
 #ifndef travel_h
 #define travel_h
 
+#include "tconfreader.h"
 #include "structs.h"
 #include "clust.h"
 #include "graphalgs.h"
@@ -59,7 +60,7 @@ class travelCenter {
 		 *
 		 */
 		int mode;
-		unsigned int max_travelers;
+		//unsigned int max_travelers;
 		unsigned int source_count;
 		unsigned int target_count;
 
@@ -77,9 +78,13 @@ class travelCenter {
 
 		/* per hand eingefügte daten beachten */
 		std::vector< travelCircle >* manual_targets;
+		unsigned int radius;
+		std::vector<unsigned int> nodes;
+		unsigned int count;
+
 
 		/* == CONFIG STUFF END */
-
+		vector<travelconf>* tcfg;
 
 		void workConf(conf* c);
 		void clearStuff();
@@ -89,6 +94,8 @@ class travelCenter {
 		void mode3();
 		void mode4();
 		void mode5();
+		
+		bool run(unsigned int i);
 
 public:
 		travelCenter(Graph* gr, travelers* tr, conf* c);

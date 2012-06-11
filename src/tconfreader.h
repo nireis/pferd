@@ -1,7 +1,7 @@
 #ifndef tconfreader_h
 #define tconfreader_h
 
-#include "travelconf.h"
+#include "structs.h"
 #include <string>
 #include <fstream>
 #include <cstdlib>

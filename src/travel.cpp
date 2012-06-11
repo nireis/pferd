@@ -21,6 +21,10 @@ travelCenter::~travelCenter(){
 }
 void travelCenter::workConf(conf* c) 
 {
+	string str("travel.cfg");
+	tconfreader* tcr = new tconfreader(str);
+	tcfg = tcr->readConf();
+	/*
 	mode = c->mode;
 	max_travelers = c->max_travelers;
 	source_count = c->source_count;
@@ -37,6 +41,7 @@ void travelCenter::workConf(conf* c)
 	clust_top_lower_nodecount_per_cluster
 	 = c->clust_top_lower_nodecount_per_cluster;
 	manual_targets = &(c->manual_targets);
+	 */
 }
 void travelCenter::clearStuff(){
 	t->traffic.clear();
@@ -44,13 +49,14 @@ void travelCenter::clearStuff(){
 }
 void travelCenter::mode1(){
 	/* all to all */
+	unsigned int s = t->traffic.size();
 	t->traffic.resize(1);
 	//t->traffic.push_back(pendler());
-	t->traffic[0].source.resize(g->getNodeCount());
-	t->traffic[0].target.resize(g->getNodeCount());
+	t->traffic[s+0].source.resize(g->getNodeCount());
+	t->traffic[s+0].target.resize(g->getNodeCount());
 	for(unsigned int i = 0; i < g->getNodeCount(); i++){
-		t->traffic[0].source[i] = i;
-		t->traffic[0].target[i] = i;
+		t->traffic[s+0].source[i] = i;
+		t->traffic[s+0].target[i] = i;
 	}
 
 	/* random weights */
@@ -59,34 +65,35 @@ void travelCenter::mode1(){
 	while( r > rand_upper_bound){
 		r = rand();
 	}
-	t->traffic[0].weight = weight_lower_bound + (r % rand_range);
+	t->traffic[s+0].weight = weight_lower_bound + (r % rand_range);
 
 }
 void travelCenter::mode2(){
 	/* random to random , max_travelers pairs */
+	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(max_travelers);
-	for(unsigned int i = 0; i < max_travelers; i++){
+	t->traffic.resize(count);
+	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
-		t->traffic[i].target.resize(1);
-		t->traffic[i].source.resize(1);
+		t->traffic[s+i].target.resize(1);
+		t->traffic[s+i].source.resize(1);
 	}
 	/* sources */
-	for(unsigned int i = 0; i < max_travelers; i++){
+	for(unsigned int i = 0; i < count; i++){
 		unsigned int rand = (std::rand() / RAND_MAX) * nc;
-		t->traffic[i].source[0] = rand;
+		t->traffic[s+i].source[0] = rand;
 
-		float x = g->getNodeData( t->traffic[i].source[0] ).lon;
-		float y = g->getNodeData( t->traffic[i].source[0] ).lat;
+		float x = g->getNodeData( t->traffic[s+i].source[0] ).lon;
+		float y = g->getNodeData( t->traffic[s+i].source[0] ).lat;
 		float r = clust_step/1.0;
 		float c = 0.25+(0.0);
 		t->circles.push_front( openGL_Cluster(x, y, r, c) );
 	}
 	/* targets */
-	for(unsigned int i = 0; i < max_travelers; i++){
+	for(unsigned int i = 0; i < count; i++){
 		unsigned int rand = (std::rand() / RAND_MAX) * nc;
-		t->traffic[i].target[0] = rand;
+		t->traffic[s+i].target[0] = rand;
 
 		float x = g->getNodeData( t->traffic[i].source[0] ).lon;
 		float y = g->getNodeData( t->traffic[i].source[0] ).lat;
@@ -95,40 +102,41 @@ void travelCenter::mode2(){
 		t->circles.push_front( openGL_Cluster(x, y, r, c) );
 	}
 	/* random weights */
-	for(unsigned int i = 0; i < max_travelers; i++){
+	for(unsigned int i = 0; i < count; i++){
 		unsigned int r = rand();
 		while( r > rand_upper_bound){
 			r = rand();
 		}
-		t->traffic[i].weight = weight_lower_bound + (r % rand_range);
+		t->traffic[s+i].weight = weight_lower_bound + (r % rand_range);
 	}
 
 }
 void travelCenter::mode3(){
-	/* random max_travelers to all */
+	/* random count to all */
+	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(max_travelers);
-	for(unsigned int i = 0; i < max_travelers; i++){
+	t->traffic.resize(count);
+	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
-		t->traffic[i].target.resize(nc);
-		t->traffic[i].source.resize(1);
+		t->traffic[s+i].target.resize(nc);
+		t->traffic[s+i].source.resize(1);
 	}
 	/* sources */
-	for(unsigned int i = 0; i < max_travelers; i++){
+	for(unsigned int i = 0; i < count; i++){
 		unsigned int rand = (std::rand() / RAND_MAX) * nc;
-		t->traffic[i].source[0] = rand;
+		t->traffic[s+i].source[0] = rand;
 
-		float x = g->getNodeData( t->traffic[i].source[0] ).lon;
-		float y = g->getNodeData( t->traffic[i].source[0] ).lat;
+		float x = g->getNodeData( t->traffic[s+i].source[0] ).lon;
+		float y = g->getNodeData( t->traffic[s+i].source[0] ).lat;
 		float r = clust_step/1.0;
 		float c = 0.25+(0.0);
 		t->circles.push_front( openGL_Cluster(x, y, r, c) );
 	}
 	/* targets */
-	for(unsigned int i = 0; i < max_travelers; i++){
+	for(unsigned int i = 0; i < count; i++){
 		for(unsigned int j = 0; j < nc; j++){
-			t->traffic[i].target[j] = j;
+			t->traffic[s+i].target[j] = j;
 		}
 
 		/* random weights */
@@ -136,7 +144,7 @@ void travelCenter::mode3(){
 		while( r > rand_upper_bound){
 			r = rand();
 		}
-		t->traffic[i].weight = weight_lower_bound + (r % rand_range);
+		t->traffic[s+i].weight = weight_lower_bound + (r % rand_range);
 	}
 }
 void travelCenter::mode4(){
@@ -151,6 +159,8 @@ void travelCenter::mode4(){
 	 *	clust_top_{lower,upper}_nodecount_per_cluster
 	 *	many nodes per lower/upper cluster
 	 */
+	
+	unsigned int s = t->traffic.size();
 	cl = new cluster(g, clust_step);
 
 	cl->setMostPopulatedCells( clust_count_top_clusters );
@@ -186,16 +196,16 @@ void travelCenter::mode4(){
 
 	t->traffic.resize( 1 );
 	//t->traffic.push_back(pendler());
-	t->traffic[0].source.reserve(starts.size());
-	t->traffic[0].target.reserve(targets.size());
+	t->traffic[s+0].source.reserve(starts.size());
+	t->traffic[s+0].target.reserve(targets.size());
 
 	while(! starts.empty()){
-		t->traffic[0].source.push_back( starts.front() );
+		t->traffic[s+0].source.push_back( starts.front() );
 		starts.pop_front();
 
 	}
 	while(! targets.empty()){
-		t->traffic[0].target.push_back( targets.front() );
+		t->traffic[s+0].target.push_back( targets.front() );
 		targets.pop_front();
 	}
 
@@ -206,7 +216,7 @@ void travelCenter::mode4(){
 	while( r > rand_upper_bound){
 		r = rand();
 	}
-	t->traffic[0].weight = 1;//weight_lower_bound + (r % rand_range);
+	t->traffic[s+0].weight = 1;//weight_lower_bound + (r % rand_range);
 
 	delete cl; cl = 0;
 }
@@ -215,13 +225,14 @@ void travelCenter::mode5(){
 	 * use given radius and count to determine
 	 * sources.
 	 */
+	 
 	for(unsigned int i=0; i<manual_targets->size(); i++){
-		unsigned int node_id = (*manual_targets)[i].node_id;
-		unsigned int radius = (*manual_targets)[i].radius;
-		unsigned int count = (*manual_targets)[i].count;
+		//unsigned int node_id = (*manual_targets)[i].node_id;
+		//unsigned int radius = (*manual_targets)[i].radius;
+		//unsigned int count = (*manual_targets)[i].count;
 		std::vector<unsigned int> candidates;
 		// Finde alle Knoten in dem Radius
-		getNeighbours(g, node_id, radius, &candidates);
+		getNeighbours(g, nodes[i], radius, &candidates);
 		if(candidates.size() > count){
 			// Zufällig <count> Knoten an den Anfang des Vektors setzen und dann
 			// den Vektor auf die Größe zuschneiden.
@@ -237,7 +248,7 @@ void travelCenter::mode5(){
 		// Pendler hinzufügen.
 		if(!candidates.empty()){
 			t->traffic.push_back(pendler(
-						std::vector<unsigned int>(1, node_id),
+						std::vector<unsigned int>(1, nodes[i]),
 						candidates,
 						1));
 		}
@@ -245,6 +256,33 @@ void travelCenter::mode5(){
 }
 bool travelCenter::run(){
 	clearStuff();
+	for(unsigned int i=0;i<tcfg->size();i++){
+		mode = (*tcfg)[i].mode;
+		count = (*tcfg)[i].count;
+		source_count = (*tcfg)[i].source_count;
+		target_count = (*tcfg)[i].target_count;
+		weight_lower_bound = (*tcfg)[i].weight_lower_bound;
+		weight_upper_bound = (*tcfg)[i].weight_upper_bound;
+		clust_step = (*tcfg)[i].clust_step;
+		clust_count_top_clusters = (*tcfg)[i].clust_count_top_clusters;
+		clust_top_percentage = (*tcfg)[i].clust_top_percentage;
+		clust_top_uppers = (*tcfg)[i].clust_top_uppers;
+		clust_top_lowers = (*tcfg)[i].clust_top_lowers;
+		clust_top_upper_nodecount_per_cluster
+		 = (*tcfg)[i].clust_top_upper_nodecount_per_cluster;
+		clust_top_lower_nodecount_per_cluster
+		 = (*tcfg)[i].clust_top_lower_nodecount_per_cluster;
+		 nodes = (*tcfg)[i].nodes;
+		 radius = (*tcfg)[i].radius;
+		 
+		//manual_targets = &((*tcfg)[i].manual_targets);
+		
+		
+		run(i);
+	}
+	return true;
+}
+bool travelCenter::run(unsigned int i){
 	switch(mode)
 	{
       case 1:

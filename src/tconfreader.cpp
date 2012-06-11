@@ -59,11 +59,12 @@ vector<travelconf>* tconfreader::readConf(){
 			if(value[0] == "{"){
 				travelconf tmp;
 				tmp.mode = 0;
-				tmp.max_travelers = 1;
+				tmp.count = 1;
 				tmp.source_count = 1;
 				tmp.target_count = 1;
 				tmp.weight_lower_bound = 1;
 				tmp.weight_upper_bound = 1;
+				tmp.radius = 0;
 				
 				if(!readLine()){
 					cout << "Error while parsing traffic-config: \"}\" expected." << endl;
@@ -84,7 +85,7 @@ vector<travelconf>* tconfreader::readConf(){
 					}
 					else if(value[0] == "count"){
 						if(value.size() == 2){
-							tmp.max_travelers = atoi(value[1].c_str());
+							tmp.count = atoi(value[1].c_str());
 						}
 						else{
 							cout << "Error while parsing traffic-config: Illegal number of arguments for \"" << value[0] <<  "\"" << endl;
@@ -202,10 +203,20 @@ vector<travelconf>* tconfreader::readConf(){
 							throw std::runtime_error("file does not meet requirements");
 						}
 					}
+					else if(value[0] == "radius"){
+						if(value.size() == 2){
+							tmp.radius = atoi(value[1].c_str());
+						}
+						else{
+							cout << "Error while parsing traffic-config: Illegal number of arguments for \"" << value[0] <<  "\"" << endl;
+							f.close();
+							throw std::runtime_error("file does not meet requirements");
+						}
+					}
 					else if(value[0] == "nodes"){
 						if(value.size() > 1){
 							tmp.nodes.reserve(value.size() - 1);
-							for(int i = 1; i < value.size(); i++){
+							for(unsigned int i = 1; i < value.size(); i++){
 								tmp.nodes.push_back(atoi(value[1].c_str()));
 							}
 						}
@@ -228,7 +239,6 @@ vector<travelconf>* tconfreader::readConf(){
 						throw std::runtime_error("file does not meet requirements");
 					}
 				}
-				
 				trconf->push_back(tmp);
 				
 			}
