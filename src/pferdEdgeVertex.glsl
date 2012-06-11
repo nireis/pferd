@@ -13,9 +13,14 @@ vec4 transferFunction(in float value)
 	float r;
 	float g;
 	float b;
-	r = sin(value * 3.14/2.0);
+	r = 0.0;
 	g = sin(value * 3.14);
-	b = cos(value* 3.14/2.0);
+	b = cos(value* 3.14);
+	if(value > 0.5)
+	{
+		b = 0.0;
+		r = sin((value-0.5) * (3.14/2.0));
+	}
 	return vec4(r,g,b,1.0);
 }
 
