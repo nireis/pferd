@@ -197,7 +197,9 @@ void sim::recalcEdgevals(){
 		double value = dist / weight;
 
 		// gerundeter neuer wert für die kante
-		ed[i].value = (unsigned int)( floor(value +0.5));
+		unsigned int newval = (unsigned int)( floor(value +0.5)) ;
+		//cout << "Edge " << i << " old val: " << ed[i].value <<  ", new val: " << newval << ", type: " << ed[i].type << ", load: " << ed[i].load << endl;
+		ed[i].value = newval;
 	}
 	// der graph übernimmt die neuen edge_values
 	// der EdgeData an den Kanten
@@ -206,6 +208,7 @@ void sim::recalcEdgevals(){
 
 void sim::simTravelers(){
 	// Alle Traveler fahren lassen.
+	weights_sum = 0;
 	for(unsigned int i=0; i<trav->traffic.size(); i++){
 		// Schauen welche Art weniger Dijkstras benötigt bzw. ob
 		// es ein one to one ist.
@@ -215,22 +218,27 @@ void sim::simTravelers(){
 		unsigned int srcsize = src->size();
 		unsigned int tgtsize = tgt->size();
 		
+
 		if(srcsize > tgtsize){
 			for(unsigned int j=0; j<tgtsize; j++){
 				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+				weights_sum += tmp_pendler->weight * src->size();
 			}
 		}
 		else if(srcsize < tgtsize){
 			for(unsigned int j=0; j<srcsize; j++){
 				chd->oneToMany((*src)[j], tgt, tmp_pendler->weight);
+				weights_sum += tmp_pendler->weight * tgt->size();
 			}
 		}
 		else if(srcsize == 1){ // Beide sizes sind 1.
+			weights_sum += tmp_pendler->weight;
 			chd->oneToOne((*src)[0], (*tgt)[0], tmp_pendler->weight);
 		}
 		else{ // Die sizes sind gleich, aber ungleich 1.
 			for(unsigned int j=0; j<tgtsize; j++){
 				chd->manyToOne(src, (*tgt)[j], tmp_pendler->weight);
+				weights_sum += tmp_pendler->weight * src->size();
 			}
 		}
 		
@@ -258,33 +266,64 @@ void sim::initArrays(){
 	smallTypes[11] = 30;
 	smallTypes[12] = 50;
 
+	
 	// 130
-	functionParameter[0][0] = -130.0/40.0;//0.3;
-	functionParameter[0][1] = 0.0;//0.0013;
+	functionParameter[0][0] = 0.3;
+	functionParameter[0][1] = 0.0013;
 	// 120
-	functionParameter[1][0] = -120.0/35.0;//0.3;
-	functionParameter[1][1] = 0.0;//0.0013;
+	functionParameter[1][0] = 0.3;
+	functionParameter[1][1] = 0.0013;
 	// 100
-	functionParameter[2][0] = -100.0/25.0;//0.3;
-	functionParameter[2][1] = 0.0;//0.003;
+	functionParameter[2][0] = 0.3;
+	functionParameter[2][1] = 0.003;
 	// 80
-	functionParameter[3][0] = -80.0/20.0;//0.5;
-	functionParameter[3][1] = 0.0;//0.003;
+	functionParameter[3][0] = 0.5;
+	functionParameter[3][1] = 0.003;
 	// 70
-	functionParameter[4][0] = -70.0/15.0;//0.5;
-	functionParameter[4][1] = 0.0;//0.0035;
+	functionParameter[4][0] = 0.5;
+	functionParameter[4][1] = 0.0035;
 	// 50
-	functionParameter[5][0] = -50.0/10.0;//1.0;
-	functionParameter[5][1] = 0.0;//0.0065;
+	functionParameter[5][0] = 1.0;
+	functionParameter[5][1] = 0.0065;
 	// 45
-	functionParameter[6][0] = -45.0/8.0;//1.0;
-	functionParameter[6][1] = 0.0;//0.0065;
+	functionParameter[6][0] = 1.0;
+	functionParameter[6][1] = 0.0065;
 	//30
-	functionParameter[7][0] = -30.0/4.0;//0.7;
-	functionParameter[7][1] = 0.0;//0.016;
+	functionParameter[7][0] = 0.7;
+	functionParameter[7][1] = 0.016;
 	// 10
-	functionParameter[8][0] = -10.0/1.0;//0.0005;
-	functionParameter[8][1] = 0.0;//0.15;
+	functionParameter[8][0] = 0.0005;
+	functionParameter[8][1] = 0.15;
+	
+	/*
+	// 130
+	functionParameter[0][0] = -130.0/2000.0;
+	functionParameter[0][1] = 0.0013;
+	// 120
+	functionParameter[1][0] = -120.0/1800.0;
+	functionParameter[1][1] = 0.0013;
+	// 100
+	functionParameter[2][0] = -100.0/1500.0;
+	functionParameter[2][1] = 0.003;
+	// 80
+	functionParameter[3][0] = -80.0/1000.0;
+	functionParameter[3][1] = 0.003;
+	// 70
+	functionParameter[4][0] = -70.0/800.0;
+	functionParameter[4][1] = 0.0035;
+	// 50
+	functionParameter[5][0] = -50.0/500.0;
+	functionParameter[5][1] = 0.0065;
+	// 45
+	functionParameter[6][0] = -45.0/400.0;
+	functionParameter[6][1] = 0.0065;
+	//30
+	functionParameter[7][0] = -30.0/200.0;
+	functionParameter[7][1] = 0.016;
+	// 10
+	functionParameter[8][0] = -10.0/100.0;
+	functionParameter[8][1] = 0.15;
+	*/
 	
 }
 void sim::findGraphEdgesTypes(){
@@ -381,12 +420,10 @@ double sim::weightEdge(unsigned int type, unsigned int load){
 	double x = (double)load;
 	double res =  /* TODO lineare funktion testweise */
 		v - ((v * a) / (a + ((v-a)*exp(-b*x))));
-		//v - a*x;
+		//v + a*x
 		;
 	if( res < 0.0 ) 
 		res = 0.0;
-	if(res > type)
-		res = type;
 
 	return res;
 }
@@ -396,7 +433,9 @@ void sim::paintEdges(){
 		double tmpcolour =  0.0 ;
 		
 		if(ed[i].load != 0){
-			tmpcolour = (double)ed[i].load / (double)cfg->max_travelers;
+			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
+			tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
+			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
 		}
 
 		//if(ed[i].load == 0.0)

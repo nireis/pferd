@@ -66,31 +66,31 @@ void travelCenter::mode2(){
 	/* random to random , max_travelers pairs */
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(max_travelers);
+	//t->traffic.resize(max_travelers);
 	for(unsigned int i = 0; i < max_travelers; i++){
-		//t->traffic.push_back(pendler());
+		t->traffic.push_back(pendler());
 		t->traffic[i].target.resize(1);
 		t->traffic[i].source.resize(1);
 	}
 	/* sources */
 	for(unsigned int i = 0; i < max_travelers; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = ((double)std::rand() / (double)RAND_MAX) * nc;
 		t->traffic[i].source[0] = rand;
 
 		float x = g->getNodeData( t->traffic[i].source[0] ).lon;
 		float y = g->getNodeData( t->traffic[i].source[0] ).lat;
-		float r = clust_step/1.0;
+		float r = clust_step/2.0;
 		float c = 0.25+(0.0);
 		t->circles.push_front( openGL_Cluster(x, y, r, c) );
 	}
 	/* targets */
 	for(unsigned int i = 0; i < max_travelers; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = ((double)std::rand() / (double)RAND_MAX) * nc;
 		t->traffic[i].target[0] = rand;
 
-		float x = g->getNodeData( t->traffic[i].source[0] ).lon;
-		float y = g->getNodeData( t->traffic[i].source[0] ).lat;
-		float r = clust_step/1.0;
+		float x = g->getNodeData( t->traffic[i].target[0] ).lon;
+		float y = g->getNodeData( t->traffic[i].target[0] ).lat;
+		float r = clust_step/2.0;
 		float c = 0.75+(0.0);
 		t->circles.push_front( openGL_Cluster(x, y, r, c) );
 	}
@@ -116,7 +116,7 @@ void travelCenter::mode3(){
 	}
 	/* sources */
 	for(unsigned int i = 0; i < max_travelers; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = (unsigned int) ((double)std::rand() / (double)RAND_MAX) * nc;
 		t->traffic[i].source[0] = rand;
 
 		float x = g->getNodeData( t->traffic[i].source[0] ).lon;

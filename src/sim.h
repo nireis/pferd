@@ -44,6 +44,8 @@ class simulation {
 		SCGraph* oscg;
 		CH* ch;
 
+		unsigned int weights_sum;
+
 		/*
 		 * das Bestimmen der Typen der Kanten
 		 * ist deshalb wichtig, 
@@ -79,6 +81,8 @@ class sim{
 		CH* ch;
 		CHDijkstra* chd;
 		conf* cfg;
+
+		unsigned int weights_sum;
 
 		int graphtype;
 		unsigned int smallTypes[13];

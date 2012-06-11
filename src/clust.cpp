@@ -209,7 +209,7 @@ void cluster::getNodesLower(unsigned int count,
 		if(! nodes->empty()){
 			float x = g->getNodeData(nodes->front()).lon ;
 			float y = g->getNodeData(nodes->front()).lat ;
-			float r = step/1.0 ;
+			float r = step/2.0 ;
 			float c = 0.25 + (0.0) ;
 			cluster->push_front( openGL_Cluster(x, y, r, c) );
 		}
@@ -234,7 +234,7 @@ void cluster::getNodesUpper(unsigned int count,
 		if(! nodes->empty()){
 			float x = g->getNodeData(nodes->front()).lon ;
 			float y = g->getNodeData(nodes->front()).lat ;
-			float r = step/1.0 ;
+			float r = step/2.0 ;
 			float c = 0.75 + (0.0) ;
 			cluster->push_front( openGL_Cluster(x, y, r, c) );
 		}
