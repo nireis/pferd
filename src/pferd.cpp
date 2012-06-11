@@ -17,9 +17,21 @@
 
 using namespace std;
 
-void startVisThread(bool* active){
+void startVisThread(bool* active, bool* running, bool* renderMode, Graph** g_pp){
 	cout << "> Starte Visualisierung" << endl;
-	vis anzeige; anzeige.start(active, true);
+	vis anzeige;
+	while(*running){
+		if(*renderMode){
+			anzeige.start(active, true);
+		}
+		else{
+			if(*g_pp){
+				anzeige.initVis(*g_pp);
+				anzeige.start(active, false);
+			}
+		}
+		*active = true;
+	}
 }
 
 
@@ -37,6 +49,11 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 	string file;
+	Graph** g_pp = new Graph*;
+	bool running = true;
+	bool renderMode = true;
+	thread t;
+	bool active;
 	// bool startVis = false;
 	// bool chverbose = false;
 
@@ -95,11 +112,9 @@ int main(int argc, char *argv[]){
 
 	// Starte Visualisierung
 
-	thread t;
-	bool active;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t = thread(&startVisThread, &active);
+		t = thread(&startVisThread, &active, &running, &renderMode, g_pp);
 	}
 
 	clock_t start,finish;
@@ -107,7 +122,8 @@ int main(int argc, char *argv[]){
 
 	cout << "> Erstelle Graph mit Datei " << file << endl;
 	start = clock();
-	Graph g = Graph();
+	Graph g;
+	*g_pp = &g;
 
 	g.setGraph(file, true);
 
@@ -143,10 +159,19 @@ int main(int argc, char *argv[]){
 
 	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
-	cout << "> Warte auf Runde." << endl;
-	s.calcOneRoundCH();
+	while(true){
+		cout << "> Warte auf Runde." << endl;
+		s.calcOneRoundCH();
+		active = false;
+		renderMode = false;
+		cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren...";
+		cin.get();
+		active = false;
+		renderMode = true;
+	}
 
 	cout << "> Warte auf Thread: join()" << endl;
+	// running = false;
 	if(co.showVis){
 		t.join();
 	}
