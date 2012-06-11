@@ -215,7 +215,7 @@ void travelCenter::mode4(){
 	while( r > rand_upper_bound){
 		r = rand();
 	}
-	t->traffic[s+0].weight = 1;//weight_lower_bound + (r % rand_range);
+	t->traffic[s+0].weight = weight_lower_bound + (r % rand_range);
 
 	delete cl; cl = 0;
 }

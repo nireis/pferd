@@ -60,6 +60,7 @@ void sim::calcOneRoundNormal(){
 	base_g->updateEdgeLoads();
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -110,6 +111,7 @@ void sim::calcOneRoundCH(){
 	cout << "> >> " << endl;
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -120,7 +122,7 @@ void sim::calcOneRoundCH(){
 	delete chd; chd = 0;
 }
 void sim::calcOneRoundBoth(){
-
+/* TODO */
 	sim_g = new SCGraph(base_g);
 	
 	ch = new CH(base_g, sim_g);
@@ -140,6 +142,7 @@ void sim::calcOneRoundBoth(){
 	base_g->getEdgeLoads(sim_g);
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -156,7 +159,6 @@ bool sim::eqFound(){
 void sim::recalcEdgevals(){
 	// der graph kopiert die temporären
 	// edge_loads der dijkstras ins eine EdgeData
-	base_g->updateEdgeLoads();
 	EdgeData* ed = base_g->getEdgeDataPointer();
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		double dist = (double) ed[i].distance;
@@ -178,7 +180,6 @@ void sim::recalcEdgevals(){
 	}
 	// der graph übernimmt die neuen edge_values
 	// der EdgeData an den Kanten
-	base_g->updateEdgeValues();
 }
 
 void sim::simTravelers(){
@@ -335,6 +336,7 @@ void sim::simTravelers(){
 			<< one2one_dtimer/one2one_dcounter << std::endl;
 		normal_rounds_time += one2one_dtimer + many2one_dtimer + one2many_dtimer;
 	}
+	cout << "XXX weights " << weights_sum << endl;
 }
 
 void sim::initArrays(){
@@ -523,6 +525,8 @@ void sim::paintEdges(){
 			tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
 		}
+
+		//tmpcolour = 1.0;
 
 		//if(ed[i].load == 0.0)
 		//	tmpcolour = 0.0;
