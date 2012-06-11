@@ -11,17 +11,23 @@
 #include "CHConstruction.h"
 #include "structs.h"
 #include "openGLrender.h"
+#include "visStructs.h"
  
 class vis {
 	private:
+		//actual render object
 		openGLrender render;
+		//openGL representation of graph elements
 		openGL_Node_3d* nodes;
 		openGL_Edge_Node* edges;
 		openGL_Node_3d* shortcut_edges;
 		openGL_Cluster* circles;
 
-
 		struct pipe {
+			pipe() : 
+				graph(0),
+				scgraph(0)
+			{}
 			pipe(Graph* g) : 
 				graph(g),
 				scgraph(0)
@@ -119,17 +125,29 @@ class vis {
 
 		pipe p;
 
+		//don't know what this one does
 		void init();
-		void init(std::list<openGL_Cluster>* circs);
+		//pass on graph data to openGLrender
+		void initRenderer(std::list<openGL_Cluster>* circs);
+
+		float merkatorX(float);
+		float merkatorY(float);
 
 	public: 
+		//initializes graph data
+		void initVis(Graph* g, std::list<openGL_Cluster>* circs);
+		void initVis(SCGraph* g, std::list<openGL_Cluster>* circs);
+		void initVis(Graph* g);
+		void initVis(SCGraph* g);
+
 		vis(Graph* g, std::list<openGL_Cluster>* circs);
 		vis(SCGraph* g, std::list<openGL_Cluster>* circs);
 		vis(Graph* g);
 		vis(SCGraph* g);
+		vis();
 		~vis();
 
-		bool start();
+		bool start(bool*,bool);
 };
 
 
