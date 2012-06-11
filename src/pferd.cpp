@@ -14,14 +14,41 @@
 #include "conf.h"
 #include "travel.h"
 #include <thread>
+#include <fstream>
+#include <stdio.h>
 
 using namespace std;
 
-void startVisThread(bool* active){
-	cout << "> Starte Visualisierung" << endl;
-	vis anzeige; anzeige.start(active, true);
+void startVisThread(bool* active, bool* running, bool* renderMode, Graph** g_pp){
+	vis anzeige;
+	while(*running){
+		if(*renderMode){
+			anzeige.start(active, true);
+		}
+		else{
+			if(*g_pp){
+				anzeige.initVis(*g_pp);
+				anzeige.start(active, false);
+			}
+		}
+		*active = true;
+	}
 }
 
+void startMusic(string* filename){
+	// Musik in Endlosschleife.
+	while(true){
+		#ifdef _WIN32
+			//TODO
+		#else
+			FILE* pptr;
+			char temp[1024];
+			sprintf(temp, "mpg123 -q %s", filename->c_str());
+			pptr = popen(temp, "w");
+			pclose(pptr);
+		#endif
+	}
+}
 
 int main(int argc, char *argv[]){
 	cout << "            _|\\__/|, " << endl;
@@ -37,6 +64,12 @@ int main(int argc, char *argv[]){
 	cout << " " << endl;
 
 	string file;
+	Graph** g_pp = new Graph*;
+	bool running = true;
+	bool renderMode = true;
+	thread t_sound;
+	thread t_vis;
+	bool active;
 	// bool startVis = false;
 	// bool chverbose = false;
 
@@ -93,13 +126,18 @@ int main(int argc, char *argv[]){
 	conf co = conf();
 	readConf("pferdrc", &co);
 
+	// Starte Sound
+	
+	if(co.playSound){
+		cout << "> Starte Sound" << endl;
+		t_sound = thread(&startMusic, &co.soundFile);
+	}
+
 	// Starte Visualisierung
 
-	thread t;
-	bool active;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t = thread(&startVisThread, &active);
+		t_vis = thread(&startVisThread, &active, &running, &renderMode, g_pp);
 	}
 
 	clock_t start,finish;
@@ -107,7 +145,8 @@ int main(int argc, char *argv[]){
 
 	cout << "> Erstelle Graph mit Datei " << file << endl;
 	start = clock();
-	Graph g = Graph();
+	Graph g;
+	*g_pp = &g;
 
 	g.setGraph(file, true);
 
@@ -143,14 +182,24 @@ int main(int argc, char *argv[]){
 
 	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
-	cout << "> Warte auf Runde." << endl;
+	cout << "> Warte auf normale Runde." << endl;
 	s.calcOneRoundNormal();
 	s.resetGraph();
-	s.calcOneRoundCH();
+	while(true){
+		cout << "> Warte auf Runde." << endl;
+		s.calcOneRoundCH();
+		active = false;
+		renderMode = false;
+		cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren...";
+		cin.get();
+		active = false;
+		renderMode = true;
+	}
 
 	cout << "> Warte auf Thread: join()" << endl;
+	running = false;
 	if(co.showVis){
-		t.join();
+		t_vis.join();
 	}
 	cout << "> Exit Pferd" << endl;
 	return 0;

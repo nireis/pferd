@@ -1,4 +1,5 @@
-showVis false
+showVis true
 playSound true
 chConstVerbose false
 tConfFile tGen.conf
+soundFile song.mp3

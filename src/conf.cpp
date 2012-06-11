@@ -85,6 +85,15 @@ void parseLine(string* line, conf* cfg){
 			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
 		}
 	}
+	else if(key == "soundFile"){
+		if(value.size() == 1){
+			cfg->soundFile = value[0];
+		}
+		else{
+			cout << "Fehler beim Einlesen des Wertes von \"soundFile\":" << endl;
+			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
+		}
+	}
 	else{
 		cout << "Fehler beim lesen eines keys. Die Option \"" << key << "\" ist unbekannt." << endl;
 	}

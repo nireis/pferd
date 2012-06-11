@@ -336,7 +336,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[1].shader_program = initShaderProgram(shader1[0] , shader1[1], atrb1, 2);
 	glLinkProgram(sceneEntities[1].shader_program);
 	sceneEntities[1].texture = 0;
-	sceneEntities[1].visabilty = true;
+	sceneEntities[1].visabilty = false;
 	sceneEntities[1].world_position = glm::vec3(0.0);
 
 	//init shortcuts
@@ -354,7 +354,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[2].visabilty = true;
 	sceneEntities[2].world_position = glm::vec3(0.0);
 
-	for(int i=0; i<clusterCount; i++)
+	for(unsigned int i=0; i<clusterCount; i++)
 	{
 		//init cluster-highlight
 		sceneEntities[i+3] = openGL_Entity();
@@ -400,7 +400,7 @@ void openGLrender::displayGraph()
 			//set model matrix
 			modelMX = glm::translate(glm::mat4(1.0f), sceneEntities[i].world_position);
 			//set model_view_projection matrix
-			glm::mat4 mvpMX = projMX * viewMX * modelMX;
+			mvpMX = projMX * viewMX * modelMX;
 
 			glUseProgram(sceneEntities[i].shader_program);
 			glUniformMatrix4fv(glGetUniformLocation(sceneEntities[i].shader_program, "mvp"), 1, GL_FALSE, glm::value_ptr(mvpMX));
@@ -957,7 +957,7 @@ void openGLrender::resizeCallback(int w, int h)
 
 void openGLrender::timer()
 {
-	cam_alpha = cam_alpha + 0.5;
+	cam_alpha = cam_alpha + 1.0;
 	glutPostRedisplay();
 }
 
@@ -965,7 +965,7 @@ void openGLrender::timerCallback(int value)
 {
 	currentInstance->timer();
 
-	glutTimerFunc(16,timerCallback,1);
+	glutTimerFunc(33,timerCallback,1);
 }
 
 openGLrender* openGLrender::currentInstance = 0;
@@ -989,7 +989,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if(std::string(argv[0]) == "graph")
+	if(argv[0] == "graph")
 	{
 		render_mode = 0;
 	}
@@ -1016,7 +1016,7 @@ bool openGLrender::start(int argc, char* argv[])
 	glutMouseFunc(mouseClickCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(keyboardArrowsCallback);
-	glutTimerFunc(16,timerCallback,1);
+	glutTimerFunc(33,timerCallback,1);
 	glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutMainLoop();

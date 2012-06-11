@@ -64,9 +64,6 @@ void sim::calcOneRoundNormal(){
 	// einfärben der kanten im base_g Graph
 	paintEdges();
 
-	// vis bescheid sagen
-	pokeVis();
-
 	// aufräumen der graphen und ch ?
 	delete d; d = 0;
 }
@@ -117,9 +114,6 @@ void sim::calcOneRoundCH(){
 	// einfärben der kanten im base_g Graph
 	paintEdges();
 
-	// vis bescheid sagen
-	pokeVis();
-
 	// aufräumen der graphen und ch ?
 	delete sim_g; sim_g = 0;
 	delete ch; ch = 0;
@@ -150,16 +144,11 @@ void sim::calcOneRoundBoth(){
 	// einfärben der kanten im base_g Graph
 	paintEdges();
 
-	// vis bescheid sagen
-	pokeVis();
-
 	// aufräumen der graphen und ch ?
 	delete d; d = 0;
 	delete sim_g; sim_g = 0;
 	delete ch; ch = 0;
 	delete chd; chd = 0;
-}
-void sim::pokeVis(){
 }
 bool sim::eqFound(){
 	return false;
