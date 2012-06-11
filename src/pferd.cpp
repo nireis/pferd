@@ -137,11 +137,12 @@ int main(int argc, char *argv[]){
 //	co.clust_top_upper_nodecount_per_cluster = 3;
 //	co.clust_top_lower_nodecount_per_cluster = 20000;
 
+	cout << "> Erzeuge den Verkehr." << endl;
 	travelCenter tc = travelCenter(&g, &tr, &co);
 	tc.run();
 
+	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
-
 	s.calcOneRoundCH();
 
 	t->join();
