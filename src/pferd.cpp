@@ -144,6 +144,8 @@ int main(int argc, char *argv[]){
 	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
 	cout << "> Warte auf Runde." << endl;
+	s.calcOneRoundNormal();
+	s.resetGraph();
 	s.calcOneRoundCH();
 
 	cout << "> Warte auf Thread: join()" << endl;
