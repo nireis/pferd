@@ -513,6 +513,7 @@ struct conf{
 	bool playSound;
 	bool chConstVerbose;
 	std::string tConfFile;
+	std::string soundFile;
 };
 
 #endif
