@@ -240,6 +240,7 @@ vector<travelconf>* tconfreader::readConf(){
 					}
 				}
 				trconf->push_back(tmp);
+				readLine();
 				
 			}
 			else{
