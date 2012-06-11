@@ -1,3 +1,10 @@
++	sim: CHDijkstra / Dijkstra
++	Paper nochmal lesen.
++	Kantengewichtungsfunktion.
++	Equilibrium stuff?
+
+
+
 === allgemein ===
 
 * nach dem beenden des openGL-Fensters sollte das hauptprogramm nicht beendet werden

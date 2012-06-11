@@ -133,7 +133,7 @@ void vis::init(std::list<openGL_Cluster>* circs)
 
 bool vis::start()
 {
-	char* argument[] = { "graph" };
+	char* argument[] = { "grapha" };
 	return render.start(0,argument);
 }
 

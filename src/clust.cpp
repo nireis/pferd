@@ -3,6 +3,8 @@
 cluster::cluster(Graph* gr, double s) : g(gr), step(s) {
 	mostPop = 0;
 	mostPopSize = 0;
+	Xcells = 0;
+	Ycells = 0;
 
 	setXY();
 

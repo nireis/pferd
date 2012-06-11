@@ -12,6 +12,8 @@ travelCenter::travelCenter(Graph* gr, travelers* tr, conf* c) :
 		workConf(c);
 	rand_range = weight_upper_bound - weight_lower_bound + 1; 
 	rand_upper_bound = RAND_MAX - (RAND_MAX % rand_range);
+
+	cl = new cluster(g, clust_step);
 }
 travelCenter::~travelCenter(){
 	g = 0;
@@ -151,7 +153,6 @@ void travelCenter::mode4(){
 	 *	clust_top_{lower,upper}_nodecount_per_cluster
 	 *	many nodes per lower/upper cluster
 	 */
-	cl = new cluster(g, clust_step);
 
 	cl->setMostPopulatedCells( clust_count_top_clusters );
 

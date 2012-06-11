@@ -91,7 +91,7 @@ int main(int argc, char *argv[]){
 	clock_t start,finish;
 	double time;
 
-	cout << "Erstelle Graph mit Datei " << file << endl;
+	cout << "> Erstelle Graph mit Datei " << file << endl;
 	start = clock();
 	Graph g = Graph();
 
@@ -99,7 +99,46 @@ int main(int argc, char *argv[]){
 
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "Zeit zum Initialisieren des Graphen: " << time << endl;
+	cout << "> Zeit zum Initialisieren des Graphen: " << time << endl;
+
+
+	// starte simulationssachen ab hier
+	
+	travelers tr = travelers();
+	conf co = conf();
+
+	co.showVis = true;
+	co.playSound = true;
+	co.chConstVerbose = false;
+
+	/* traffic options */
+	co.mode = 2;
+	co.max_travelers = 50;
+	co.source_count = 10; // ??
+	co.target_count = 10; // ??
+
+	co.weight_lower_bound = 20;
+	co.weight_upper_bound = 40;
+	
+	/* cluster options */
+	co.clust_step = 0.01/8.0;
+	co.clust_top_percentage = 0.1;
+	co.clust_count_top_clusters = 20;
+	co.clust_top_uppers = 2;
+	co.clust_top_lowers = 8;
+	co.clust_top_upper_nodecount_per_cluster = 3;
+	co.clust_top_lower_nodecount_per_cluster = 20000;
+
+	travelCenter tc = travelCenter(&g, &tr, &co);
+	tc.run();
+
+	sim s(&g, &tr, &co);
+
+	s.calcOneRoundCH();
+
+	cout << "> Exit Pferd" << endl;
+	return 0;
+}
 
 //	/* erstelle Simulation und i
 //	 * lasse Kantengewichte an 
@@ -227,40 +266,6 @@ int main(int argc, char *argv[]){
 //		clist.pop_front();
 //	}
 
-	travelers tr = travelers();
-
-	conf co = conf();
-	cout << "1. " << endl;
-
-	co.showVis = true;
-	co.playSound = true;
-	co.chConstVerbose = false;
-
-	/* traffic options */
-	co.mode = 4;
-	co.max_travelers = 54;
-	co.source_count = 10; // ??
-	co.target_count = 10; // ??
-
-	co.weight_lower_bound = 20;
-	co.weight_upper_bound = 40;
-	
-	/* cluster options */
-	co.clust_step = 0.01/8.0;
-	co.clust_top_percentage = 0.1;
-	co.clust_count_top_clusters = 20;
-	co.clust_top_uppers = 2;
-	co.clust_top_lowers = 8;
-	co.clust_top_upper_nodecount_per_cluster = 3;
-	co.clust_top_lower_nodecount_per_cluster = 100;
-
-	travelCenter tc = travelCenter(&g, &tr, &co);
-	tc.run();
-	cout << "2. " << endl;
-	sim s(&g, &tr, &co);
-	cout << "3. " << endl;
-	s.calcOneRound();
-	cout << "4. " << endl;
 	
 //	CHDijkstra* chd = new CHDijkstra(&scg);
 //	
@@ -289,9 +294,3 @@ int main(int argc, char *argv[]){
 //		cout << "> Starte Visualisierung" << endl;
 //		vis anzeige(&g, &(tr.circles)); anzeige.start();
 //	}
-
-
-	cout << "> Exit Pferd" << endl;
-	return 0;
-}
-
