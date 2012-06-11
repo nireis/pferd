@@ -113,7 +113,7 @@ int main(int argc, char *argv[]){
 
 	/* traffic options */
 	co.mode = 2;
-	co.max_travelers = 50;
+	co.max_travelers = 500;
 	co.source_count = 10; // ??
 	co.target_count = 10; // ??
 

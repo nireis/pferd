@@ -10,6 +10,7 @@
 #include "structs.h"
 #include <thread>
 #include <mutex>
+#include <ctime>
 
 
 class sim{
@@ -21,6 +22,20 @@ class sim{
 		CHDijkstra* chd;
 		Dijkstra* d;
 		conf* cfg;
+
+		unsigned int many2one_chdcounter;
+		unsigned int one2many_chdcounter;
+		unsigned int one2one_chdcounter;
+		unsigned int many2one_dcounter;
+		unsigned int one2many_dcounter;
+		unsigned int one2one_dcounter;
+
+		double many2one_chdtimer;
+		double one2many_chdtimer;
+		double one2one_chdtimer;
+		double many2one_dtimer;
+		double one2many_dtimer;
+		double one2one_dtimer;
 
 		double normal_rounds_time;
 		double ch_rounds_time;
@@ -39,12 +54,14 @@ class sim{
 
 		void simTravelers();
 		void recalcEdgevals();
+		void pokeVis();
 	public:
 		sim(Graph* g, travelers* t, conf* c);
 		~sim();
 		void calcOneRoundNormal();
 		void calcOneRoundCH();
 		void calcOneRoundBoth();
+		void resetGraph();
 		bool eqFound();
 };
 

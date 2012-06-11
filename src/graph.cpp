@@ -360,7 +360,7 @@ void Graph::updateEdgeValues(){
 }
 void Graph::updateEdgeLoads(){
 	for(unsigned int i = 0; i < edge_count; i++){
-		edge_data[i].load += EdgeLoads[i];
+		edge_data[i].load = EdgeLoads[i];
 		EdgeLoads[i] = 0; 
 	}
 }
@@ -942,7 +942,7 @@ void SCGraph::shareShortcutLoads(){
 }
 void SCGraph::updateEdgeLoads(){
 	for(unsigned int i = 0; i < edge_count+shortcut_count; i++){
-		edge_data[i].load += EdgeLoads[i];
+		edge_data[i].load = EdgeLoads[i];
 		EdgeLoads[i] = 0; 
 	}
 	//shareShortcutLoads();
