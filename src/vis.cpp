@@ -162,7 +162,7 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 	node_data = 0;
 }
 
-bool vis::start(bool* active, bool render_mode)
+bool vis::start(volatile bool* active, bool render_mode)
 {
 	if(render_mode)
 	{

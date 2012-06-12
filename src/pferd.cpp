@@ -19,7 +19,7 @@
 
 using namespace std;
 
-void startVisThread(bool* active, bool* running, bool* renderMode, Graph** g_pp){
+void startVisThread(volatile bool* active, bool* running, bool* renderMode, Graph** g_pp){
 	vis anzeige;
 	while(*running){
 		if(*renderMode){
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
 	bool renderMode = true;
 	thread t_sound;
 	thread t_vis;
-	bool active;
+	volatile bool active;
 
 	bool setVisPerParameter = false;
 	bool VisPerParameter = false;
@@ -198,14 +198,30 @@ int main(int argc, char *argv[]){
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	while(true){
+	while(!s.eqFound()){
+		int rounds;
 		cout << "> Warte auf Runde der Simulation." << endl;
-		s.calcOneRoundCH();
+		if(rounds != 0){
+			for(int i=0; i<rounds; i++){
+				s.calcOneRoundCH();
+			}
+		}
+		else{
+			while(!s.eqFound()){
+				s.calcOneRoundCH();
+			}
+		}
 		if(co.showVis){
+			// Zeige Map an.
 			active = false;
 			renderMode = false;
-			cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren...";
-			cin.get();
+		}
+		cout << "Übergebe die Anzahl der Runden, welche berechnet werden sollen." << endl;
+		cout << "Übergebe die 0, wenn so lange gerechnet werden soll, bis ein Equilibrium" << endl;
+		cout << "gefunden wird: ";
+		cin >> rounds;
+		if(co.showVis){
+			// Zeige Pferd an
 			active = false;
 			renderMode = true;
 		}
@@ -224,4 +240,3 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
-

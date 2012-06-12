@@ -639,7 +639,7 @@ void openGLrender::uninitVolume()
 /*
 *	General purpose methods
 */
-void openGLrender::setActivePointer(bool *active)
+void openGLrender::setActivePointer(volatile bool *active)
 {
 	this->run = active;
 }

@@ -147,7 +147,7 @@ class vis {
 		vis();
 		~vis();
 
-		bool start(bool*,bool);
+		bool start(volatile bool*,bool);
 };
 
 
