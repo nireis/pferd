@@ -521,9 +521,9 @@ void sim::paintEdges(){
 		
 		if(1 || ed[i].load != 0){
 			//tmpcolour = (double)ed[i].load / (double)weights_sum  ;
-			//tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
+			//tmpcolour = log(tmpcolour*(exp(2.0)-1.0) + 1.0) ;
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
-			//tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			//tmpcolour =    sqrt (sqrt( tmpcolour ));
 			
 			// aktuelle mögliche geschwindigkeit durch maximale geschwindigkeit
 			tmpcolour = 1.0 - 

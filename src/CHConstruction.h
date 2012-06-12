@@ -9,8 +9,6 @@
 #include <thread>
 #include <mutex>
 
-#define numThreads std::thread::hardware_concurrency()
-
 using namespace std;
 
 struct DijkstraData;
@@ -56,6 +54,7 @@ class CHConstruction{
       mutex mGetNext;
       mutex mInsertSC;
 		mutex mArithMean;
+		unsigned int numThreads;
 
 	public:
 		// Strukt für einzelne Daten des Dijkstra.
@@ -126,6 +125,7 @@ class CHConstruction{
 
 	public:
 		CHConstruction(G* g);
+		CHConstruction(G* g, unsigned int ThreadNumberToUse);
 		~CHConstruction();
 		/*
 		 * Berechnet ein Maximales Independent Set und kontrahiert
@@ -185,6 +185,21 @@ CHConstruction<G>::CHConstruction(G* g):
 	this->g = g;
 	allsclist = 0;
 	conodelist = 0;
+	numThreads = std::thread::hardware_concurrency();
+	if(numThreads==0){
+		numThreads=1;
+	}
+	cout << "CH: Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
+}
+template <typename G>
+CHConstruction<G>::CHConstruction(G* g, unsigned int ThreadNumberToUse):
+	nr_of_nodes(g->getNodeCount()),
+	numRounds(0),
+	lastArithMean(0){
+	this->g = g;
+	allsclist = 0;
+	conodelist = 0;
+	numThreads=ThreadNumberToUse;
 	cout << "CH: Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
 }
 

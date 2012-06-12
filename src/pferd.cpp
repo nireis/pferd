@@ -2,7 +2,6 @@
 #include "graphalgs.h"
 #include "CHConstruction.h"
 #include "parser.h"
-#include <ctime>
 #include "structs.h"
 #include "ch.h"
 #include "rlparser.h"
@@ -13,9 +12,11 @@
 #include "sim.h"
 #include "conf.h"
 #include "travel.h"
+
 #include <thread>
 #include <fstream>
 #include <stdio.h>
+#include <ctime>
 
 using namespace std;
 
@@ -207,6 +208,8 @@ int main(int argc, char *argv[]){
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "> Zeit zum Initialisieren des Graphen: " << time << endl;
+	cout << "> Graph Parameter ~ Knoten: " << g.getNodeCount() 
+		<< ", Kanten: " << g.getEdgeCount() << endl;
 
 	// starte simulationssachen ab hier
 	travelers tr = travelers();
@@ -220,9 +223,12 @@ int main(int argc, char *argv[]){
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	while(true){
+	unsigned int c = 1;
+	while(c){
+		c--;
 		cout << "> Warte auf Runde der Simulation." << endl;
-		s.calcOneRoundCH();
+		s.calcOneRoundNormal();
+		//s.calcOneRoundCH();
 		if(co.showVis){
 			active = false;
 			renderMode = false;
