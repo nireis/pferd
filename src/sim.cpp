@@ -54,7 +54,7 @@ void sim::calcOneRoundNormal(){
 	simTravelers();
 
 	cout << "Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
-	cout << "> >> " << endl;
+	cout << "> >> "  << normal_rounds_time << endl;
 
 	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
@@ -70,7 +70,7 @@ void sim::calcOneRoundNormal(){
 }
 void sim::calcOneRoundCH(){
 	clock_t start, finish;
-	double timer;
+	double timer = 0.0;
 
 		start = clock();
 	sim_g = new SCGraph(base_g);
@@ -108,7 +108,7 @@ void sim::calcOneRoundCH(){
 	cout << "CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
 	ch_rounds_time += timer;
 	cout << "CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
-	cout << "> >> " << endl;
+	cout << "> >> " << ch_rounds_time << endl;
 
 	recalcEdgevals();
 	base_g->updateEdgeValues();
@@ -164,10 +164,10 @@ void sim::recalcEdgevals(){
 		double dist = (double) ed[i].distance;
 		double weight = weightEdge( ed[i].type, ed[i].load );
 		// runden, um das problem zu umgehen, dass für load=0
-		// das gewicht nicht nur nom typ, sondern auch vom 
+		// das gewicht nicht nur vom typ, sondern auch vom 
 		// parameter a abhängt
-		weight = floor( weight + 0.5 );
-		// macche aus weight den faktor für die kantenlänge,
+		weight = floor( weight + 1.2 );
+		// mache aus weight den faktor für die kantenlänge,
 		// um die reisezeit zu erhalten
 		weight = weight / 100.0;
 
@@ -183,7 +183,7 @@ void sim::recalcEdgevals(){
 }
 
 void sim::simTravelers(){
-	std::cout << "> starte Dijkstras" << std::endl;
+	std::cout << "> arbeite Routen ab" << std::endl;
 	// Alle Traveler fahren lassen.
 	weights_sum = 0;
 
@@ -336,7 +336,6 @@ void sim::simTravelers(){
 			<< one2one_dtimer/one2one_dcounter << std::endl;
 		normal_rounds_time += one2one_dtimer + many2one_dtimer + one2many_dtimer;
 	}
-	cout << "XXX weights " << weights_sum << endl;
 }
 
 void sim::initArrays(){
@@ -522,8 +521,10 @@ void sim::paintEdges(){
 		
 		if(ed[i].load != 0){
 			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
-			tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
+			//tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
+			tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			
 		}
 
 		//tmpcolour = 1.0;
