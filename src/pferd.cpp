@@ -71,17 +71,17 @@ int main(int argc, char *argv[]){
 	thread t_vis;
 	bool active;
 
-	bool setVisPerParameter = false;
-	bool VisPerParameter = false;
-	bool setSoundPerParameter = false;
-	bool SoundPerParameter = false;
+	int setVisPerParameter = 0;
+	int setSoundPerParameter = 0;
+	int setCHverbosePerParameter = 0;
 
 	if(argc < 2 ){
 		cout << "---" << endl 
 				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " -g <Graphendatei> [-v]" << endl
 				<< "-- -g <Graphdatei> : Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
-				<< "-- -v : Visualisierung starten " << endl
-				<< "-- -chv : Contraction Hierarchie teilt Statusmeldungen mit " << endl
+				<< "-- -v {on,off} : Visualisierung starten/nicht starten " << endl
+				<< "-- -chv {on,off}: Contraction Hierarchie teilt Statusmeldungen mit oder nicht " << endl
+				<< "-- -s {on,off} : Sound starten/nicht starten " << endl
 				<< "---" << endl;
 		return 0;
 	} else {
@@ -97,38 +97,56 @@ int main(int argc, char *argv[]){
 				}
 			} else
 			if( string(argv[i]) == "-v"){
-				setVisPerParameter = true;
+				setVisPerParameter = 2;
 				if( i+1 < argc){
-					if(string(argv[i+1]) == "off"){
-						VisPerParameter = false;
-					} else
 					if(string(argv[i+1]) == "on"){
-						VisPerParameter = true;
+						setVisPerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setVisPerParameter = 1;
 					} else {
 						cout << "Vis Parameter ungültig: " << argv[i+1] << endl;
-						setVisPerParameter = false;
+						setVisPerParameter = 0;
 					}
 				} else {
 					cout << "Vis Parameter ungültig: kein on/off angegeben" << endl;
-					setVisPerParameter = false;
+					setVisPerParameter = 0;
+				}
+				i += 2;
+			} else
+			if( string(argv[i]) == "-chv"){
+				setVisPerParameter = 2;
+				if( i+1 < argc){
+					if(string(argv[i+1]) == "on"){
+						setCHverbosePerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setCHverbosePerParameter = 1;
+					} else {
+						cout << "CH Verbose Parameter ungültig: " << argv[i+1] << endl;
+						setCHverbosePerParameter = 0;
+					}
+				} else {
+					cout << "CH Verbose Parameter ungültig: kein on/off angegeben" << endl;
+					setCHverbosePerParameter = 0;
 				}
 				i += 2;
 			} else
 			if( string(argv[i]) == "-s"){
-				setSoundPerParameter = true;
+				setSoundPerParameter = 0;
 				if( i+1 < argc){
-					if(string(argv[i+1]) == "off"){
-						SoundPerParameter = false;
-					} else
 					if(string(argv[i+1]) == "on"){
-						SoundPerParameter = true;
+						setSoundPerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setSoundPerParameter = 1;
 					} else {
 						cout << "Sound Parameter ungültig: " << argv[i+1] << endl;
-						setSoundPerParameter = false;
+						setSoundPerParameter = 0;
 					}
 				} else {
 					cout << "Sond Parameter ungültig: kein on/off angegeben" << endl;
-					setSoundPerParameter = false;
+					setSoundPerParameter = 0;
 				}
 				i += 2;
 			} else {
@@ -156,9 +174,13 @@ int main(int argc, char *argv[]){
 	conf co = conf();
 	readConf("pferdrc", &co);
 
+	//ggf CH Verbose anpassen
+	if(setCHverbosePerParameter)
+		co.chConstVerbose = setCHverbosePerParameter-1;
+
 	// Starte Sound
 	if(setSoundPerParameter)
-		co.playSound = SoundPerParameter;
+		co.playSound = setSoundPerParameter-1;
 	if(co.playSound){
 		cout << "> Starte Sound" << endl;
 		t_sound = thread(&startMusic, &co.soundFile);
@@ -166,7 +188,7 @@ int main(int argc, char *argv[]){
 
 	// Starte Visualisierung
 	if(setVisPerParameter)
-		co.showVis = VisPerParameter;
+		co.showVis = setVisPerParameter-1;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
 		t_vis = thread(&startVisThread, &active, &running, &renderMode, g_pp);

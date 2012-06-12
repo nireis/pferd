@@ -519,11 +519,18 @@ void sim::paintEdges(){
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		double tmpcolour =  0.0 ;
 		
-		if(ed[i].load != 0){
-			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
+		if(1 || ed[i].load != 0){
+			//tmpcolour = (double)ed[i].load / (double)weights_sum  ;
 			//tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
-			tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			//tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			
+			// aktuelle mögliche geschwindigkeit durch maximale geschwindigkeit
+			tmpcolour = 1.0 - 
+				(
+				 (100.0 * (double(ed[i].distance) / double(ed[i].value)) ) 
+				 / double(ed[i].type)
+				);
 			
 		}
 
