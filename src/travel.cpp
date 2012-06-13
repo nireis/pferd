@@ -80,7 +80,7 @@ void travelCenter::mode2(){
 	}
 	/* sources */
 	for(unsigned int i = 0; i < count; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = (double(std::rand()) / double(RAND_MAX)) * nc;
 		t->traffic[s+i].source[0] = rand;
 
 		float x = g->getNodeData( t->traffic[s+i].source[0] ).lon;
@@ -91,7 +91,7 @@ void travelCenter::mode2(){
 	}
 	/* targets */
 	for(unsigned int i = 0; i < count; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = (double(std::rand()) / double(RAND_MAX)) * nc;
 		t->traffic[s+i].target[0] = rand;
 
 		float x = g->getNodeData( t->traffic[i].target[0] ).lon;
@@ -123,7 +123,7 @@ void travelCenter::mode3(){
 	}
 	/* sources */
 	for(unsigned int i = 0; i < count; i++){
-		unsigned int rand = (std::rand() / RAND_MAX) * nc;
+		unsigned int rand = (double(std::rand()) / double(RAND_MAX)) * nc;
 		t->traffic[s+i].source[0] = rand;
 
 		float x = g->getNodeData( t->traffic[s+i].source[0] ).lon;
@@ -215,7 +215,7 @@ void travelCenter::mode4(){
 	while( r > rand_upper_bound){
 		r = rand();
 	}
-	t->traffic[s+0].weight = 1;//weight_lower_bound + (r % rand_range);
+	t->traffic[s+0].weight = weight_lower_bound + (r % rand_range);
 
 	delete cl; cl = 0;
 }
@@ -237,7 +237,7 @@ void travelCenter::mode5(){
 			// den Vektor auf die Größe zuschneiden.
 			for(unsigned int i=0; i<count; i++){
 				// Eine random number aus dem Bereich [i, #candidates] holen.
-				unsigned int r = (rand()/RAND_MAX)*(candidates.size()-i);
+				unsigned int r = (double(rand())/double(RAND_MAX))*(candidates.size()-i);
 				unsigned int dummy = candidates[r];
 				candidates[r] = candidates[i];
 				candidates[i] = dummy;

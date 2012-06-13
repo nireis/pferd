@@ -47,18 +47,20 @@ void sim::calcOneRoundNormal(){
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 	normal_rounds_time = timer;
-	cout << "Dijkstra Round, initialisierung: " << normal_rounds_time << endl;
+	cout << "Dijkstra Round, initialisierung Zeit: " << normal_rounds_time << endl;
 
 	chd = 0;
 
 	simTravelers();
 
 	cout << "Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
+	cout << "> >> "  << normal_rounds_time << endl;
 
 	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -68,7 +70,7 @@ void sim::calcOneRoundNormal(){
 }
 void sim::calcOneRoundCH(){
 	clock_t start, finish;
-	double timer;
+	double timer = 0.0;
 
 		start = clock();
 	sim_g = new SCGraph(base_g);
@@ -106,8 +108,10 @@ void sim::calcOneRoundCH(){
 	cout << "CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
 	ch_rounds_time += timer;
 	cout << "CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
+	cout << "> >> " << ch_rounds_time << endl;
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -118,7 +122,7 @@ void sim::calcOneRoundCH(){
 	delete chd; chd = 0;
 }
 void sim::calcOneRoundBoth(){
-
+/* TODO */
 	sim_g = new SCGraph(base_g);
 	
 	ch = new CH(base_g, sim_g);
@@ -138,6 +142,7 @@ void sim::calcOneRoundBoth(){
 	base_g->getEdgeLoads(sim_g);
 
 	recalcEdgevals();
+	base_g->updateEdgeValues();
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
@@ -154,16 +159,15 @@ bool sim::eqFound(){
 void sim::recalcEdgevals(){
 	// der graph kopiert die temporären
 	// edge_loads der dijkstras ins eine EdgeData
-	base_g->updateEdgeLoads();
 	EdgeData* ed = base_g->getEdgeDataPointer();
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		double dist = (double) ed[i].distance;
 		double weight = weightEdge( ed[i].type, ed[i].load );
 		// runden, um das problem zu umgehen, dass für load=0
-		// das gewicht nicht nur nom typ, sondern auch vom 
+		// das gewicht nicht nur vom typ, sondern auch vom 
 		// parameter a abhängt
-		weight = floor( weight + 0.5 );
-		// macche aus weight den faktor für die kantenlänge,
+		weight = floor( weight + 1.2 );
+		// mache aus weight den faktor für die kantenlänge,
 		// um die reisezeit zu erhalten
 		weight = weight / 100.0;
 
@@ -176,11 +180,10 @@ void sim::recalcEdgevals(){
 	}
 	// der graph übernimmt die neuen edge_values
 	// der EdgeData an den Kanten
-	base_g->updateEdgeValues();
 }
 
 void sim::simTravelers(){
-	std::cout << "> starte Dijkstras" << std::endl;
+	std::cout << "> arbeite Routen ab" << std::endl;
 	// Alle Traveler fahren lassen.
 	weights_sum = 0;
 
@@ -518,9 +521,13 @@ void sim::paintEdges(){
 		
 		if(ed[i].load != 0){
 			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
-			tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
+			//tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
+			tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			
 		}
+
+		//tmpcolour = 1.0;
 
 		//if(ed[i].load == 0.0)
 		//	tmpcolour = 0.0;
