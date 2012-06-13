@@ -20,7 +20,7 @@
 
 using namespace std;
 
-void startVisThread(bool* active, bool* running, bool* renderMode, Graph** g_pp){
+void startVisThread(volatile bool* active, bool* running, bool* renderMode, Graph** g_pp){
 	vis anzeige;
 	while(*running){
 		if(*renderMode){
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
 	bool renderMode = true;
 	thread t_sound;
 	thread t_vis;
-	bool active;
+	volatile bool active;
 
 	int setVisPerParameter = 0;
 	int setSoundPerParameter = 0;
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]){
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	unsigned int c = 1;
+	unsigned int c = 3;
 	while(c){
 		c--;
 		cout << "> Warte auf Runde der Simulation." << endl;
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]){
 		if(co.showVis){
 			active = false;
 			renderMode = false;
-			cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren...";
+			cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren..." << endl;
 			cin.get();
 			active = false;
 			renderMode = true;
@@ -247,8 +247,8 @@ int main(int argc, char *argv[]){
 
 	cout << "> Exit Pferd" << endl;
 
-	*g_pp = 0;
-	delete g_pp; g_pp = 0;
+	//*g_pp = 0;
+	//delete g_pp; g_pp = 0;
 
 	return 0;
 }

@@ -78,15 +78,16 @@ void sim::calcOneRoundCH(){
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 	ch_rounds_time = timer;
-	cout << "CHDijkstra Round SCGraph init. Zeit: " << ch_rounds_time << endl;
+	cout << "CHDijkstra Round, SCGraph init. Zeit: " << ch_rounds_time << endl;
 
 		start = clock();
 	ch = new CH(base_g, sim_g);
 	ch->calcCH(cfg->chConstVerbose);
 		finish = clock();
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "CHDijkstra Round CH Konstruktion Zeit: " << timer << endl;
+	cout << "CHDijkstra Round, CH Konstruktion Zeit: " << timer << endl;
 	ch_rounds_time += timer;
+	cout << "CHDijkstra Round, SCGraph Shortcuts: " << sim_g->getShortcutCount() << endl;
 
 		start = clock();
 	chd = new CHDijkstra(sim_g);

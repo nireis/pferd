@@ -16,6 +16,9 @@ struct DijkstraData;
 template <typename G>
 class CHConstruction{
 	private:
+		typedef typename G::RoundEdge Edge;
+		typedef typename G::RoundEdgesIterator EdgesIterator;
+
 		// struct für die Elemente aus U des Dijkstra.
 		struct U_element{
 			unsigned int sourceid;

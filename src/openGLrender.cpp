@@ -306,6 +306,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 bool openGLrender::initGraphVis()
 {
+
 	entityCount = 3 + clusterCount;
 	sceneEntities = new openGL_Entity[entityCount];
 
@@ -639,7 +640,7 @@ void openGLrender::uninitVolume()
 /*
 *	General purpose methods
 */
-void openGLrender::setActivePointer(bool *active)
+void openGLrender::setActivePointer(volatile bool *active)
 {
 	this->run = active;
 }
@@ -989,7 +990,9 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if(argv[0] == "graph")
+	// undefiniertes verhalten kann einem den schlaf rauben
+	if( 1 || argv[0] == "graph")
+	if(strcmp(argv[0], "graph") == 0)
 	{
 		render_mode = 0;
 	}

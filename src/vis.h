@@ -15,6 +15,9 @@
  
 class vis {
 	private:
+		typedef typename Graph::Edge Edge;
+		typedef typename Graph::EdgesIterator EdgesIterator;
+
 		//actual render object
 		openGLrender render;
 		//openGL representation of graph elements
@@ -22,108 +25,8 @@ class vis {
 		openGL_Edge_Node* edges;
 		openGL_Node_3d* shortcut_edges;
 		openGL_Cluster* circles;
-
-		struct pipe {
-			pipe() : 
-				graph(0),
-				scgraph(0)
-			{}
-			pipe(Graph* g) : 
-				graph(g),
-				scgraph(0)
-			{}
-			pipe(SCGraph* g) : 
-				graph(0),
-				scgraph(g)
-			{}
-			~pipe(){
-				graph = 0;
-				scgraph = 0;
-			}
-
-			Graph* graph;
-			SCGraph* scgraph;
-
-			unsigned int getNodeCount(){
-				unsigned int ret = 0;
-				if(graph){
-					ret = graph->getNodeCount();
-				}
-				if(scgraph){
-					ret = scgraph->getNodeCount();
-				}
-				return ret;
-			}
-
-			unsigned int getEdgeCount(){
-				unsigned int ret = 0;
-				if(graph){
-					ret = graph->getEdgeCount();
-				}
-				if(scgraph){
-					ret = scgraph->getEdgeCount();
-				}
-				return ret;
-			}
-
-			unsigned int getShortcutCount(){
-				unsigned int ret = 0;
-				if(graph){
-					ret = 0;
-				}
-				if(scgraph){
-					ret = scgraph->getShortcutCount();
-				}
-				return ret;
-			}
-
-			EdgesIterator getOutEdgesIt(unsigned int id){
-				EdgesIterator ret;
-				if(graph){
-					ret = graph->getOutEdgesIt(id);
-				}
-				if(scgraph){
-					ret = scgraph->getOutEdgesIt(id);
-				}
-				return ret;
-			}
-
-			EdgeData getEdgeData(unsigned int id){
-				EdgeData ret;
-				if(graph){
-					ret = graph->getEdgeData(id);
-				}
-				if(scgraph){
-					ret = scgraph->getEdgeData(id);
-				}
-				return ret;
-			}
-
-			bool isShortcut(unsigned int id){
-				bool ret = 0;
-				if(graph){
-					ret =  false;
-				}
-				if(scgraph){
-					ret =  scgraph->isShortcut(id);
-				}
-				return ret;
-			}
-
-			NodeData* getNodeDataPointer(){
-				NodeData* ret = 0;
-				if(graph){
-					ret = graph->getNodeDataPointer();
-				}
-				if(scgraph){
-					ret = scgraph->getNodeDataPointer();
-				}
-				return ret;
-			}
-
-		};
-
-		pipe p;
+		
+		Graph* g;
 
 		//don't know what this one does
 		void init();
@@ -136,18 +39,14 @@ class vis {
 	public: 
 		//initializes graph data
 		void initVis(Graph* g, std::list<openGL_Cluster>* circs);
-		void initVis(SCGraph* g, std::list<openGL_Cluster>* circs);
 		void initVis(Graph* g);
-		void initVis(SCGraph* g);
 
-		vis(Graph* g, std::list<openGL_Cluster>* circs);
-		vis(SCGraph* g, std::list<openGL_Cluster>* circs);
-		vis(Graph* g);
-		vis(SCGraph* g);
+		vis(Graph* gr, std::list<openGL_Cluster>* circs);
+		vis(Graph* gr);
 		vis();
 		~vis();
 
-		bool start(bool*,bool);
+		bool start(volatile bool*,bool);
 };
 
 

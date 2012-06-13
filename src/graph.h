@@ -9,18 +9,6 @@
 #include <queue>
 #include <algorithm>
 
-typedef unsigned int N;
-typedef NodeData ND;
-
-typedef Edge E;
-typedef EdgeData ED;
-
-typedef Shortcut S;
-typedef ShortcutData SD;
-
-typedef Andrenator_P<E> EdgesIterator;
-typedef Andrenator_P<LVLEdge> LVLEdgesIterator;
-
 class SCGraph;
 
 /*
@@ -29,6 +17,9 @@ class SCGraph;
  */
 class Graph {
 	public:
+		typedef GEdge Edge;
+		typedef Andrenator_P<Edge> EdgesIterator;
+
 	/*
 	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
 	 *		*_data
@@ -36,6 +27,10 @@ class Graph {
 	 *	schnell und kompakt werden.
 	 */
 	private:
+		typedef Edge E;
+		typedef EdgeData ED;
+		typedef unsigned int N;
+		typedef NodeData ND;
 		/*
 		 * statischer Teil des Graphen
 		 */
@@ -204,7 +199,19 @@ class Graph {
  * zu einem Graph zusammenfügen
  */
 class SCGraph {
+	public:
+		typedef SCGEdge Edge;
+		typedef Andrenator_P<Edge> EdgesIterator;
+		typedef GEdge RoundEdge;
+		typedef Andrenator_P<GEdge> RoundEdgesIterator;
+	
 	private:
+		typedef Edge E;
+		typedef EdgeData ED;
+		typedef unsigned int N;
+		typedef NodeData ND;
+		typedef Shortcut S;
+
 		Graph* g;
 
 		unsigned int* node_lvl;
@@ -219,11 +226,11 @@ class SCGraph {
 		unsigned int current_edge_arrays_size;
 
 		struct AdjEdges {
-			Edge* start;
+			Graph::Edge* start;
 			unsigned int count;
 
 			AdjEdges() : start(0), count(0) {}
-			AdjEdges(Edge* s, unsigned int c) : start(s), count(c) {}
+			AdjEdges(Graph::Edge* s, unsigned int c) : start(s), count(c) {}
 		};
 
 		AdjEdges* nodes_out_edges;
@@ -231,8 +238,10 @@ class SCGraph {
 
 		N* nodes_in_offs;
 		E* in_edges; 
+		GEdge* round_in_edges;
 		N* nodes_out_offs;
 		E* out_edges;
+		GEdge* round_out_edges;
 
 		ND* node_data;
 		ED* edge_data;
@@ -322,15 +331,15 @@ class SCGraph {
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
 
-		EdgesIterator getOutEdgesIt_Round(unsigned int node){
-			Edge* s = nodes_out_edges[node].start ;
+		Graph::EdgesIterator getOutEdgesIt_Round(unsigned int node){
+			Graph::Edge* s = nodes_out_edges[node].start ;
 			unsigned int c = nodes_out_edges[node].count ;
-			return EdgesIterator(s, c ); 
+			return Graph::EdgesIterator(s, c ); 
 		}
-		EdgesIterator getInEdgesIt_Round(unsigned int node){
-			Edge* s = nodes_in_edges[node].start ;
+		Graph::EdgesIterator getInEdgesIt_Round(unsigned int node){
+			Graph::Edge* s = nodes_in_edges[node].start ;
 			unsigned int c = nodes_in_edges[node].count ;
-			return EdgesIterator(s , c ); 
+			return Graph::EdgesIterator(s , c ); 
 		}
 		/*
 		 * out0_in1 == false == 0 => gebe OutEdges-Iterator
