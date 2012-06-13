@@ -42,6 +42,8 @@ class sim{
 
 		unsigned int weights_sum;
 
+		vector< vector<unsigned int>* > loadhistory;
+
 		int graphtype;
 		unsigned int smallTypes[13];
 		double functionParameter[9][2];
@@ -49,7 +51,7 @@ class sim{
 		void findGraphEdgesTypes();
 		void setGraphTypesRight();
 
-		double weightEdge(unsigned int type, unsigned int load);
+		double weightEdge(unsigned int type, double load);
 		void paintEdges();
 
 		void simTravelers();

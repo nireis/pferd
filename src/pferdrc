@@ -3,3 +3,4 @@ playSound false
 chConstVerbose false
 tConfFile tGen.conf
 soundFile song.mp3
+alpha 0.5
