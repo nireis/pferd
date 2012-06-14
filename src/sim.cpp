@@ -197,7 +197,14 @@ void sim::recalcEdgevals(){
 		double dist = (double) ed[i].distance;
 		double weight;
 		if(loadhistory.size() > 1){
-			weight = weightEdge( ed[i].type, (cfg->alpha * (double)ed[i].load) +((1-cfg->alpha) * (double)(*loadhistory[loadhistory.size() - 2])[i] ) );
+			double load= 0;
+			for(unsigned int j = loadhistory.size(); j>0;j--){
+				load += (double)(*loadhistory[loadhistory.size() - j])[i];
+				load *= 0.5;
+			}
+			load *=2.0;
+			//weight = weightEdge( ed[i].type, (cfg->alpha * (double)ed[i].load) +((1-cfg->alpha) * (double)(*loadhistory[loadhistory.size() - 2])[i] ) );
+			weight = weightEdge( ed[i].type, load);
 		}
 		else{
 			weight = weightEdge(ed[i].type, (double)ed[i].load);
