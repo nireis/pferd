@@ -161,16 +161,6 @@ void All2AllTimes(unsigned int runden){
 		unsigned int EdgeCount=0;
 		unsigned int ShortcutCount=0;
 
-		vector<unsigned int> source(g->getNodeCount());
-		vector<unsigned int> target(g->getNodeCount());
-		for(unsigned int i = 0; i < g->getNodeCount(); i++)
-		{
-			source[i] = i;
-			target[i] = i;
-		}
-	
-	for(unsigned int wiederholung = 0; wiederholung < runden; wiederholung++){
-
 		g = new Graph();
 		g->setGraph(string(graphs[i])+string(fileending), true);
 
@@ -188,6 +178,16 @@ void All2AllTimes(unsigned int runden){
 		cout << "Graph fertig mit " 
 			<< scg->getShortcutCount() << " Shortcuts"<< endl;
 			ShortcutCount = scg->getShortcutCount();
+
+		vector<unsigned int> source(g->getNodeCount());
+		vector<unsigned int> target(g->getNodeCount());
+		for(unsigned int i = 0; i < g->getNodeCount(); i++)
+		{
+			source[i] = i;
+			target[i] = i;
+		}
+	
+	for(unsigned int wiederholung = 0; wiederholung < runden; wiederholung++){
 
 		// starte Dijkstras ab hier
 
@@ -277,7 +277,7 @@ void All2AllTimes(unsigned int runden){
 }
 
 void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int sources_count){
-	string dataname = string(graphs[i]).replace(0,8,"")+"-"+"one_to_N_times.dat";
+	string dataname = string(graphs[i]).replace(0,8,"")+"-"+"one_to_All_times.dat";
 	cout << "Starte " << dataname << endl;
 	ofstream file;
 	file.open(string(folder)+"/"+dataname);
@@ -713,28 +713,28 @@ int main(){
 	// === === === 
 	
 
-	CH_Times(1);
+//CH_Times(1);
 
-	All2AllTimes(1);
+//All2AllTimes(1);
 	
 	//One2_All_Times(0, 100, 50);
 	//One2_All_Times(1, 500, 1); // 15 * 4/3 min
 	//One2_All_Times(2, ,1000 1); // 25 * 4/3 min
 	//One2_All_Times(3, 1000, 1); // > 75 * 4/3 min
 	//One2_All_Times(4, 10000, 1); // > 75 * 4/3 min
-	One2_All_Times(0, 100, 50);
-	One2_All_Times(1, 700, 1); // 15 * 4/3 min
-	One2_All_Times(2, 1500, 1); // 25 * 4/3 min
-	One2_All_Times(3, 1500, 1); // > 75 * 4/3 min
-	One2_All_Times(4, 25000, 1); // > 75 * 4/3 min
+//One2_All_Times(0, 100, 50);
+//One2_All_Times(1, 700, 1); // 15 * 4/3 min
+//One2_All_Times(2, 1500, 1); // 25 * 4/3 min
+//One2_All_Times(3, 1500, 1); // > 75 * 4/3 min
+//One2_All_Times(4, 25000, 1); // > 75 * 4/3 min
 
-	O2O_Times(2000);
+//O2O_Times(2000);
 
-	O2O_evolution(0, 1000, 100);
-	O2O_evolution(1, 1000, 100);
-	O2O_evolution(2, 1000, 200);
-	O2O_evolution(3, 1000, 200);
-	O2O_evolution(4, 1000, 250);
+O2O_evolution(0, 1000, 100);
+//O2O_evolution(1, 1000, 100);
+//O2O_evolution(2, 1000, 200);
+//O2O_evolution(3, 1000, 200);
+//O2O_evolution(4, 1000, 250);
 
 	return 0;
 }
