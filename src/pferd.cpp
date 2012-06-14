@@ -38,7 +38,7 @@ void startVisThread(volatile bool* active, bool* running, bool* renderMode, Grap
 
 void startMusic(string* filename){
 	// Musik in Endlosschleife.
-	while(true){
+	//while(true){
 		#ifdef _WIN32
 			//TODO
 		#else
@@ -48,7 +48,7 @@ void startMusic(string* filename){
 			pptr = popen(temp, "w");
 			pclose(pptr);
 		#endif
-	}
+	//}
 }
 
 int main(int argc, char *argv[]){
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]){
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	unsigned int c = 3;
+	unsigned int c = 1;
 	while(c){
 		c--;
 		cout << "> Warte auf Runde der Simulation." << endl;
@@ -247,8 +247,8 @@ int main(int argc, char *argv[]){
 
 	cout << "> Exit Pferd" << endl;
 
-	//*g_pp = 0;
-	//delete g_pp; g_pp = 0;
+	*g_pp = 0;
+	delete g_pp; g_pp = 0;
 
 	return 0;
 }

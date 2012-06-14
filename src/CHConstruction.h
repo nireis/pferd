@@ -203,6 +203,11 @@ CHConstruction<G>::CHConstruction(G* g, unsigned int ThreadNumberToUse):
 	allsclist = 0;
 	conodelist = 0;
 	numThreads=ThreadNumberToUse;
+	if(numThreads==0)
+	numThreads = std::thread::hardware_concurrency();
+	if(numThreads==0){
+		numThreads=1;
+	}
 	cout << "CH: Berechnung wird mit " << numThreads << " Threads durchgeführt." << endl;
 }
 

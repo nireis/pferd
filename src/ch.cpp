@@ -2,6 +2,11 @@
 
 using namespace std;
 
+CH::CH(Graph* gr, SCGraph* scgr, unsigned int ThreadsCount) : 
+	isDone(false), g(gr), scg(scgr), algos(scgr, ThreadsCount), rounds(1),
+	sclistpointer(scgr->getShortcutListPointer()), 
+	bnlistpointer(scgr->getBlackNodesListPointer())
+{}
 CH::CH(Graph* gr, SCGraph* scgr) : 
 	isDone(false), g(gr), scg(scgr), algos(scgr), rounds(1),
 	sclistpointer(scgr->getShortcutListPointer()), 

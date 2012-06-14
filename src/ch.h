@@ -31,6 +31,7 @@ class CH {
 		list<unsigned int>* bnlistpointer;
 
 	public:
+		CH(Graph* gr, SCGraph* scgr, unsigned int ThreadsCount);
 		CH(Graph* gr, SCGraph* scgr);
 		~CH();
 
