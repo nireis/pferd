@@ -215,7 +215,7 @@ void sim::simTravelers(){
 						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 					many2one_chdtimer += timer;
 					many2one_chdcounter ++;
-					weights_sum += tmp_pendler->weight * src->size();
+					weights_sum += tmp_pendler->weight ;//* src->size();
 				}
 			}
 			else if(srcsize < tgtsize){
@@ -226,7 +226,7 @@ void sim::simTravelers(){
 						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 					one2many_chdtimer += timer;
 					one2many_chdcounter ++;
-					weights_sum += tmp_pendler->weight * tgt->size();
+					weights_sum += tmp_pendler->weight ;//* tgt->size();
 				}
 			}
 			else if(srcsize == 1){ // Beide sizes sind 1.
@@ -521,10 +521,10 @@ void sim::paintEdges(){
 		double tmpcolour =  0.0 ;
 		
 		if(1 || ed[i].load != 0){
-			//tmpcolour = (double)ed[i].load / (double)weights_sum  ;
+			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
 			//tmpcolour = log(tmpcolour*(exp(2.0)-1.0) + 1.0) ;
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
-			//tmpcolour =    sqrt (sqrt( tmpcolour ));
+			tmpcolour =    sqrt (sqrt( tmpcolour ));
 			
 			// aktuelle mögliche geschwindigkeit durch maximale geschwindigkeit
 			tmpcolour = 1.0 - 

@@ -976,9 +976,10 @@ void openGLrender::setInstance(openGLrender* instance)
 	currentInstance = instance;
 }
 
-bool openGLrender::start(int argc, char* argv[])
+bool openGLrender::start(int argc, char** pferd_argv, bool inverse_graph_switch)
 {
-	glutInit(&argc, argv);
+	glutInit(&argc, pferd_argv);
+
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Pferd");
@@ -990,9 +991,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	// undefiniertes verhalten kann einem den schlaf rauben
-	if( 1 || argv[0] == "graph")
-	if(strcmp(argv[0], "graph") == 0)
+	if(inverse_graph_switch == 0)
 	{
 		render_mode = 0;
 	}

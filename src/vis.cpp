@@ -2,13 +2,19 @@
 
 using namespace std;
 
-vis::vis(Graph* gr, std::list<openGL_Cluster>* circs) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
+vis::vis(int pargc, char** pargv, Graph* gr, std::list<openGL_Cluster>* circs) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
+	pferd_argc = pargc;
+	pferd_argv = pargv;
 	initRenderer(circs);
 }
-vis::vis(Graph* gr) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
+vis::vis(int pargc, char** pargv, Graph* gr) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
+	pferd_argc = pargc;
+	pferd_argv = pargv;
 	init();
 }
-vis::vis() : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(0){
+vis::vis(int pargc, char** pargv) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(0){
+	pferd_argc = pargc;
+	pferd_argv = pargv;
 }
 
 vis::~vis(){
@@ -63,6 +69,11 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 	NodeCount = g->getNodeCount();
 	EdgeCount = g->getEdgeCount();
 	node_data = g->getNodeDataPointer();
+
+	delete[] nodes; nodes = 0;
+	delete[] edges; edges = 0;
+	delete[] shortcut_edges; shortcut_edges = 0;
+	delete[] circles; circles = 0;
 
 	nodes = new openGL_Node_3d[ NodeCount ];
 	edges = new openGL_Edge_Node[2 * ( EdgeCount )];
@@ -152,15 +163,13 @@ bool vis::start(volatile bool* active, bool render_mode)
 {
 	if(render_mode)
 	{
-		char* argument[] = { "volume" };
 		render.setActivePointer(active);
-		return render.start(0,argument);
+		return render.start(pferd_argc, pferd_argv, true);
 	}
 	else
 	{
-		char* argument[] = { "graph" };
 		render.setActivePointer(active);
-		return render.start(0,argument);
+		return render.start(pferd_argc, pferd_argv, false);
 	}
 }
 

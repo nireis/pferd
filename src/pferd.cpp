@@ -20,8 +20,8 @@
 
 using namespace std;
 
-void startVisThread(volatile bool* active, bool* running, bool* renderMode, Graph** g_pp){
-	vis anzeige;
+void startVisThread(int argc, char** argv, volatile bool* active, bool* running, bool* renderMode, Graph** g_pp){
+	vis anzeige(argc, argv);
 	while(*running){
 		if(*renderMode){
 			anzeige.start(active, true);
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]){
 		co.showVis = setVisPerParameter-1;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t_vis = thread(&startVisThread, &active, &running, &renderMode, g_pp);
+		t_vis = thread(&startVisThread, argc, argv, &active, &running, &renderMode, g_pp);
 	}
 
 	clock_t start,finish;
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]){
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	unsigned int c = 1;
+	unsigned int c = -1;
 	while(c){
 		c--;
 		cout << "> Warte auf Runde der Simulation." << endl;

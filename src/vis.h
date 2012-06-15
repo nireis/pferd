@@ -18,6 +18,8 @@ class vis {
 		typedef typename Graph::Edge Edge;
 		typedef typename Graph::EdgesIterator EdgesIterator;
 
+		int pferd_argc;
+		char** pferd_argv;
 		//actual render object
 		openGLrender render;
 		//openGL representation of graph elements
@@ -41,9 +43,9 @@ class vis {
 		void initVis(Graph* g, std::list<openGL_Cluster>* circs);
 		void initVis(Graph* g);
 
-		vis(Graph* gr, std::list<openGL_Cluster>* circs);
-		vis(Graph* gr);
-		vis();
+		vis(int vargc, char** pargv, Graph* gr, std::list<openGL_Cluster>* circs);
+		vis(int vargc, char** pargv, Graph* gr);
+		vis(int vargc, char** pargv);
 		~vis();
 
 		bool start(volatile bool*,bool);

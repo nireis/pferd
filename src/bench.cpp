@@ -59,7 +59,7 @@ void CH_Times(unsigned int runden){
 		<<	" \n";
 
 
-	for(unsigned int i = 0; i < /* graphs_count TODO */ 3; i++){
+	for(unsigned int i = 0; i < graphs_count ; i++){
 		double graph_init_time=0.0;
 		double scgr_init_time=0.0; 
 		double ch_init_time=0.0; 
@@ -415,7 +415,7 @@ void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int source
 				cout << o2m_time/double(sources_count) << " Zeit o2m" << endl;
 			}
 
-			file << current_N
+			file << current_N << " "
 				<< o2m_time << " " 
 				<< o2mch_time << " " 
 				//<< chd_init_time << " "
@@ -713,9 +713,9 @@ int main(){
 	// === === === 
 	
 
-//CH_Times(1);
+CH_Times(1);
 
-//All2AllTimes(1);
+All2AllTimes(1);
 	
 	//One2_All_Times(0, 100, 50);
 	//One2_All_Times(1, 500, 1); // 15 * 4/3 min
@@ -730,7 +730,7 @@ int main(){
 
 //O2O_Times(2000);
 
-O2O_evolution(0, 1000, 100);
+//O2O_evolution(0, 1000, 100);
 //O2O_evolution(1, 1000, 100);
 //O2O_evolution(2, 1000, 200);
 //O2O_evolution(3, 1000, 200);
