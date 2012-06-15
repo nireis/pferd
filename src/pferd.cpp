@@ -27,22 +27,56 @@ bool running = true;
 bool renderMode = true;
 volatile bool active=false;
 
-void startVisThread(int argc, char** argv, volatile bool* active, bool* running, bool* renderMode, Graph** g_pp){
-	vis anzeige(argc, argv);
-	while(*running){
-		if(*renderMode){ 
+struct vis_stuff {
+	int argc;
+	char** argv;
+	volatile bool* active;
+	bool* running;
+	bool* renderMode;
+	Graph** g_pp;
+
+	vis_stuff(int a, char** b, volatile bool* c, bool* d, bool* e, Graph** f) :
+		argc(a),
+		argv(b),
+		active(c),
+		running(d),
+		renderMode(e),
+		g_pp(f)
+	{}
+	//vis_stuff( const vis_stuff& vs ) :
+	//	argc(vs.argc),
+	//	argv(vs.argv),
+	//	active(vs.active),
+	//	running(vs.running),
+	//	renderMode(vs.renderMode),
+	//	g_pp(vs.g_pp)
+	//{}
+	~vis_stuff()
+	{
+		argv=0;
+		active=0;
+		running=0;
+		renderMode=0;
+		g_pp=0;
+	}
+};
+
+void startVisThread( vis_stuff vs ){
+	vis anzeige(vs.argc, vs.argv);
+	while(*vs.running){
+		if(*vs.renderMode){ 
 		// if false draw graph new
 		// if true draw horse
 
-			anzeige.start(active, true);
+			anzeige.start(vs.active, true);
 		}
 		else{
-			if(*g_pp){
-				anzeige.initVis(*g_pp);
-				anzeige.start(active, false);
+			if(*vs.g_pp){
+				anzeige.initVis(*vs.g_pp);
+				anzeige.start(vs.active, false);
 			}
 		}
-		*active = true;
+		*vs.active = true;
 	}
 }
 void setVisHorse(){
@@ -218,7 +252,7 @@ int main(int argc, char *argv[]){
 		co.showVis = setVisPerParameter-1;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t_vis = thread(&startVisThread, argc, argv, &active, &running, &renderMode, g_pp);
+		t_vis = thread( &startVisThread, vis_stuff( argc, argv, &active, &running, &renderMode, g_pp ) );
 	}
 
 	clock_t start,finish;
