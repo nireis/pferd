@@ -161,15 +161,7 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 
 bool vis::start(volatile bool* active, bool render_mode)
 {
-	if(render_mode)
-	{
-		render.setActivePointer(active);
-		return render.start(pferd_argc, pferd_argv, true);
-	}
-	else
-	{
-		render.setActivePointer(active);
-		return render.start(pferd_argc, pferd_argv, false);
-	}
+	render.setActivePointer(active);
+	return render.start(pferd_argc, pferd_argv, render_mode);
 }
 
