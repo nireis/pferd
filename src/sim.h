@@ -42,7 +42,7 @@ class sim{
 
 		unsigned int weights_sum;
 
-		vector< vector<unsigned int>* > loadhistory;
+		vector< vector<unsigned int> > loadhistory;
 
 		int graphtype;
 		unsigned int smallTypes[13];

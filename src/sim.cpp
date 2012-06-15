@@ -9,6 +9,7 @@ sim::sim(Graph* g, travelers* t, conf* c):
 	chd(0),
 	d(0),
 	cfg(c),
+	loadhistory(),
 	graphtype(-1)
 {
 	// Graphtypen anpassen und
@@ -19,7 +20,6 @@ sim::sim(Graph* g, travelers* t, conf* c):
 	recalcEdgevals();
 	normal_rounds_time = 0.0;
 	ch_rounds_time = 0.0;
-	loadhistory.reserve(1);
 }
 sim::~sim(){
 	delete sim_g; sim_g = 0;
@@ -169,12 +169,12 @@ bool sim::eqFound(){
 	double tmp;
 	cout << "enthält Knoten:" << base_g->getEdgeCount() << endl;
 	for(unsigned int i=0; i<base_g->getEdgeCount(); i++){
-		if((*loadhistory[loadhistory.size() -2])[i] == 0){
+		if(loadhistory[loadhistory.size() -2][i] == 0){
 			k++;
 			tmp = 1;
 		}
 		else{
-			tmp = (*loadhistory[loadhistory.size() -1])[i]  / (*loadhistory[loadhistory.size() -2])[i];
+			tmp = loadhistory[loadhistory.size() -1][i]  / loadhistory[loadhistory.size() -2][i];
 		}
 		//cout << tmp << endl;
 		if(tmp >2.0 || tmp < (1/2.0)){
@@ -189,8 +189,8 @@ void sim::recalcEdgevals(){
 	// der graph kopiert die temporären
 	// edge_loads der dijkstras ins eine EdgeData
 	EdgeData* ed = base_g->getEdgeDataPointer();
-	loadhistory.push_back(new vector<unsigned int>);
-	(*loadhistory[loadhistory.size() -1]).resize(base_g->getEdgeCount());
+	loadhistory.resize( loadhistory.size() + 1 );
+	loadhistory[loadhistory.size() -1].resize(base_g->getEdgeCount());
 	
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		
@@ -200,7 +200,7 @@ void sim::recalcEdgevals(){
 		if(loadhistory.size() > 1){
 			double load= 0;
 			for(unsigned int j = loadhistory.size(); j>0;j--){
-				load += (double)(*loadhistory[loadhistory.size() - j])[i];
+				load += (double)loadhistory[loadhistory.size() - j][i];
 				load *= 0.5;
 			}
 			load *=2.0;
@@ -210,7 +210,7 @@ void sim::recalcEdgevals(){
 		else{
 			weight = weightEdge(ed[i].type, (double)ed[i].load);
 		}
-		(*loadhistory[loadhistory.size() -1])[i] = ed[i].load;
+		loadhistory[loadhistory.size() -1][i] = ed[i].load;
 		
 		// runden, um das problem zu umgehen, dass für load=0
 		// das gewicht nicht nur vom typ, sondern auch vom 
