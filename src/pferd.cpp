@@ -290,6 +290,7 @@ int main(int argc, char *argv[]){
 	int rounds = -1;
 
 	// Abfrage nach Modus: SimCH
+	cout << endl;
 	cout << "Übergebe die Anzahl X der Runden , welche berechnet werden sollen:" << endl;
 	cout << "-- X = 0 => Führe Simulationsrunden durch, bis Gleichgewicht erreicht." << endl
 		<< "            (starte danach Visualisierung, falls diese aktiv)." << endl;
@@ -318,7 +319,7 @@ int main(int argc, char *argv[]){
 		// loope unendlich bis eq_found==true und zeige dann evtl Vis an
 		while( ! eq_found ){
 			rounds++;
-			cout << "> Warte auf Runde der Simulation." << endl;
+			cout << endl << "> Warte auf Runde " << rounds << " der Simulation." << endl;
 			s.calcOneRoundCH();
 			eq_found = s.eqFound();
 		}
@@ -331,8 +332,9 @@ int main(int argc, char *argv[]){
 	if( rounds > 0){ 
 		cout << "> >> Modus finde Gleichgewicht in " << rounds << " Runden hintereinander " << endl;
 		// loope rounds runden und zeige vis evtl am ende an
+		unsigned int  running_rounds = 0;
 		for(unsigned int i = 0; i < (unsigned int)(rounds); i++){
-			cout << "> Warte auf Runde der Simulation." << endl;
+			cout << endl << "> Warte auf Runde "<< running_rounds++ <<" der Simulation." << endl;
 			s.calcOneRoundCH();
 		}
 		eq_found = s.eqFound();
@@ -344,12 +346,11 @@ int main(int argc, char *argv[]){
 	else { 
 		// rounds negativ 
 		//=> loope |rounds| runden und zeige nach jeder runde vis an
-		cout << "> >> Modus finde Gleichgewicht in " << "|" << -rounds << "| " << " Runden hintereinander, mit Stop pro Runde " << endl;
+		cout << "> >> Modus finde Gleichgewicht in " << "|" << rounds << "| " << " Runden hintereinander, mit Stop pro Runde " << endl;
 		int running_rounds = 1;
 		for(unsigned int i = 0; i < (unsigned int)(-rounds); i++){
-			cout << "> Warte auf Runde der Simulation." << endl;
+			cout << endl << "> Warte auf Runde "<< running_rounds++ <<" der Simulation." << endl;
 			s.calcOneRoundCH();
-			running_rounds++;
 
 			cout << "Runde " << running_rounds << " fertig";
 			if(co.showVis){
