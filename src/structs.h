@@ -528,6 +528,7 @@ struct conf{
 	bool showVis;
 	bool playSound;
 	bool chConstVerbose;
+	double alpha;
 	std::string tConfFile;
 	std::string soundFile;
 };

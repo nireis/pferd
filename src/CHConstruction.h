@@ -9,6 +9,7 @@
 #include <thread>
 #include <mutex>
 
+
 using namespace std;
 
 struct DijkstraData;
@@ -16,6 +17,8 @@ struct DijkstraData;
 template <typename G>
 class CHConstruction{
 	private:
+		//typedef typename G::RoundEdge Edge;
+		//typedef typename G::RoundEdgesIterator EdgesIterator;
 		typedef typename G::RoundEdge Edge;
 		typedef typename G::RoundEdgesIterator EdgesIterator;
 
