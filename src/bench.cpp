@@ -25,6 +25,8 @@ CH* ch;
 CHDijkstra* chd;
 Dijkstra* d;
 
+const unsigned int threads = 0;
+
 const char* folder = "../benchdata";
 
 const char* fileending = ".txt.grp";
@@ -89,7 +91,7 @@ void CH_Times(unsigned int runden){
 
 
 			start = clock();
-		ch = new CH(g, scg, 1); // starte CH mit einem Thread
+		ch = new CH(g, scg, threads); // starte CH mit #threads
 			finish = clock();
 			ch_init_time += (double(finish)-double(start))/CLOCKS_PER_SEC;
 
@@ -171,7 +173,7 @@ void All2AllTimes(unsigned int runden){
 
 			start = clock();
 		scg = new SCGraph(g);
-		ch = new CH(g, scg, 1); // starte CH mit einem Thread
+		ch = new CH(g, scg, threads); // starte CH mit #threads
 		ch->calcCH(false);
 			finish = clock();
 			ch_constr_time += (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -307,7 +309,7 @@ void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int source
 
 			start = clock();
 		scg = new SCGraph(g);
-		ch = new CH(g, scg, 1); // starte CH mit einem Thread
+		ch = new CH(g, scg, threads); // starte CH mit #threads
 		ch->calcCH(false);
 			finish = clock();
 			ch_constr_time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -502,7 +504,7 @@ void O2O_Times(unsigned int runden){
 
 		scg = new SCGraph(g);
 
-		ch = new CH(g, scg, 1); // starte CH mit einem Thread
+		ch = new CH(g, scg, threads); // starte CH mit #threads
 
 		ch->calcCH(false);
 		cout << "Graph fertig mit " 
@@ -610,7 +612,7 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 
 		scg = new SCGraph(g);
 
-		ch = new CH(g, scg, 1); // starte CH mit einem Thread
+		ch = new CH(g, scg, threads); // starte CH mit #threads
 
 		ch->calcCH(false);
 		cout << "Graph fertig mit " 
@@ -713,9 +715,9 @@ int main(){
 	// === === === 
 	
 
-CH_Times(1);
+//CH_Times(1);
 
-All2AllTimes(1);
+//All2AllTimes(1);
 	
 	//One2_All_Times(0, 100, 50);
 	//One2_All_Times(1, 500, 1); // 15 * 4/3 min
@@ -725,16 +727,16 @@ All2AllTimes(1);
 //One2_All_Times(0, 100, 50);
 //One2_All_Times(1, 700, 1); // 15 * 4/3 min
 //One2_All_Times(2, 1500, 1); // 25 * 4/3 min
-//One2_All_Times(3, 1500, 1); // > 75 * 4/3 min
-//One2_All_Times(4, 25000, 1); // > 75 * 4/3 min
+One2_All_Times(3, 149999, 1); // > 75 * 4/3 min
+One2_All_Times(4, 1499999, 1); // > 75 * 4/3 min
 
-//O2O_Times(2000);
+O2O_Times(1000);
 
 //O2O_evolution(0, 1000, 100);
 //O2O_evolution(1, 1000, 100);
 //O2O_evolution(2, 1000, 200);
 //O2O_evolution(3, 1000, 200);
-//O2O_evolution(4, 1000, 250);
+O2O_evolution(4, 1010, 249);
 
 	return 0;
 }

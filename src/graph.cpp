@@ -16,7 +16,7 @@ Graph::Graph() :
 	edge_data(0),
 	EdgeLoads(0){
 }
-const int Graph::BinID = 50;
+const int Graph::BinID = 51;
 const std::string Graph::dateiendung = "grp";
 
 
@@ -296,10 +296,10 @@ EdgeData Graph::getEdgeData(unsigned int id){
 	return edge_data[id];
 }
 
-Graph::Edge* Graph::getOutEdge(unsigned int edge_id){
+Edge* Graph::getOutEdge(unsigned int edge_id){
 	return out_edges + edge_id;
 }
-Graph::Edge* Graph::getInEdge(unsigned int edge_id){
+Edge* Graph::getInEdge(unsigned int edge_id){
 	return in_edges + edge_data[edge_id].in_index;
 }
 /*
@@ -307,7 +307,7 @@ Graph::Edge* Graph::getInEdge(unsigned int edge_id){
  * genau umgekehrt im vgl. zu getEdgesIt
  * wegen backtracing im dijkstra (?)
  */
-Graph::Edge* Graph::getEdge(bool out1_in0, unsigned int edge_id){
+Edge* Graph::getEdge(bool out1_in0, unsigned int edge_id){
 	if(out1_in0){
 		return out_edges+edge_data[edge_id].out_index;
 	}
@@ -315,10 +315,10 @@ Graph::Edge* Graph::getEdge(bool out1_in0, unsigned int edge_id){
 		return in_edges+edge_data[edge_id].in_index;
 	}
 }
-Graph::Edge* Graph::copyOutEdge(unsigned int edge_id){
+Edge* Graph::copyOutEdge(unsigned int edge_id){
 	return out_edges + edge_id;
 }
-Graph::Edge* Graph::copyInEdge(unsigned int edge_id){
+Edge* Graph::copyInEdge(unsigned int edge_id){
 	return in_edges + edge_id;
 }
 void Graph::addEdgeLoad(unsigned int edge_id){
@@ -383,10 +383,10 @@ SCGraph::SCGraph(Graph* gr) :
 	nodes_in_edges( new AdjEdges[gr->getNodeCount()] ),
 	nodes_in_offs(0),
 	in_edges( 0 ),
-	round_in_edges( new Graph::Edge[gr->getEdgeCount()] ),
+	round_in_edges( new Edge[gr->getEdgeCount()] ),
 	nodes_out_offs(0),
 	out_edges( 0 ),
-	round_out_edges( new Graph::Edge[gr->getEdgeCount()] ),
+	round_out_edges( new Edge[gr->getEdgeCount()] ),
 	node_data(gr->getNodeDataPointer()),
 	edge_data(0),
 	shortcutlist( new list<Shortcut>[gr->getNodeCount()] ),
@@ -542,7 +542,7 @@ unsigned int SCGraph::sortShortcuts(){
 }
 void SCGraph::buildGraph(){
 	
-	list<Graph::Edge>* ValidOutEdges = new list<Graph::Edge>[goodNodesSize];
+	list<Edge>* ValidOutEdges = new list<Edge>[goodNodesSize];
 
 	/* In-Edges Counts auf 0*/
 	for(unsigned int i = 0; i < goodNodesSize; i++){
@@ -554,9 +554,9 @@ void SCGraph::buildGraph(){
 	for(unsigned int i = 0; i < goodNodesSize; i++){
 		unsigned int gn = goodNodes[i];
 		/* Edges zu schwarzen Nodes rauszählen */
-		Graph::EdgesIterator ei = g->getOutEdgesIt(gn);
+		EdgesIterator ei = g->getOutEdgesIt(gn);
 		while(ei.hasNext()){
-			Graph::Edge* te = ei.getNext();
+			Edge* te = ei.getNext();
 			if(goodNodesIndex[te->other_node] != node_count){
 				ValidOutEdges[i].push_back( *te );
 				/* In-Edge bescheid sagen */
@@ -570,7 +570,7 @@ void SCGraph::buildGraph(){
 			Shortcut sc = *si;
 			if( goodNodesIndex[sc.target] != node_count){
 				ValidOutEdges[i].
-					push_back( Graph::Edge(sc.id, sc.value, sc.target) );
+					push_back( Edge(sc.id, sc.value, sc.target) );
 				/* In-Edge bescheid sagen */
 				nodes_in_edges[sc.target].count++;
 			}
@@ -586,8 +586,8 @@ void SCGraph::buildGraph(){
 		cout << "SCGraph Shortcut Merging: brauche neue Edge-Arrays" << endl;
 		delete[] round_out_edges;
 		delete[] round_in_edges;
-		round_out_edges = new Graph::Edge[new_ec];
-		round_in_edges = new Graph::Edge[new_ec];
+		round_out_edges = new Edge[new_ec];
+		round_in_edges = new Edge[new_ec];
 		current_edge_arrays_size = new_ec;
 	}
 	edge_count = new_ec;
@@ -598,7 +598,7 @@ void SCGraph::buildGraph(){
 		/* Out */
 		unsigned int gon = goodNodes[0];
 		nodes_out_edges[gon].start = round_out_edges;
-		Graph::Edge* start_next = round_out_edges + nodes_out_edges[gon].count;
+		Edge* start_next = round_out_edges + nodes_out_edges[gon].count;
 		for(unsigned int i = 1; i < goodNodesSize; i++){
 			unsigned int gn = goodNodes[i];
 			nodes_out_edges[gn].start = start_next;
@@ -632,10 +632,10 @@ void SCGraph::buildGraph(){
 	for(unsigned int i = 0; i < goodNodesSize; i++){
 		unsigned int gn = goodNodes[i];
 		unsigned int ec = nodes_out_edges[gn].count;
-		Graph::Edge* edge = nodes_out_edges[gn].start;
+		Edge* edge = nodes_out_edges[gn].start;
 		while(ec > 0){
 			ValidOutEdges[goodNodesIndex[edge->other_node]].
-				push_front( Graph::Edge(edge->id, edge->value, gn) );
+				push_front( Edge(edge->id, edge->value, gn) );
 			edge++;
 			ec--;
 		}
@@ -669,7 +669,7 @@ void SCGraph::fillGoodNodes(){
 		 compare_uint_pair_asc_by_key);
 }
 
-bool compare_edges_desc_by_lvl(SCGraph::Edge one, SCGraph::Edge two){
+bool compare_edges_desc_by_lvl(Edge one, Edge two){
 	/* one soll vor two */
 	return (one.other_lvl > two.other_lvl);
 }
@@ -767,7 +767,7 @@ void SCGraph::buildGraphFinal(){
 		in_edges[ i ] = E(s.id, s.value, s.source );
 	}
 	/* Graph Edges übernehmen */
-	Graph::EdgesIterator eit;
+	EdgesIterator eit;
 	for(unsigned int c = 0; c < node_count; c++){
 		eit = g->getOutEdgesIt(c);
 		o = nodes_out_offs[c + 1] - 1;
@@ -891,16 +891,16 @@ EdgeData SCGraph::getEdgeData(unsigned int edge_id){
 	return edge_data[edge_id];
 }
 
-SCGraph::Edge* SCGraph::getOutEdge(unsigned int edge_id){
+Edge* SCGraph::getOutEdge(unsigned int edge_id){
 	return out_edges+edge_data[edge_id].out_index;
 }
-SCGraph::Edge* SCGraph::getInEdge(unsigned int edge_id){
+Edge* SCGraph::getInEdge(unsigned int edge_id){
 	return in_edges+edge_data[edge_id].in_index;
 }
-SCGraph::Edge* SCGraph::copyOutEdge(unsigned int edge_id){
+Edge* SCGraph::copyOutEdge(unsigned int edge_id){
     	return out_edges + edge_id;
 }
-SCGraph::Edge* SCGraph::copyInEdge(unsigned int edge_id){
+Edge* SCGraph::copyInEdge(unsigned int edge_id){
 		return in_edges + edge_id;
 }
 /*
@@ -908,7 +908,7 @@ SCGraph::Edge* SCGraph::copyInEdge(unsigned int edge_id){
  * genau umgekehrt im vgl. zu getEdgesIt
  * wegen backtracing im dijkstra (?)
  */
-SCGraph::Edge* SCGraph::getEdge(bool out1_in0, unsigned int edge_id){
+Edge* SCGraph::getEdge(bool out1_in0, unsigned int edge_id){
 	if(out1_in0){
 		return out_edges+edge_data[edge_id].out_index;
 	}

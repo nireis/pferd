@@ -19,8 +19,8 @@ class CHConstruction{
 	private:
 		//typedef typename G::RoundEdge Edge;
 		//typedef typename G::RoundEdgesIterator EdgesIterator;
-		typedef typename G::RoundEdge Edge;
-		typedef typename G::RoundEdgesIterator EdgesIterator;
+		//typedef GEdge Edge;
+		//typedef GEdgesIterator EdgesIterator;
 
 		// struct für die Elemente aus U des Dijkstra.
 		struct U_element{

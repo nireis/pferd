@@ -46,6 +46,7 @@ class travelCenter {
 		 *           use given radius and count to determine
 		 *           sources
 		 *
+		 * mode 6 => one to random count
 		 */
 		int mode;
 		//unsigned int max_travelers;
@@ -82,6 +83,7 @@ class travelCenter {
 		void mode3();
 		void mode4();
 		void mode5();
+		void mode6();
 		
 		bool run(unsigned int i);
 

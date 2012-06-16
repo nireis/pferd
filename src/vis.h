@@ -15,8 +15,8 @@
  
 class vis {
 	private:
-		typedef Graph::Edge Edge;
-		typedef Graph::EdgesIterator EdgesIterator;
+		//typedef GEdge Edge;
+		//typedef GEdgesIterator EdgesIterator;
 
 		int pferd_argc;
 		char** pferd_argv;

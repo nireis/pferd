@@ -40,30 +40,64 @@ struct ParserEdge {
  * aufruft, interessiert nur der "andere Knoten"
  * die ID verweist auf die zugehörige Stelle im Daten-Array
  */
-struct GEdge {
-	GEdge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
-	GEdge(unsigned int i, unsigned int v, unsigned int o) : 
-		id(i), value(v), other_node(o) {}
-	
-	unsigned int id;
-	unsigned int value;
-	unsigned int other_node;
+//struct GEdge {
+//	GEdge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
+//	GEdge(unsigned int i, unsigned int v, unsigned int o) : 
+//		id(i), value(v), other_node(o) {}
+//	
+//	unsigned int id;
+//	unsigned int value;
+//	unsigned int other_node;
+//
+//	GEdge& operator=(GEdge const& e){
+//		id = e.id;
+//		value = e.value;
+//		other_node = e.other_node;
+//		return *this;
+//	}
+//
+//	GEdge(const GEdge& e) : 
+//		id(e.id), value(e.value), other_node(e.other_node) {}
+//};
+//struct SCGEdge {
+//	SCGEdge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
+//	SCGEdge(unsigned int i, unsigned int v, unsigned int o) : 
+//		id(i), value(v), other_node(o) {}
+//	SCGEdge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
+//		id(i), value(v), other_node(o), other_lvl(ol) {}
+//	
+//	unsigned int id;
+//	unsigned int value;
+//	unsigned int other_node;
+//	unsigned int other_lvl; 
+//
+//	SCGEdge& operator=(SCGEdge const& e){
+//		id = e.id;
+//		value = e.value;
+//		other_node = e.other_node;
+//		other_lvl = e.other_lvl;
+//		return *this;
+//	}
+//	SCGEdge& operator=(GEdge const& e){
+//		id = e.id;
+//		value = e.value;
+//		other_node = e.other_node;
+//		other_lvl = 0;
+//		return *this;
+//	}
+//
+//	SCGEdge(const SCGEdge& e) : 
+//		id(e.id), value(e.value), other_node(e.other_node), other_lvl(e.other_lvl) {}
+//	SCGEdge(const GEdge& e) : 
+//		id(e.id), value(e.value), other_node(e.other_node), other_lvl(0) {}
+//};
 
-	GEdge& operator=(GEdge const& e){
-		id = e.id;
-		value = e.value;
-		other_node = e.other_node;
-		return *this;
-	}
 
-	GEdge(const GEdge& e) : 
-		id(e.id), value(e.value), other_node(e.other_node) {}
-};
-struct SCGEdge {
-	SCGEdge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
-	SCGEdge(unsigned int i, unsigned int v, unsigned int o) : 
+struct Edge {
+	Edge() : id(((unsigned int)0)-1), value(0), other_node(0) {}
+	Edge(unsigned int i, unsigned int v, unsigned int o) : 
 		id(i), value(v), other_node(o) {}
-	SCGEdge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
+	Edge(unsigned int i, unsigned int v, unsigned int o, unsigned int ol) : 
 		id(i), value(v), other_node(o), other_lvl(ol) {}
 	
 	unsigned int id;
@@ -71,26 +105,19 @@ struct SCGEdge {
 	unsigned int other_node;
 	unsigned int other_lvl; 
 
-	SCGEdge& operator=(SCGEdge const& e){
+	Edge& operator=(Edge const& e){
 		id = e.id;
 		value = e.value;
 		other_node = e.other_node;
 		other_lvl = e.other_lvl;
 		return *this;
 	}
-	SCGEdge& operator=(GEdge const& e){
-		id = e.id;
-		value = e.value;
-		other_node = e.other_node;
-		other_lvl = 0;
-		return *this;
-	}
 
-	SCGEdge(const SCGEdge& e) : 
+	Edge(const Edge& e) : 
 		id(e.id), value(e.value), other_node(e.other_node), other_lvl(e.other_lvl) {}
-	SCGEdge(const GEdge& e) : 
-		id(e.id), value(e.value), other_node(e.other_node), other_lvl(0) {}
 };
+
+
 struct EdgeData {
 	EdgeData() : out_index(0), in_index(0), distance(0), type(0), load(0), colour(0), value(0) {}
 	EdgeData(unsigned int o, unsigned int i, unsigned int d, unsigned int t, unsigned int l) : 
@@ -368,6 +395,74 @@ class Andrenator_P {
 			return start++;
 		}
 };
+class EdgesIterator {
+	private:
+		unsigned int max;
+		Edge* start;
+	public:
+		EdgesIterator() : max(0), start(0) {}
+		EdgesIterator(Edge* strt, unsigned int mx) : 
+			max(mx), start(strt) {}
+
+		~EdgesIterator(){
+			start = 0;
+		}
+		
+		bool hasNext() const {
+			return max != 0;
+		}
+
+		Edge* getNext() {
+			--max;
+			return start++;
+		}
+};
+
+//class GEdgesIterator {
+//	private:
+//		unsigned int max;
+//		GEdge* start;
+//	public:
+//		GEdgesIterator() : max(0), start(0) {}
+//		GEdgesIterator(GEdge* strt, unsigned int mx) : 
+//			max(mx), start(strt) {}
+//
+//		~GEdgesIterator(){
+//			start = 0;
+//		}
+//		
+//		bool hasNext() const {
+//			return max != 0;
+//		}
+//
+//		GEdge* getNext() {
+//			--max;
+//			return start++;
+//		}
+//};
+//class SCGEdgesIterator {
+//	private:
+//		unsigned int max;
+//		SCGEdge* start;
+//	public:
+//		SCGEdgesIterator() : max(0), start(0) {}
+//		SCGEdgesIterator(SCGEdge* strt, unsigned int mx) : 
+//			max(mx), start(strt) {}
+//
+//		~SCGEdgesIterator(){
+//			start = 0;
+//		}
+//		
+//		bool hasNext() const {
+//			return max != 0;
+//		}
+//
+//		SCGEdge* getNext() {
+//			--max;
+//			return start++;
+//		}
+//};
+
 
 class bitvec {
 	private:

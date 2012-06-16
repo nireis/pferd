@@ -17,8 +17,8 @@ class SCGraph;
  */
 class Graph {
 	public:
-		typedef GEdge Edge;
-		typedef Andrenator_P<Edge> EdgesIterator;
+		//typedef GEdge Edge;
+		//typedef GEdgesIterator EdgesIterator;
 
 	/*
 	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
@@ -200,10 +200,10 @@ class Graph {
  */
 class SCGraph {
 	public:
-		typedef SCGEdge Edge;
-		typedef Andrenator_P<Edge> EdgesIterator;
-		typedef GEdge RoundEdge;
-		typedef Andrenator_P<GEdge> RoundEdgesIterator;
+		//typedef SCGEdge Edge;
+		//typedef SCGEdgesIterator EdgesIterator;
+		//typedef GEdge RoundEdge;
+		//typedef GEdgesIterator RoundEdgesIterator;
 	
 	private:
 		typedef Edge E;
@@ -226,11 +226,11 @@ class SCGraph {
 		unsigned int current_edge_arrays_size;
 
 		struct AdjEdges {
-			Graph::Edge* start;
+			Edge* start;
 			unsigned int count;
 
 			AdjEdges() : start(0), count(0) {}
-			AdjEdges(Graph::Edge* s, unsigned int c) : start(s), count(c) {}
+			AdjEdges(Edge* s, unsigned int c) : start(s), count(c) {}
 		};
 
 		AdjEdges* nodes_out_edges;
@@ -238,10 +238,10 @@ class SCGraph {
 
 		N* nodes_in_offs;
 		E* in_edges; 
-		GEdge* round_in_edges;
+		Edge* round_in_edges;
 		N* nodes_out_offs;
 		E* out_edges;
-		GEdge* round_out_edges;
+		Edge* round_out_edges;
 
 		ND* node_data;
 		ED* edge_data;
@@ -331,15 +331,15 @@ class SCGraph {
 			return EdgesIterator(in_edges + nifs , c ); 
 		}
 
-		Graph::EdgesIterator getOutEdgesIt_Round(unsigned int node){
-			Graph::Edge* s = nodes_out_edges[node].start ;
+		EdgesIterator getOutEdgesIt_Round(unsigned int node){
+			Edge* s = nodes_out_edges[node].start ;
 			unsigned int c = nodes_out_edges[node].count ;
-			return Graph::EdgesIterator(s, c ); 
+			return EdgesIterator(s, c ); 
 		}
-		Graph::EdgesIterator getInEdgesIt_Round(unsigned int node){
-			Graph::Edge* s = nodes_in_edges[node].start ;
+		EdgesIterator getInEdgesIt_Round(unsigned int node){
+			Edge* s = nodes_in_edges[node].start ;
 			unsigned int c = nodes_in_edges[node].count ;
-			return Graph::EdgesIterator(s , c ); 
+			return EdgesIterator(s , c ); 
 		}
 		/*
 		 * out0_in1 == false == 0 => gebe OutEdges-Iterator
