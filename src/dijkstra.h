@@ -9,6 +9,9 @@ using namespace std;
 
 class Dijkstra{
 	private:
+		typedef Graph::Edge Edge;
+		typedef Graph::EdgesIterator EdgesIterator;
+
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
 			 unsigned int distance;

@@ -49,7 +49,7 @@ void travelCenter::clearStuff(){
 void travelCenter::mode1(){
 	/* all to all */
 	unsigned int s = t->traffic.size();
-	t->traffic.resize(1);
+	t->traffic.resize(s+1);
 	//t->traffic.push_back(pendler());
 	t->traffic[s+0].source.resize(g->getNodeCount());
 	t->traffic[s+0].target.resize(g->getNodeCount());
@@ -72,7 +72,7 @@ void travelCenter::mode2(){
 	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(count);
+	t->traffic.resize(s+count);
 	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
 		t->traffic[s+i].target.resize(1);
@@ -115,7 +115,7 @@ void travelCenter::mode3(){
 	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(count);
+	t->traffic.resize(s+count);
 	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
 		t->traffic[s+i].target.resize(nc);
@@ -193,7 +193,7 @@ void travelCenter::mode4(){
 		&(t->circles)
 		);
 
-	t->traffic.resize( 1 );
+	t->traffic.resize(s+1);
 	//t->traffic.push_back(pendler());
 	t->traffic[s+0].source.reserve(starts.size());
 	t->traffic[s+0].target.reserve(targets.size());

@@ -9,6 +9,9 @@ sim::sim(Graph* g, travelers* t, conf* c):
 	chd(0),
 	d(0),
 	cfg(c),
+	loadhistory(),
+	currentweight(g->getEdgeCount(), 0.0),
+	lastweight(g->getEdgeCount(), 0.0),
 	graphtype(-1)
 {
 	// Graphtypen anpassen und
@@ -47,14 +50,14 @@ void sim::calcOneRoundNormal(){
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 	normal_rounds_time = timer;
-	cout << "Dijkstra Round, initialisierung Zeit: " << normal_rounds_time << endl;
+	cout << "Sim: Dijkstra Round, initialisierung Zeit: " << normal_rounds_time << endl;
 
 	chd = 0;
 
 	simTravelers();
 
-	cout << "Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
-	cout << "> >> "  << normal_rounds_time << endl;
+	cout << "Sim: Dijkstra Round, Zeit insgesammt: " << normal_rounds_time << endl;
+	cout << "Sim: >> "  << normal_rounds_time << endl;
 
 	// graph übernimmt EdgeLoads
 	base_g->updateEdgeLoads();
@@ -78,21 +81,22 @@ void sim::calcOneRoundCH(){
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
 	ch_rounds_time = timer;
-	cout << "CHDijkstra Round SCGraph init. Zeit: " << ch_rounds_time << endl;
+	cout << "Sim: CHDijkstra Round, SCGraph init. Zeit: " << ch_rounds_time << endl;
 
 		start = clock();
 	ch = new CH(base_g, sim_g);
 	ch->calcCH(cfg->chConstVerbose);
 		finish = clock();
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "CHDijkstra Round CH Konstruktion Zeit: " << timer << endl;
+	cout << "Sim: CHDijkstra Round, CH Konstruktion Zeit: " << timer << endl;
 	ch_rounds_time += timer;
+	cout << "Sim: CHDijkstra Round, SCGraph Shortcuts: " << sim_g->getShortcutCount() << endl;
 
 		start = clock();
 	chd = new CHDijkstra(sim_g);
 		finish = clock();
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "CHDijkstra Round, CHDijkstras initialisierung Zeit: " << timer << endl;
+	cout << "Sim: CHDijkstra Round, CHDijkstras initialisierung Zeit: " << timer << endl;
 	ch_rounds_time += timer;
 	d = 0;
 
@@ -105,10 +109,10 @@ void sim::calcOneRoundCH(){
 	base_g->getEdgeLoads(sim_g);
 		finish = clock();
 		timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
-	cout << "CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
+	cout << "Sim: CHDijkstra Round, verteilen der Shortcut Loads Zeit: " << timer << endl;
 	ch_rounds_time += timer;
-	cout << "CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
-	cout << "> >> " << ch_rounds_time << endl;
+	cout << "Sim: CHDijkstra Round, Zeit insgesammt: " << ch_rounds_time << endl;
+	cout << "Sim: >> " << ch_rounds_time << endl;
 
 	recalcEdgevals();
 	base_g->updateEdgeValues();
@@ -120,49 +124,104 @@ void sim::calcOneRoundCH(){
 	delete sim_g; sim_g = 0;
 	delete ch; ch = 0;
 	delete chd; chd = 0;
+	
+	if(eqFound()){
+		
+	}
 }
 void sim::calcOneRoundBoth(){
-/* TODO */
-	sim_g = new SCGraph(base_g);
-	
-	ch = new CH(base_g, sim_g);
-	ch->calcCH(cfg->chConstVerbose);
-	
-	chd = new CHDijkstra(sim_g);
-	d = new Dijkstra(base_g);
-
-	simTravelers();
-
-	// graph übernimmt EdgeLoads
-	
-	// TODO welcher graph der beiden wird angezeigt ?
-	//base_g->updateEdgeLoads();
-	sim_g->updateEdgeLoads();
-	sim_g->shareShortcutLoads();
-	base_g->getEdgeLoads(sim_g);
-
-	recalcEdgevals();
-	base_g->updateEdgeValues();
-
-	// einfärben der kanten im base_g Graph
-	paintEdges();
-
-	// aufräumen der graphen und ch ?
-	delete d; d = 0;
-	delete sim_g; sim_g = 0;
-	delete ch; ch = 0;
-	delete chd; chd = 0;
+/* TODO ? */
 }
 bool sim::eqFound(){
+	unsigned int j = 0;
+	unsigned int k = 0;
+	unsigned int w = 0;
+	double tmp;
+	cout << "===============>enthält Knoten:" << base_g->getEdgeCount() << endl;
+	for(unsigned int i=0; i<base_g->getEdgeCount(); i++){
+		if(loadhistory[loadhistory.size() -2][i] == 0){
+			k++;
+			tmp = 1;
+		}
+		else{
+			tmp = loadhistory[loadhistory.size() -1][i]  / loadhistory[loadhistory.size() -2][i];
+		}
+		//cout << tmp << endl;
+		if(tmp >2.0 || tmp < (1/2.0)){
+			j++;
+		}
+	}
+	cout << "===============>loadänderung größer 100%: " << j << " von " << base_g->getEdgeCount() << endl;
+	cout << "===============>zuletzt nicht benutzte kanten : " << k << endl;
+	
+	for(unsigned int i=0; i< base_g->getEdgeCount(); i++){
+		if(lastweight[i]==0.0){
+			if (currentweight[i] != 0.0){
+				cout << "===============>wert hat sich von 0 auf " << currentweight[i] << " geändert." << endl;
+				tmp = 0.0;
+			}
+			else{
+				tmp = 1.0;
+			}
+		}
+		else{
+			tmp = currentweight[i]/lastweight[i];
+		}
+		if (tmp >1.1 || tmp < 1.0/(1.1)){
+			w++;
+		}
+	}
+	cout << "==============================>>weightänderung größer 10%: " << w << " von " << base_g->getEdgeCount() << endl;
+	
+	
 	return false;
 }
 void sim::recalcEdgevals(){
 	// der graph kopiert die temporären
 	// edge_loads der dijkstras ins eine EdgeData
 	EdgeData* ed = base_g->getEdgeDataPointer();
+
+
+	loadhistory.resize( loadhistory.size() + 1 );
+	loadhistory[loadhistory.size() -1].resize(base_g->getEdgeCount());
+
+	
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
+		
 		double dist = (double) ed[i].distance;
-		double weight = weightEdge( ed[i].type, ed[i].load );
+		double weight;
+		lastweight[i]=currentweight[i];
+
+
+
+
+
+		loadhistory[loadhistory.size() -1][i] = ed[i].load;
+
+		if(loadhistory.size() > 1){
+			double load= (double)loadhistory[0][i];
+			for(unsigned int j = 0; j < loadhistory.size(); j++){
+				load += (double)loadhistory[j][i];
+				load *= 0.5;
+			}
+			load *=2.0;
+			//weight = weightEdge( ed[i].type, (cfg->alpha * (double)ed[i].load) +((1-cfg->alpha) * (double)(*loadhistory[loadhistory.size() - 2])[i] ) );
+
+			weight = weightEdge( ed[i].type, load);
+		}
+		else{
+			weight = weightEdge(ed[i].type, (double)ed[i].load);
+		}
+		
+
+		//weight = weightEdge( ed[i].type, (cfg->alpha * (double)ed[i].load) +((1-cfg->alpha) * (double)(*loadhistory[loadhistory.size() - 2])[i] ) );
+		
+
+
+
+		currentweight[i] = floor( weight + 1.2 );
+
+		// weight = weightEdge( ed[i].type, (double)ed[i].load );
 		// runden, um das problem zu umgehen, dass für load=0
 		// das gewicht nicht nur vom typ, sondern auch vom 
 		// parameter a abhängt
@@ -175,7 +234,6 @@ void sim::recalcEdgevals(){
 
 		// gerundeter neuer wert für die kante
 		unsigned int newval = (unsigned int)( floor(value +0.5)) ;
-		//cout << "Edge " << i << " old val: " << ed[i].value <<  ", new val: " << newval << ", type: " << ed[i].type << ", load: " << ed[i].load << endl;
 		ed[i].value = newval;
 	}
 	// der graph übernimmt die neuen edge_values
@@ -183,7 +241,7 @@ void sim::recalcEdgevals(){
 }
 
 void sim::simTravelers(){
-	std::cout << "> arbeite Routen ab" << std::endl;
+	std::cout << "Sim: arbeite Routen ab" << std::endl;
 	// Alle Traveler fahren lassen.
 	weights_sum = 0;
 
@@ -214,7 +272,7 @@ void sim::simTravelers(){
 						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 					many2one_chdtimer += timer;
 					many2one_chdcounter ++;
-					weights_sum += tmp_pendler->weight * src->size();
+					weights_sum += tmp_pendler->weight ;//* src->size();
 				}
 			}
 			else if(srcsize < tgtsize){
@@ -225,7 +283,7 @@ void sim::simTravelers(){
 						timer = (double(finish)-double(start))/CLOCKS_PER_SEC;
 					one2many_chdtimer += timer;
 					one2many_chdcounter ++;
-					weights_sum += tmp_pendler->weight * tgt->size();
+					weights_sum += tmp_pendler->weight ;//* tgt->size();
 				}
 			}
 			else if(srcsize == 1){ // Beide sizes sind 1.
@@ -250,15 +308,15 @@ void sim::simTravelers(){
 			}
 		}
 		std::cout 
-			<< "Many to One CHDijkstras: " << many2one_chdcounter 
+			<< "Sim: Many to One CHDijkstras: " << many2one_chdcounter 
 			<< ", insg. Zeit: " << many2one_chdtimer 
 			<< ", Zeit durchschnittlich: " << many2one_chdtimer/many2one_chdcounter << std::endl;
 		std::cout 
-			<< "One to Many CHDijkstras: " << one2many_chdcounter 
+			<< "Sim: One to Many CHDijkstras: " << one2many_chdcounter 
 			<< ", insg. Zeit: " << one2many_chdtimer 
 			<< ", Zeit durchschnittlich: " << one2many_chdtimer/one2many_chdcounter << std::endl;
 		std::cout 
-			<< "One to One CHDijkstras: " << one2one_chdcounter 
+			<< "Sim: One to One CHDijkstras: " << one2one_chdcounter 
 			<< ", insg. Zeit: " << one2one_chdtimer << ", Zeit durchschnittlich: " 
 			<< one2one_chdtimer/one2one_chdcounter << std::endl;
 		ch_rounds_time += one2one_chdtimer + many2one_chdtimer + one2many_chdtimer;
@@ -323,15 +381,15 @@ void sim::simTravelers(){
 			}
 		}
 		std::cout 
-			<< "Many to One Dijkstras: " << many2one_dcounter 
+			<< "Sim: Many to One Dijkstras: " << many2one_dcounter 
 			<< ", insg. Zeit: " << many2one_dtimer 
 			<< ", Zeit durchschnittlich: " << many2one_dtimer/many2one_dcounter << std::endl;
 		std::cout 
-			<< "One to Many Dijkstras: " << one2many_dcounter 
+			<< "Sim: One to Many Dijkstras: " << one2many_dcounter 
 			<< ", insg. Zeit: " << one2many_dtimer 
 			<< ", Zeit durchschnittlich: " << one2many_dtimer/one2many_dcounter << std::endl;
 		std::cout 
-			<< "One to One Dijkstras: " << one2one_dcounter 
+			<< "Sim: One to One Dijkstras: " << one2one_dcounter 
 			<< ", insg. Zeit: " << one2one_dtimer << ", Zeit durchschnittlich: " 
 			<< one2one_dtimer/one2one_dcounter << std::endl;
 		normal_rounds_time += one2one_dtimer + many2one_dtimer + one2many_dtimer;
@@ -436,7 +494,7 @@ void sim::setGraphTypesRight(){
 		}
 	}
 }
-double sim::weightEdge(unsigned int type, unsigned int load){
+double sim::weightEdge(unsigned int type, double load){
 	double a, b;
 	switch(type){
 		case 130:
@@ -520,10 +578,17 @@ void sim::paintEdges(){
 		double tmpcolour =  0.0 ;
 		
 		if(ed[i].load != 0){
-			tmpcolour = (double)ed[i].load / (double)weights_sum  ;
-			//tmpcolour = sqrt( sqrt( log(tmpcolour*(exp(2.0)-1.0) + 1.0) ));
+			//tmpcolour = (double)ed[i].load / (double)weights_sum  ;
+			//tmpcolour = log(tmpcolour*(exp(2.0)-1.0) + 1.0) ;
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
-			tmpcolour =   sqrt( sqrt (sqrt( tmpcolour )));
+			//tmpcolour =    sqrt (sqrt( tmpcolour ));
+			
+			// aktuelle mögliche geschwindigkeit durch maximale geschwindigkeit
+			tmpcolour = 1.0 - 
+				(
+				 (100.0 * (double(ed[i].distance) / double(ed[i].value)) ) 
+				 / double(ed[i].type)
+				);
 			
 		}
 

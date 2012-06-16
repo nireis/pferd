@@ -9,6 +9,9 @@ using namespace std;
 
 class CHDijkstra{
 	private:
+		typedef SCGraph::EdgesIterator EdgesIterator;
+		typedef SCGraph::Edge Edge;
+
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
 			 unsigned int distance;

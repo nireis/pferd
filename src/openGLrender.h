@@ -215,7 +215,7 @@ public:
 	~openGLrender();
 
 	//starts the visualization
-	bool start(int argc, char* argv[]);
+	bool start(int argc, char**, bool);
 	//set methods
 	void setNodeCount(int);
 	void setEdgeCount(int);

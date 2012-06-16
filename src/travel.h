@@ -8,18 +8,6 @@
 #include <vector>
 #include <list>
 
-/*
-struct pendler {
-	vector<unsigned int> source;
-	vector<unsigned int> target;
-};
-
-struct travelers {
-	vector<pendler> traffic;
-	list<openGL_Cluster> circles;
-};
-*/
-
 class travelCenter {
 	private:
 		travelCenter();
