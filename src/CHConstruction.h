@@ -68,9 +68,6 @@ class CHConstruction{
 			// Standarddaten
 			vector<bool> found;
 			priority_queue<U_element, vector<U_element>, Compare_U_element> U;
-			// Attribute um mehrere kürzeste Pfade festzustellen.
-			unsigned int lastDist;
-			map<unsigned int, Shortcut> sameDist;
 			// Reset Liste, um zu wissen welche Felder zurück
 			// gesetzt werden müssen. Sollte Laufzeit verbessern.
 			list<unsigned int> resetlist;
