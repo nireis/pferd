@@ -278,8 +278,8 @@ void All2AllTimes(unsigned int runden){
 	cout << dataname << " Berechnung fertig. " << endl;
 }
 
-void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int sources_count){
-	string dataname = string(graphs[i]).replace(0,8,"")+"-"+"one_to_All_times.dat";
+void One2_N_Times(unsigned int i, unsigned int max_targets, unsigned int up_counter, unsigned int sources_count){
+	string dataname = string(graphs[i]).replace(0,8,"")+"-"+"one_to_n_times.dat";
 	cout << "Starte " << dataname << endl;
 	ofstream file;
 	file.open(string(folder)+"/"+dataname);
@@ -348,7 +348,7 @@ void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int source
 		unsigned int max_rand = RAND_MAX - (RAND_MAX % NodeCount);
 
 		// lege zufällig permutierte arrays an
-		vector<unsigned int> target(g->getNodeCount());
+		vector<unsigned int> target(max_targets);
 		vector<unsigned int> source(sources_count);
 		for(unsigned int j=0; j < sources_count; j++){
 			unsigned int ran = rand();
@@ -357,25 +357,14 @@ void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int source
 			ran = ran % NodeCount;
 			source[j] = ran;
 		}
-		for(unsigned int j = 0; j < g->getNodeCount(); j++)
+		for(unsigned int j = 0; j < max_targets; j++)
 		{
-			target[j] = j;
-		}
-		for(unsigned int j = 0; j < g->getNodeCount(); j++)
-		{
-			unsigned int randIndex1 = rand();
-			while( randIndex1 > max_rand )
-				randIndex1 = rand();
-			randIndex1 = randIndex1 % NodeCount;
+			unsigned int ran = rand();
+			while( ran > max_rand )
+				ran = rand();
+			ran = ran % NodeCount;
 
-			unsigned int randIndex2 = rand();
-			while( randIndex2 > max_rand )
-				randIndex2 = rand();
-			randIndex2 = randIndex2 % NodeCount;
-
-			unsigned int tmp = target[randIndex1];
-			target[randIndex1] = target[randIndex2];
-			target[randIndex2] = tmp;
+			target[j] = ran;
 		}
 		vector<unsigned int> target_plate;
 		current_N = 1;
@@ -391,7 +380,7 @@ void One2_All_Times(unsigned int i, unsigned int up_counter, unsigned int source
 			finish = clock();
 			d_init_time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 
-		while(current_N < NodeCount)
+		while(current_N <= max_targets)
 		{
 
 			{
@@ -715,28 +704,23 @@ int main(){
 	// === === === 
 	
 
-//CH_Times(1);
+CH_Times(1);
 
-//All2AllTimes(1);
+All2AllTimes(1);
 	
-	//One2_All_Times(0, 100, 50);
-	//One2_All_Times(1, 500, 1); // 15 * 4/3 min
-	//One2_All_Times(2, ,1000 1); // 25 * 4/3 min
-	//One2_All_Times(3, 1000, 1); // > 75 * 4/3 min
-	//One2_All_Times(4, 10000, 1); // > 75 * 4/3 min
-//One2_All_Times(0, 100, 50);
-//One2_All_Times(1, 700, 1); // 15 * 4/3 min
-//One2_All_Times(2, 1500, 1); // 25 * 4/3 min
-One2_All_Times(3, 149999, 1); // > 75 * 4/3 min
-One2_All_Times(4, 1499999, 1); // > 75 * 4/3 min
+One2_N_Times(0, 1013, 100, 1);
+One2_N_Times(1, 1013, 100, 1);
+One2_N_Times(2, 1013, 200, 1);
+One2_N_Times(3, 1013, 250, 1);
+One2_N_Times(4, 1013, 250, 1);
 
 O2O_Times(1000);
 
-//O2O_evolution(0, 1000, 100);
-//O2O_evolution(1, 1000, 100);
-//O2O_evolution(2, 1000, 200);
-//O2O_evolution(3, 1000, 200);
-O2O_evolution(4, 1010, 249);
+O2O_evolution(0, 1010, 100);
+O2O_evolution(1, 1010, 100);
+O2O_evolution(2, 1010, 200);
+O2O_evolution(3, 1010, 250);
+O2O_evolution(4, 1010, 250);
 
 	return 0;
 }
