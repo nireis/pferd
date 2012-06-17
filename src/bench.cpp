@@ -141,8 +141,10 @@ void All2AllTimes(unsigned int runden){
 		<< ", ch_constr_time"
 		//<<	", o2o" 
 		//<<	", o2och"
-		<<	", o2m"
-		<<	", o2mch"
+		<<	", o2m all"
+		<<	", o2mch all"
+		<<	", o2m per dijk"
+		<<	", o2mch per dijk"
 		<< ", init_time_chd"
 		<< ", init_time_d"
 		<<	", cleanup_time_chd"
@@ -265,6 +267,8 @@ void All2AllTimes(unsigned int runden){
 			<< ch_constr_time/double(runden) << " "
 			//<< o2o/double(runden) << " "
 		 	//<< o2och/double(runden) << " " 
+		 	<< o2m/double(runden) << " " 
+		 	<< o2mch/double(runden) << " " 
 		 	<< o2m/double(runden)/double(NodeCount) << " " 
 		 	<< o2mch/double(runden)/double(NodeCount) << " " 
 		 	<< chd_init_time/double(runden) << " "
@@ -335,6 +339,7 @@ void One2_N_Times(unsigned int i, unsigned int max_targets, unsigned int up_coun
 			<< ", current_N"
 			<< ", o2m_time"
 			<< ", o2mch_time"
+			<< ", o2mch_time + ch_constr_time"
 			//<< ", chd_init_time"
 			//<< ", d_init_time"
 			//<< ", chd_cleanup"
@@ -409,6 +414,7 @@ void One2_N_Times(unsigned int i, unsigned int max_targets, unsigned int up_coun
 			file << current_N << " "
 				<< o2m_time << " " 
 				<< o2mch_time << " " 
+				<< o2mch_time + ch_constr_time << " "
 				//<< chd_init_time << " "
 				//<< d_init_time << " "
 				//<< chd_cleanup << " "
@@ -585,6 +591,7 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 
 		double o2o_time=0.0;
 		double o2och_time=0.0;
+		double ch_calc_time;
 		unsigned int NodeCount=0;
 		unsigned int EdgeCount=0;
 		unsigned int ShortcutCount=0;
@@ -599,11 +606,13 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 			NodeCount = g->getNodeCount();
 			EdgeCount = g->getEdgeCount();
 
+			start = clock();
 		scg = new SCGraph(g);
-
 		ch = new CH(g, scg, threads); // starte CH mit #threads
-
 		ch->calcCH(false);
+			finish = clock();
+			ch_calc_time = (double(finish)-double(start))/CLOCKS_PER_SEC;
+
 		cout << "Graph fertig mit " 
 			<< scg->getShortcutCount() << " Shortcuts"<< endl;
 
@@ -617,12 +626,22 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 		<< "Graph NodeCount"
 		<<	", EdgeCount"
 		<<	", ShortcutCount"
+		<< ", CH Calc Time"
 		<<	" \n";
 	file << "# " 
 		<< NodeCount <<" "
 		<<	EdgeCount <<" "
 		<<	ShortcutCount <<" "
+		<< ch_calc_time << " "
 		<<	" \n";
+
+	file << "# "
+		<< "current_Pairs_count" << ", "
+		<< "o2o_time/query" << ", " 
+		<< "o2och_time/query" << ", " 
+		<< "o2o_time all pairs" << ", " 
+		<< "o2och_time all pairs + ch_calc_time" << " "
+		<< " \n";
 
 
 		// random pairs erzeugen
@@ -646,7 +665,7 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 		cout << "Starte CHDijkstras " << runden << endl;
 
 			start = clock();
-		for(unsigned int k=0; k < current_Count; k+=2)
+		for(unsigned int k=0; k < current_Count*2; k+=2)
 		{
 			chd->oneToOne(pairs[k], pairs[k+1], 1);
 		}
@@ -656,7 +675,7 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 		cout << "Starte Dijkstras " << runden << endl;
 
 			start = clock();
-		for(unsigned int k=0; k < current_Count; k+=2)
+		for(unsigned int k=0; k < current_Count*2; k+=2)
 		{
 			d->oneToOne(pairs[k], pairs[k+1], 1);
 		}
@@ -672,6 +691,8 @@ void O2O_evolution(unsigned int i, unsigned int runden, unsigned int up_count){
 		file << current_Count << " "
 			<< o2o_time/double(current_Count) << " " 
 			<< o2och_time/double(current_Count) << " " 
+			<< o2o_time << " " 
+			<< o2och_time + ch_calc_time << " "
 			<< " \n";
 
 		current_Count += up_count;
@@ -704,23 +725,41 @@ int main(){
 	// === === === 
 	
 
+//CH_Times(1);
+//
+//All2AllTimes(1);
+//	
+//One2_N_Times(0, 1013, 100, 1);
+//One2_N_Times(1, 1013, 100, 1);
+//One2_N_Times(2, 1013, 200, 1);
+//One2_N_Times(3, 1013, 250, 1);
+//One2_N_Times(4, 1013, 250, 1);
+//
+//O2O_Times(1000);
+//
+//O2O_evolution(0, 1010, 100);
+//O2O_evolution(1, 1010, 100);
+//O2O_evolution(2, 1010, 200);
+//O2O_evolution(3, 1010, 250);
+//O2O_evolution(4, 1010, 250);
+
 CH_Times(1);
 
 All2AllTimes(1);
 	
-One2_N_Times(0, 1013, 100, 1);
-One2_N_Times(1, 1013, 100, 1);
-One2_N_Times(2, 1013, 200, 1);
-One2_N_Times(3, 1013, 250, 1);
-One2_N_Times(4, 1013, 250, 1);
+//One2_N_Times(0, 1013, 100, 1);
+//One2_N_Times(1, 1013, 100, 1);
+One2_N_Times(2, 1002, 100, 1);
+One2_N_Times(3, 1002, 100, 1);
+One2_N_Times(4, 1002, 100, 1);
 
 O2O_Times(1000);
 
-O2O_evolution(0, 1010, 100);
-O2O_evolution(1, 1010, 100);
-O2O_evolution(2, 1010, 200);
-O2O_evolution(3, 1010, 250);
-O2O_evolution(4, 1010, 250);
+//O2O_evolution(0, 1010, 100);
+//O2O_evolution(1, 1010, 100);
+O2O_evolution(2, 1002, 100);
+O2O_evolution(3, 1002, 100);
+O2O_evolution(4, 1002, 100);
 
 	return 0;
 }
