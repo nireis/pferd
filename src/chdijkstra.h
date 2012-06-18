@@ -85,8 +85,6 @@ class CHDijkstra{
 		vector<int> m_found_by;
 		// ...inkl. Resetlisten.
 		vector< vector<unsigned int>> o_reset_found_by;
-		vector<unsigned int> m_reset_found_by;
-		vector<unsigned int> m_reset_marked;
 
 	public:
 

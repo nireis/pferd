@@ -80,7 +80,6 @@ class Dijkstra{
 		vector<bool> n_found;
 		// ...inkl. Resetlisten.
 		vector< vector<unsigned int>> o_reset_found_by;
-		vector<unsigned int> m_reset_found_by;
 
 	public:
 
