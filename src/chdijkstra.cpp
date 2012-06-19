@@ -112,6 +112,13 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 				int takenedge = o_found_by[i][tmpid];
 				// path->push_front(takenedge);
 				g->addEdgeLoad(takenedge, weight);
+				/*TODO
+				 * this is slow. we know 'other_node' by the time 
+				 * we are about to touch the edge with id "tmpid"
+				 * so instead of looking up other_node in the graph, 
+				 * wen can just throw it in a struct in o_fond_by[i][...]
+				 * together with the edge id.
+				 */
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}

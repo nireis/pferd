@@ -392,7 +392,7 @@ void One2_N_Times(unsigned int i, unsigned int max_targets, unsigned int up_coun
 				start = clock();
 				for(unsigned int j = 0; j < source.size(); j++)
 				{
-				chd->oneToMany(source[j], &target, 1);
+				chd->oneToMany(source[j], &target_plate, 1);
 				}
 				finish = clock();
 				o2mch_time = (double(finish)-double(start))/CLOCKS_PER_SEC;
@@ -403,7 +403,7 @@ void One2_N_Times(unsigned int i, unsigned int max_targets, unsigned int up_coun
 				start = clock();
 				for(unsigned int j = 0; j < source.size(); j++)
 				{
-				d->oneToMany(source[j], &target, 1);
+				d->oneToMany(source[j], &target_plate, 1);
 				}
 				finish = clock();
 				o2m_time = (double(finish)-double(start))/CLOCKS_PER_SEC;

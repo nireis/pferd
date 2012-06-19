@@ -24,7 +24,6 @@ vis::~vis(){
 	delete[] circles; circles = 0;
 }
 
-
 float vis::merkatorX(float in_x)
 {
 	float pi = 3.141592;
@@ -133,9 +132,11 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 	render.setNodeArray(nodes);
 	render.setEdgeCount((EdgeCount) *2);
 	render.setEdgeArray(edges);
+	render.setCamera((float) node_data[0].lon, (float)node_data[0].lat, 2.0);
+
+
 	render.setShortcutEdgeCount((ShortcutCount) *2);
 	render.setShortcutEdgeArray(shortcut_edges);
-	render.setCamera((float) node_data[0].lon, (float)node_data[0].lat, 2.0);
 
 	/* anlegen der cirlce strukturen für renderer */
 	unsigned int circles_count = 0;
