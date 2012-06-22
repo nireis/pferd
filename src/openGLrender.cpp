@@ -906,6 +906,8 @@ void openGLrender::keyboardArrowsCallback(int key, int x, int y)
 
 void openGLrender::display()
 {
+	//glClearColor(0.9,0.9,0.9,0.9);
+	glClearColor(0.0,0.0,0.0,0.0); // black background
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
 	//render_mode == 0 for graph rendering

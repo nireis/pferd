@@ -574,11 +574,14 @@ double sim::weightEdge(unsigned int type, double load){
 }
 void sim::paintEdges(){
 	EdgeData* ed = base_g->getEdgeDataPointer();
+	//double maxc = 0.0;
 	for(unsigned int i = 0; i < base_g->getEdgeCount(); i++){
 		double tmpcolour =  0.0 ;
 		
 		if(ed[i].load != 0){
 			//tmpcolour = (double)ed[i].load / (double)weights_sum  ;
+			//if(maxc < tmpcolour)
+			//	maxc = tmpcolour;
 			//tmpcolour = log(tmpcolour*(exp(2.0)-1.0) + 1.0) ;
 			//tmpcolour =  sqrt( sqrt( sqrt (sqrt( tmpcolour ))));
 			//tmpcolour =    sqrt (sqrt( tmpcolour ));
@@ -603,4 +606,5 @@ void sim::paintEdges(){
 
 		ed[i].colour = tmpcolour;
 	}
+		//cout << ">>>>>>>>>> " << maxc << endl;;
 }
