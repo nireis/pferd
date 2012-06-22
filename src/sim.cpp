@@ -199,8 +199,8 @@ void sim::recalcEdgevals(){
 		loadhistory[loadhistory.size() -1][i] = ed[i].load;
 
 		if(loadhistory.size() > 1){
-			double load= (double)loadhistory[0][i];
-			for(unsigned int j = 0; j < loadhistory.size(); j++){
+			 double load= (double)loadhistory[0][i];
+			/* for(unsigned int j = 0; j < loadhistory.size(); j++){
 				load += (double)loadhistory[j][i];
 				load *= 0.5;
 			}
@@ -208,6 +208,18 @@ void sim::recalcEdgevals(){
 			//weight = weightEdge( ed[i].type, (cfg->alpha * (double)ed[i].load) +((1-cfg->alpha) * (double)(*loadhistory[loadhistory.size() - 2])[i] ) );
 
 			weight = weightEdge( ed[i].type, load);
+			*/
+			for (unsigned int j = 1; j <= 5; j++){
+				if(loadhistory.size() > j){
+					load += (double)loadhistory[loadhistory.size()-(j+1)][i];
+				}
+				else{
+					load += (double)loadhistory[loadhistory.size() -1][i];
+				}
+			}
+			
+			load *= 0.2;
+			weight = weightEdge(ed[i].type, load);
 		}
 		else{
 			weight = weightEdge(ed[i].type, (double)ed[i].load);

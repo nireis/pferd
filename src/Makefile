@@ -1,6 +1,6 @@
 CC = g++
 CXXFLAGS = -Wall -g -std=c++0x -lglut -lGL -pthread -O3
-LDFLAGS = -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a
+LDFLAGS = -Il /usr/lib/x86_64-linux-gnu/libGLEW.so /usr/lib/libSOIL.a
 #LDFLAGS = -Il /usr/lib/libGLEW.so /usr/lib/libSOIL.a
 
 BIN =pferd
