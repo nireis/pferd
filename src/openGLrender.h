@@ -88,7 +88,7 @@ private:
 	//boolean used to switch between graph and volume rendering
 	bool render_mode;
 	//boolean used to check if restart is necessary
-	bool *run;
+	volatile bool *run;
 	//transformation matrixes
 	glm::mat4 projMX, modelMX, viewMX;
 	//window size
@@ -215,7 +215,7 @@ public:
 	~openGLrender();
 
 	//starts the visualization
-	bool start(int argc, char* argv[]);
+	bool start(int argc, char**, bool);
 	//set methods
 	void setNodeCount(int);
 	void setEdgeCount(int);
@@ -226,7 +226,7 @@ public:
 	void setShortcutEdgeArray(openGL_Node_3d*);
 	void setClusterArray(openGL_Cluster*);
 	void setCamera(float,float,float);
-	void setActivePointer(bool*);
+	void setActivePointer(volatile bool*);
 
 };
 

@@ -9,6 +9,9 @@ using namespace std;
 
 class CHDijkstra{
 	private:
+		//typedef SCGEdgesIterator EdgesIterator;
+		//typedef SCGEdge Edge;
+
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
 			 unsigned int distance;
@@ -82,8 +85,6 @@ class CHDijkstra{
 		vector<int> m_found_by;
 		// ...inkl. Resetlisten.
 		vector< vector<unsigned int>> o_reset_found_by;
-		vector<unsigned int> m_reset_found_by;
-		vector<unsigned int> m_reset_marked;
 
 	public:
 

@@ -9,18 +9,6 @@
 #include <queue>
 #include <algorithm>
 
-typedef unsigned int N;
-typedef NodeData ND;
-
-typedef Edge E;
-typedef EdgeData ED;
-
-typedef Shortcut S;
-typedef ShortcutData SD;
-
-typedef Andrenator_P<E> EdgesIterator;
-typedef Andrenator_P<LVLEdge> LVLEdgesIterator;
-
 class SCGraph;
 
 /*
@@ -29,6 +17,9 @@ class SCGraph;
  */
 class Graph {
 	public:
+		//typedef GEdge Edge;
+		//typedef GEdgesIterator EdgesIterator;
+
 	/*
 	 * Zu jeder Struktur merken wir uns umfangreiche Daten in
 	 *		*_data
@@ -36,6 +27,10 @@ class Graph {
 	 *	schnell und kompakt werden.
 	 */
 	private:
+		typedef Edge E;
+		typedef EdgeData ED;
+		typedef unsigned int N;
+		typedef NodeData ND;
 		/*
 		 * statischer Teil des Graphen
 		 */
@@ -204,7 +199,19 @@ class Graph {
  * zu einem Graph zusammenfügen
  */
 class SCGraph {
+	public:
+		//typedef SCGEdge Edge;
+		//typedef SCGEdgesIterator EdgesIterator;
+		//typedef GEdge RoundEdge;
+		//typedef GEdgesIterator RoundEdgesIterator;
+	
 	private:
+		typedef Edge E;
+		typedef EdgeData ED;
+		typedef unsigned int N;
+		typedef NodeData ND;
+		typedef Shortcut S;
+
 		Graph* g;
 
 		unsigned int* node_lvl;
@@ -231,8 +238,10 @@ class SCGraph {
 
 		N* nodes_in_offs;
 		E* in_edges; 
+		Edge* round_in_edges;
 		N* nodes_out_offs;
 		E* out_edges;
+		Edge* round_out_edges;
 
 		ND* node_data;
 		ED* edge_data;

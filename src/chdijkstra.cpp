@@ -10,8 +10,6 @@ CHDijkstra::CHDijkstra(SCGraph* g):
 	this->g = g;
 	o_reset_found_by[0].reserve(nr_of_nodes);
 	o_reset_found_by[1].reserve(nr_of_nodes);
-	m_reset_found_by.reserve(nr_of_nodes);
-	m_reset_marked.reserve(g->getEdgeCount() + g->getShortcutCount());
 }
 
 unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
@@ -114,6 +112,13 @@ unsigned int CHDijkstra::oneToOne(unsigned int node_id0, unsigned int node_id1,
 				int takenedge = o_found_by[i][tmpid];
 				// path->push_front(takenedge);
 				g->addEdgeLoad(takenedge, weight);
+				/*TODO
+				 * this is slow. we know 'other_node' by the time 
+				 * we are about to touch the edge with id "tmpid"
+				 * so instead of looking up other_node in the graph, 
+				 * wen can just throw it in a struct in o_fond_by[i][...]
+				 * together with the edge id.
+				 */
 				tmpid = g->getEdge(i, (unsigned int)takenedge)->other_node;
 			}
 		}
@@ -166,7 +171,6 @@ void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 				if(m_found_by[tmpnode] == -1){
 					dist[tmpnode] = U.top().distance;
 					m_found_by[tmpnode] = (int)U.top().eid;
-					m_reset_found_by.push_back(tmpnode);
 					// Die ausgehenden Kanten durchgehen und wenn sie aufwärts gehen oder
 					// markiert sind auf ihnen weitersuchen.
 					EdgesIterator it = g->getOutEdgesIt(tmpnode);
@@ -198,7 +202,6 @@ void CHDijkstra::oneToMany(unsigned int node_id0, vector<unsigned int>* targets,
 				if(target == targets->back()){
 					dist[target] = U.top().distance;
 					m_found_by[target] = (int)U.top().eid;
-					m_reset_found_by.push_back(target);
 				}
 			}
 			else{
@@ -261,7 +264,6 @@ void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 				if(m_found_by[tmpnode] == -1){
 					dist[tmpnode] = U.top().distance;
 					m_found_by[tmpnode] = (int)U.top().eid;
-					m_reset_found_by.push_back(tmpnode);
 					// Die ausgehenden Kanten durchgehen und wenn sie aufwärts gehen oder
 					// markiert sind auf ihnen weitersuchen.
 					EdgesIterator it = g->getInEdgesIt(tmpnode);
@@ -293,7 +295,6 @@ void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 				if(target == sources->back()){
 					dist[target] = U.top().distance;
 					m_found_by[target] = (int)U.top().eid;
-					m_reset_found_by.push_back(target);
 				}
 			}
 			else{
@@ -322,13 +323,11 @@ void CHDijkstra::manyToOne(vector<unsigned int>* sources, unsigned int node_id0,
 }
 
 void CHDijkstra::resetOneToMany(){
-	while(!m_reset_found_by.empty()){
-		m_found_by[m_reset_found_by.back()] = -1;
-		m_reset_found_by.pop_back();
+	for(unsigned int i=0, s=m_found_by.size(); i<s; i++){
+		m_found_by[i] = -1;
 	}
-	while(!m_reset_marked.empty()){
-		marked[m_reset_marked.back()] = false;
-		m_reset_marked.pop_back();
+	for(unsigned int i=0, s=g->getEdgeCount() + g->getShortcutCount(); i<s; i++){
+		marked[i] = false;
 	}
 }
 
@@ -347,7 +346,6 @@ void CHDijkstra::markBackEdges(vector<unsigned int>* nodes, vector<unsigned int>
 			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
 				if(!((*marked)[tmpedge->id])){
 					(*marked)[tmpedge->id] = true;
-					m_reset_marked.push_back(tmpedge->id);
 					todo.push_back(tmpedge->other_node);
 				}
 			}
@@ -373,7 +371,6 @@ void CHDijkstra::markForwEdges(vector<unsigned int>* nodes, vector<unsigned int>
 			if(tmpedge->other_lvl > g->getNodeLVL(tmpnode)){
 				if(!((*marked)[tmpedge->id])){
 					(*marked)[tmpedge->id] = true;
-					m_reset_marked.push_back(tmpedge->id);
 					todo.push_back(tmpedge->other_node);
 				}
 			}

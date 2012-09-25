@@ -49,7 +49,7 @@ void travelCenter::clearStuff(){
 void travelCenter::mode1(){
 	/* all to all */
 	unsigned int s = t->traffic.size();
-	t->traffic.resize(1);
+	t->traffic.resize(s+1);
 	//t->traffic.push_back(pendler());
 	t->traffic[s+0].source.resize(g->getNodeCount());
 	t->traffic[s+0].target.resize(g->getNodeCount());
@@ -72,7 +72,7 @@ void travelCenter::mode2(){
 	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(count);
+	t->traffic.resize(s+count);
 	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
 		t->traffic[s+i].target.resize(1);
@@ -115,7 +115,7 @@ void travelCenter::mode3(){
 	unsigned int s = t->traffic.size();
 	unsigned int nc = g->getNodeCount();
 	std::srand((unsigned)std::time(0));
-	t->traffic.resize(count);
+	t->traffic.resize(s+count);
 	for(unsigned int i = 0; i < count; i++){
 		//t->traffic.push_back(pendler());
 		t->traffic[s+i].target.resize(nc);
@@ -193,7 +193,7 @@ void travelCenter::mode4(){
 		&(t->circles)
 		);
 
-	t->traffic.resize( 1 );
+	t->traffic.resize(s+1);
 	//t->traffic.push_back(pendler());
 	t->traffic[s+0].source.reserve(starts.size());
 	t->traffic[s+0].target.reserve(targets.size());
@@ -251,6 +251,39 @@ void travelCenter::mode5(){
 						candidates,
 						1));
 		}
+	}
+}
+void travelCenter::mode6(){
+	/* one to random count */
+	unsigned int s = t->traffic.size();
+	unsigned int nc = g->getNodeCount();
+	std::srand((unsigned)std::time(0));
+	t->traffic.resize(s+1);
+
+	t->traffic[s].target.resize(count);
+	t->traffic[s].source.resize(1);
+
+	/* source */
+	unsigned int rand = (unsigned int) floor((double(std::rand()) / double(RAND_MAX)) * double(nc));
+	t->traffic[s].source[0] = rand;
+
+	float x = g->getNodeData( t->traffic[s].source[0] ).lon;
+	float y = g->getNodeData( t->traffic[s].source[0] ).lat;
+	float r = clust_step/1.0;
+	float c = 0.25+(0.0);
+	t->circles.push_front( openGL_Cluster(x, y, r, c) );
+
+	/* targets */
+	for(unsigned int j = 0; j < count; j++){
+		rand = (unsigned int) floor((double(std::rand()) / double(RAND_MAX)) * double(nc));
+		t->traffic[s].target[j] = rand;
+
+		/* random weights */
+		unsigned int r = std::rand();
+		while( r > rand_upper_bound){
+			r = std::rand();
+		}
+		t->traffic[s].weight = weight_lower_bound + (r % rand_range);
 	}
 }
 bool travelCenter::run(){
@@ -316,6 +349,11 @@ bool travelCenter::run(unsigned int i){
 		case 5:
 		{
 			mode5();
+			break;
+		}
+		case 6:
+		{
+			mode6();
 			break;
 		}
 		default:

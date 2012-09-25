@@ -306,6 +306,7 @@ bool openGLrender::drawText(glm::mat4 mvp)
 
 bool openGLrender::initGraphVis()
 {
+
 	entityCount = 3 + clusterCount;
 	sceneEntities = new openGL_Entity[entityCount];
 
@@ -639,7 +640,7 @@ void openGLrender::uninitVolume()
 /*
 *	General purpose methods
 */
-void openGLrender::setActivePointer(bool *active)
+void openGLrender::setActivePointer(volatile bool *active)
 {
 	this->run = active;
 }
@@ -905,6 +906,8 @@ void openGLrender::keyboardArrowsCallback(int key, int x, int y)
 
 void openGLrender::display()
 {
+	//glClearColor(0.9,0.9,0.9,0.9);
+	glClearColor(0.0,0.0,0.0,0.0); // black background
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
 	//render_mode == 0 for graph rendering
@@ -975,9 +978,10 @@ void openGLrender::setInstance(openGLrender* instance)
 	currentInstance = instance;
 }
 
-bool openGLrender::start(int argc, char* argv[])
+bool openGLrender::start(int argc, char** pferd_argv, bool inverse_graph_switch)
 {
-	glutInit(&argc, argv);
+	glutInit(&argc, pferd_argv);
+
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Pferd");
@@ -989,7 +993,7 @@ bool openGLrender::start(int argc, char* argv[])
 		return false;
 	}
 
-	if(argv[0] == "graph")
+	if(inverse_graph_switch == 0)
 	{
 		render_mode = 0;
 	}

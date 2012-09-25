@@ -30,6 +30,9 @@ class Compare_U_element_bi{
 };
 
 void DijkstraFunc(Graph* g, unsigned int node_id){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -113,6 +116,9 @@ void DijkstraFunc(Graph* g, unsigned int node_id){
 }
 
 void getNeighbours(Graph* g, unsigned int node_id, unsigned int radius, vector<unsigned int>* nbrs){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -162,6 +168,9 @@ void getNeighbours(Graph* g, unsigned int node_id, unsigned int radius, vector<u
 
 bool DijkstraFunc(Graph* g, unsigned int start_node_id, unsigned int end_node_id,
 		unsigned int over_node_id){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(start_node_id);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -222,6 +231,9 @@ bool DijkstraFunc(Graph* g, unsigned int start_node_id, unsigned int end_node_id
 
 
 unsigned int DijkstraFunc(Graph* g, unsigned int node_id0, unsigned int node_id1){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Iterator für die ausgehenden Kanten eines Knotens
 	EdgesIterator it = g->getOutEdgesIt(node_id0);
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -293,6 +305,9 @@ unsigned int DijkstraFunc(Graph* g, unsigned int node_id0, unsigned int node_id1
 }
 
 void DirectDijkstra(Graph* g, unsigned int node_id){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Pointer um die akutelle Kante zu behandeln
 	Edge currentEdge;
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -373,6 +388,9 @@ void DirectDijkstra(Graph* g, unsigned int node_id){
 }
 
 unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Pointer um die akutelle Kante zu behandeln
 	Edge currentEdge;
 	// Die priotiry_queue, welche der Menge U im Dijkstra entspricht
@@ -418,6 +436,9 @@ unsigned int DirectDijkstra(Graph* g, unsigned int node_id0, unsigned int node_i
 }
 
 unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	// Iterator für die ausgehenden und eingehenden Kanten eines Knotens
 	EdgesIterator itout = g->getOutEdgesIt(node_id0);
 	EdgesIterator itin = g->getInEdgesIt(node_id1);
@@ -517,6 +538,9 @@ unsigned int BiDijkstra(Graph* g, unsigned int node_id0, unsigned int node_id1){
  * @solution Ist das angebliche Max Ind Set.
  */
 void independent_set_test(Graph* g, list<unsigned int> solution){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	unsigned int nr_of_nodes = g->getNodeCount();
 	vector<bool> found(nr_of_nodes,false);
 	EdgesIterator it;
@@ -561,6 +585,9 @@ void independent_set_test(Graph* g, list<unsigned int> solution){
  * @return Liste der Knoten des Max Ind Sets.
  */
 list<unsigned int> independent_set(Graph* g){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	unsigned int nr_of_nodes = g->getNodeCount();
 	list<unsigned int> solution;
 	vector<bool> found(nr_of_nodes,false);
@@ -608,6 +635,9 @@ list<unsigned int> independent_set(Graph* g){
 }
 
 unsigned int CHDijkstraFunc(SCGraph* g, unsigned int node_id0, unsigned int node_id1){
+	//typedef SCGEdge Edge;
+	//typedef SCGEdgesIterator EdgesIterator;
+
 	// Wegen Codeschönheit: Array für Source und Target anlegen.
 	vector<unsigned int> node_id(2);
 	node_id[0] = node_id0;
@@ -720,6 +750,9 @@ unsigned int CHDijkstraFunc(SCGraph* g, unsigned int node_id0, unsigned int node
 }
 
 void CHDijkstraFunc(SCGraph* g, unsigned int node_id0, vector<unsigned int>* targets){
+	//typedef SCGEdge Edge;
+	//typedef SCGEdgesIterator EdgesIterator;
+
 	// Von den targets alle aufsteigenden Kanten besuchen und markieren.
 	/* !TODO! wenn die CH fertig ist, gibt es
 	 *
@@ -819,6 +852,9 @@ void CHDijkstraFunc(SCGraph* g, unsigned int node_id0, vector<unsigned int>* tar
 }
 
 void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>* marked){
+	//typedef SCGEdge Edge;
+	//typedef SCGEdgesIterator EdgesIterator;
+
 	vector<unsigned int> todo;
 	// Erstmal alle Startknoten einfürgen. TODO man könnte auch
 	// vllt direkt den nodes Vektor benutzen, je nach Implementierung
@@ -841,6 +877,9 @@ void markAscEdges(SCGraph* g, vector<unsigned int>* nodes, vector<unsigned int>*
 }
 
 bool CHDijkstraTest(Graph* g, SCGraph* scg, unsigned int maxid){
+	//typedef GEdge Edge;
+	//typedef GEdgesIterator EdgesIterator;
+
 	/*clock_t start,finish;
 	//double time1 = 0;
 	double time2 = 0;

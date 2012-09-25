@@ -94,6 +94,15 @@ void parseLine(string* line, conf* cfg){
 			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
 		}
 	}
+	else if(key == "alpha"){
+		if(value.size() == 1){
+			cfg->alpha = atof(value[0].c_str());
+		}
+		else{
+			cout << "Fehler beim Einlesen des Wertes von \"alpha\":" << endl;
+			cout << "Mehr als ein Wert oder kein Wert angegeben." << endl;
+		}
+	}
 	else{
 		cout << "Fehler beim lesen eines keys. Die Option \"" << key << "\" ist unbekannt." << endl;
 	}

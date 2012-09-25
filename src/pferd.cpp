@@ -2,7 +2,6 @@
 #include "graphalgs.h"
 #include "CHConstruction.h"
 #include "parser.h"
-#include <ctime>
 #include "structs.h"
 #include "ch.h"
 #include "rlparser.h"
@@ -13,31 +12,85 @@
 #include "sim.h"
 #include "conf.h"
 #include "travel.h"
+
 #include <thread>
 #include <fstream>
 #include <stdio.h>
+#include <ctime>
 
 using namespace std;
 
-void startVisThread(bool* active, bool* running, bool* renderMode, Graph** g_pp){
-	vis anzeige;
-	while(*running){
-		if(*renderMode){
-			anzeige.start(active, true);
+/*
+ * Vis Stuff for easy use 
+ */
+bool running = true;
+bool renderMode = true;
+volatile bool active=false;
+
+struct vis_stuff {
+	int argc;
+	char** argv;
+	volatile bool* active;
+	bool* running;
+	bool* renderMode;
+	Graph** g_pp;
+
+	vis_stuff(int a, char** b, volatile bool* c, bool* d, bool* e, Graph** f) :
+		argc(a),
+		argv(b),
+		active(c),
+		running(d),
+		renderMode(e),
+		g_pp(f)
+	{}
+	//vis_stuff( const vis_stuff& vs ) :
+	//	argc(vs.argc),
+	//	argv(vs.argv),
+	//	active(vs.active),
+	//	running(vs.running),
+	//	renderMode(vs.renderMode),
+	//	g_pp(vs.g_pp)
+	//{}
+	~vis_stuff()
+	{
+		argv=0;
+		active=0;
+		running=0;
+		renderMode=0;
+		g_pp=0;
+	}
+};
+
+void startVisThread( vis_stuff vs ){
+	vis anzeige(vs.argc, vs.argv);
+	while(*vs.running){
+		if(*vs.renderMode){ 
+		// if false draw graph new
+		// if true draw horse
+
+			anzeige.start(vs.active, true);
 		}
 		else{
-			if(*g_pp){
-				anzeige.initVis(*g_pp);
-				anzeige.start(active, false);
+			if(*vs.g_pp){
+				anzeige.initVis(*vs.g_pp);
+				anzeige.start(vs.active, false);
 			}
 		}
-		*active = true;
+		*vs.active = true;
 	}
+}
+void setVisHorse(){
+	active = false;
+	renderMode = true;
+}
+void setVisGraph(){
+		active = false;
+		renderMode = false;
 }
 
 void startMusic(string* filename){
 	// Musik in Endlosschleife.
-	while(true){
+	//while(true){
 		#ifdef _WIN32
 			//TODO
 		#else
@@ -47,7 +100,7 @@ void startMusic(string* filename){
 			pptr = popen(temp, "w");
 			pclose(pptr);
 		#endif
-	}
+	//}
 }
 
 int main(int argc, char *argv[]){
@@ -65,23 +118,23 @@ int main(int argc, char *argv[]){
 
 	string file;
 	Graph** g_pp = new Graph*;
-	bool running = true;
-	bool renderMode = true;
 	thread t_sound;
 	thread t_vis;
-	bool active;
 
-	bool setVisPerParameter = false;
-	bool VisPerParameter = false;
-	bool setSoundPerParameter = false;
-	bool SoundPerParameter = false;
+	int setVisPerParameter = 0;
+	int setSoundPerParameter = 0;
+	int setCHverbosePerParameter = 0;
+	bool setXperParameter = false;
+	int setXParameter = 0;
 
 	if(argc < 2 ){
 		cout << "---" << endl 
 				<< "-- Aufruf der Binärdatei wie folgt: " << argv[0] << " -g <Graphendatei> [-v]" << endl
 				<< "-- -g <Graphdatei> : Pfad zu einer Datei, die als Graphdatei gelesen werden kann." << endl
-				<< "-- -v : Visualisierung starten " << endl
-				<< "-- -chv : Contraction Hierarchie teilt Statusmeldungen mit " << endl
+				<< "-- -v {on,off} : Visualisierung starten/nicht starten " << endl
+				<< "-- -chv {on,off}: Contraction Hierarchie teilt Statusmeldungen mit oder nicht " << endl
+				<< "-- -s {on,off} : Sound starten/nicht starten " << endl
+				<< "-- -X integer : benutze Modus X mit Rundenwert integer (mit Vorzeichen) " << endl
 				<< "---" << endl;
 		return 0;
 	} else {
@@ -97,38 +150,63 @@ int main(int argc, char *argv[]){
 				}
 			} else
 			if( string(argv[i]) == "-v"){
-				setVisPerParameter = true;
+				setVisPerParameter = 2;
 				if( i+1 < argc){
-					if(string(argv[i+1]) == "off"){
-						VisPerParameter = false;
-					} else
 					if(string(argv[i+1]) == "on"){
-						VisPerParameter = true;
+						setVisPerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setVisPerParameter = 1;
 					} else {
 						cout << "Vis Parameter ungültig: " << argv[i+1] << endl;
-						setVisPerParameter = false;
+						setVisPerParameter = 0;
 					}
 				} else {
 					cout << "Vis Parameter ungültig: kein on/off angegeben" << endl;
-					setVisPerParameter = false;
+					setVisPerParameter = 0;
+				}
+				i += 2;
+			} else
+			if( string(argv[i]) == "-chv"){
+				setVisPerParameter = 2;
+				if( i+1 < argc){
+					if(string(argv[i+1]) == "on"){
+						setCHverbosePerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setCHverbosePerParameter = 1;
+					} else {
+						cout << "CH Verbose Parameter ungültig: " << argv[i+1] << endl;
+						setCHverbosePerParameter = 0;
+					}
+				} else {
+					cout << "CH Verbose Parameter ungültig: kein on/off angegeben" << endl;
+					setCHverbosePerParameter = 0;
 				}
 				i += 2;
 			} else
 			if( string(argv[i]) == "-s"){
-				setSoundPerParameter = true;
+				setSoundPerParameter = 0;
 				if( i+1 < argc){
-					if(string(argv[i+1]) == "off"){
-						SoundPerParameter = false;
-					} else
 					if(string(argv[i+1]) == "on"){
-						SoundPerParameter = true;
+						setSoundPerParameter = 2;
+					} else
+					if(string(argv[i+1]) == "off"){
+						setSoundPerParameter = 1;
 					} else {
 						cout << "Sound Parameter ungültig: " << argv[i+1] << endl;
-						setSoundPerParameter = false;
+						setSoundPerParameter = 0;
 					}
 				} else {
 					cout << "Sond Parameter ungültig: kein on/off angegeben" << endl;
-					setSoundPerParameter = false;
+					setSoundPerParameter = 0;
+				}
+				i += 2;
+			} else 
+			if( string(argv[i]) == "-X"){
+				if( i+1 < argc ){
+					setXParameter = atoi(argv[i+1]);
+					setXperParameter = true;
 				}
 				i += 2;
 			} else {
@@ -138,8 +216,9 @@ int main(int argc, char *argv[]){
 					file = argv[i];
 					i++;
 				} else {
-					cout << "Input Error. " << endl;
-					return 0;
+					cout << "Input Error. Ignoring " << argv[i] << endl;
+					// return 0;
+					i++;
 				}
 			}
 		}
@@ -156,9 +235,13 @@ int main(int argc, char *argv[]){
 	conf co = conf();
 	readConf("pferdrc", &co);
 
+	//ggf CH Verbose anpassen
+	if(setCHverbosePerParameter)
+		co.chConstVerbose = setCHverbosePerParameter-1;
+
 	// Starte Sound
 	if(setSoundPerParameter)
-		co.playSound = SoundPerParameter;
+		co.playSound = setSoundPerParameter-1;
 	if(co.playSound){
 		cout << "> Starte Sound" << endl;
 		t_sound = thread(&startMusic, &co.soundFile);
@@ -166,10 +249,10 @@ int main(int argc, char *argv[]){
 
 	// Starte Visualisierung
 	if(setVisPerParameter)
-		co.showVis = VisPerParameter;
+		co.showVis = setVisPerParameter-1;
 	if(co.showVis){
 		cout << "> Starte Visualisierung" << endl;
-		t_vis = thread(&startVisThread, &active, &running, &renderMode, g_pp);
+		t_vis = thread( &startVisThread, vis_stuff( argc, argv, &active, &running, &renderMode, g_pp ) );
 	}
 
 	clock_t start,finish;
@@ -185,6 +268,8 @@ int main(int argc, char *argv[]){
 	finish = clock();
 	time = (double(finish)-double(start))/CLOCKS_PER_SEC;
 	cout << "> Zeit zum Initialisieren des Graphen: " << time << endl;
+	cout << "> Graph Parameter ~ Knoten: " << g.getNodeCount() 
+		<< ", Kanten: " << g.getEdgeCount() << endl;
 
 	// starte simulationssachen ab hier
 	travelers tr = travelers();
@@ -195,25 +280,111 @@ int main(int argc, char *argv[]){
 
 	cout << "> Starte die Simulation." << endl;
 	sim s(&g, &tr, &co);
+
+	// TODO all2all + Vis Modus bereitstellen
 	//cout << "> Warte auf normale Runde." << endl;
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
-	while(true){
-		cout << "> Warte auf Runde der Simulation." << endl;
-		s.calcOneRoundCH();
-		if(co.showVis){
-			active = false;
-			renderMode = false;
-			cout << "> Drücke ANY KEY um eine weitere Runde zu simulieren...";
-			cin.get();
-			active = false;
-			renderMode = true;
-		}
+	
+	bool eq_found = false;
+	int rounds = -1;
+
+	// Abfrage nach Modus: SimCH
+	cout << endl;
+	cout << "Übergebe die Anzahl X der Runden , welche berechnet werden sollen:" << endl;
+	cout << "-- X = 0 => Führe Simulationsrunden durch, bis Gleichgewicht erreicht." << endl
+		<< "            (starte danach Visualisierung, falls diese aktiv)." << endl;
+	cout << "-- X > 0 => Führe X Simulationsrunden hintereinander durch." << endl
+		<< "            (starte danach Visualisierung, falls diese aktiv)." << endl;
+	cout << "-- X < 0 => Führe |X| Simulationsrunden hintereinander durch." << endl 
+		<< "            (starte nach JEDER Runde Visualisierung, falls diese aktiv)." << endl;
+	cout << "" << endl;
+
+	if(! setXperParameter){
+		cout << " >> X = " ;
+		cin >> rounds;
+		cin.clear();
+		cin.sync();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	} else {
+		cout << "Benutze Parametereingabe X = " << setXParameter << endl;
+		rounds = setXParameter;
 	}
+
+	cout << "" << endl;
+
+	//anhand Modus jeweils auswählen
+	if( rounds == 0){ 
+		cout << "> >> Modus finde Gleichgewicht alleine" << endl;
+		// loope unendlich bis eq_found==true und zeige dann evtl Vis an
+		while( ! eq_found ){
+			rounds++;
+			cout << endl << "> Warte auf Runde " << rounds << " der Simulation." << endl;
+			s.calcOneRoundCH();
+			eq_found = s.eqFound();
+		}
+		setVisGraph();
+		cout << "> Gleichgewicht=" << eq_found << " gefunden nach " << rounds << " gelaufenen Runden" << endl;
+		cout << "> Drücke EINGABETASTE um Programm zu beenden" << endl;
+		cin.get();
+	} 
+	else 
+	if( rounds > 0){ 
+		cout << "> >> Modus finde Gleichgewicht in " << rounds << " Runden hintereinander " << endl;
+		// loope rounds runden und zeige vis evtl am ende an
+		unsigned int  running_rounds = 0;
+		for(unsigned int i = 0; i < (unsigned int)(rounds); i++){
+			cout << endl << "> Warte auf Runde "<< running_rounds++ <<" der Simulation." << endl;
+			s.calcOneRoundCH();
+		}
+		eq_found = s.eqFound();
+		setVisGraph();
+		cout << "> Gleichgewicht=" << eq_found << " gefunden nach " << rounds << " manuellen Runden" << endl;
+		cout << "> Drücke EINGABETASTE um Programm zu beenden" << endl;
+		cin.get();
+	} 
+	else { 
+		// rounds negativ 
+		//=> loope |rounds| runden und zeige nach jeder runde vis an
+		cout << "> >> Modus finde Gleichgewicht in " << "|" << rounds << "| " << " Runden hintereinander, mit Stop pro Runde " << endl;
+		int running_rounds = 1;
+		for(unsigned int i = 0; i < (unsigned int)(-rounds); i++){
+			cout << endl << "> Warte auf Runde "<< running_rounds++ <<" der Simulation." << endl;
+			s.calcOneRoundCH();
+
+			cout << "Runde " << running_rounds << " fertig";
+			if(co.showVis){
+				cout << ", zeige neuen Graph in Vis an" << endl;
+			} else {
+				cout << endl;
+			}
+
+			// für alle runden ausser die letzte
+			if(i < (unsigned int)(-rounds-1)){
+				setVisGraph();
+				cout << "> Drücke EINGABETASTE für weitere Runde";
+				if(co.showVis){
+					cout << " und wechseln der Vis " << endl;
+				} else {
+					cout << endl;
+				}
+				cin.get();
+				setVisHorse();
+			}
+
+		}
+		eq_found = s.eqFound();
+		setVisGraph();
+		cout << "> Gleichgewicht=" << eq_found << " gefunden nach " << -rounds << " manuellen Runden" << endl;
+		cout << "> Drücke EINGABETASTE um Programm zu beenden" << endl;
+		cin.get();
+	}
+
 
 	if(co.showVis){
 		cout << "> Warte auf VisThread: join()" << endl;
 		running = false;
+		setVisHorse();
 		t_vis.join();
 	}
 
@@ -224,4 +395,3 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
-

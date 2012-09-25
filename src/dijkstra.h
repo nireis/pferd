@@ -9,6 +9,9 @@ using namespace std;
 
 class Dijkstra{
 	private:
+		//typedef GEdge Edge;
+		//typedef GEdgesIterator EdgesIterator;
+
 		 // struct für die Elemente aus U incl. Vergleich
 		 struct U_element_bi{
 			 unsigned int distance;
@@ -77,7 +80,6 @@ class Dijkstra{
 		vector<bool> n_found;
 		// ...inkl. Resetlisten.
 		vector< vector<unsigned int>> o_reset_found_by;
-		vector<unsigned int> m_reset_found_by;
 
 	public:
 
