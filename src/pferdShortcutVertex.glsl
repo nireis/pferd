@@ -23,6 +23,7 @@ void main(void)
 {
 	gl_PointSize = 4.0;
 
-	color = transferFunction(in_color);
+	//color = transferFunction(in_color);
+	color = vec4(0.0,0.0,0.0,1.0);
 	gl_Position = mvp * vec4(in_position, 1.0, 1.0);
 }

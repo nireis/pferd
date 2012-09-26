@@ -291,6 +291,14 @@ int main(int argc, char *argv[]){
 	//s.calcOneRoundNormal();
 	//s.resetGraph();
 	
+	
+//	cout << "INTERMISSION: Zeige Karte an" << endl;
+//		setVisGraph();
+//		cout << "> Drücke EINGABETASTE um auszublenden" << endl;
+//		cin.get();
+//		setVisHorse();
+
+	
 	bool eq_found = false;
 	int rounds = -1;
 
@@ -317,12 +325,6 @@ int main(int argc, char *argv[]){
 	}
 
 	cout << "" << endl;
-
-//	cout << "INTERMISSION: Zeige Karte an" << endl;
-//		setVisGraph();
-//		cout << "> Drücke EINGABETASTE um auszublenden" << endl;
-//		cin.get();
-//		setVisHorse();
 
 
 	//anhand Modus jeweils auswählen

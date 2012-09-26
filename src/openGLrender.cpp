@@ -352,7 +352,7 @@ bool openGLrender::initGraphVis()
 	sceneEntities[2].shader_program = initShaderProgram(shader2[0] , shader2[1], atrb2, 2);
 	glLinkProgram(sceneEntities[2].shader_program);
 	sceneEntities[2].texture = 0;
-	sceneEntities[2].visabilty = true;
+	sceneEntities[2].visabilty = false;
 	sceneEntities[2].world_position = glm::vec3(0.0);
 
 	for(unsigned int i=0; i<clusterCount; i++)
@@ -906,8 +906,8 @@ void openGLrender::keyboardArrowsCallback(int key, int x, int y)
 
 void openGLrender::display()
 {
-	//glClearColor(0.9,0.9,0.9,0.9);
-	glClearColor(0.0,0.0,0.0,0.0); // black background
+	glClearColor(0.9,0.9,0.9,0.9);
+	//glClearColor(0.0,0.0,0.0,0.0); // black background
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
 	//render_mode == 0 for graph rendering
