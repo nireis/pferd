@@ -33,7 +33,7 @@ class vis {
 		//don't know what this one does
 		void init();
 		//pass on graph data to openGLrender
-		void initRenderer(std::list<openGL_Cluster>* circs);
+		void initRenderer(std::list<openGL_Cluster>* circs, std::list<Edge>* shortcuts);
 
 		float merkatorX(float);
 		float merkatorY(float);
@@ -41,6 +41,7 @@ class vis {
 	public: 
 		//initializes graph data
 		void initVis(Graph* g, std::list<openGL_Cluster>* circs);
+		void initVis(Graph* g, std::list<Edge>* shortcuts);
 		void initVis(Graph* g);
 
 		vis(int vargc, char** pargv, Graph* gr, std::list<openGL_Cluster>* circs);

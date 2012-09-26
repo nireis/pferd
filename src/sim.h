@@ -49,6 +49,7 @@ class sim{
 		int graphtype;
 		unsigned int smallTypes[13];
 		double functionParameter[9][2];
+		std::list<Edge>* shortcuts;
 		void initArrays();
 		void findGraphEdgesTypes();
 		void setGraphTypesRight();
@@ -60,7 +61,7 @@ class sim{
 		void recalcEdgevals();
 		void pokeVis();
 	public:
-		sim(Graph* g, travelers* t, conf* c);
+		sim(Graph* g, travelers* t, conf* c, std::list<Edge>* scuts);
 		~sim();
 		void calcOneRoundNormal();
 		void calcOneRoundCH();

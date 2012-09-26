@@ -34,14 +34,16 @@ struct vis_stuff {
 	bool* running;
 	bool* renderMode;
 	Graph** g_pp;
+	std::list<Edge>* shortcuts;
 
-	vis_stuff(int a, char** b, volatile bool* c, bool* d, bool* e, Graph** f) :
+	vis_stuff(int a, char** b, volatile bool* c, bool* d, bool* e, Graph** f, std::list<Edge>* scuts) :
 		argc(a),
 		argv(b),
 		active(c),
 		running(d),
 		renderMode(e),
-		g_pp(f)
+		g_pp(f),
+		shortcuts(scuts)
 	{}
 	//vis_stuff( const vis_stuff& vs ) :
 	//	argc(vs.argc),
@@ -58,6 +60,7 @@ struct vis_stuff {
 		running=0;
 		renderMode=0;
 		g_pp=0;
+		shortcuts = 0;
 	}
 };
 
@@ -72,7 +75,7 @@ void startVisThread( vis_stuff vs ){
 		}
 		else{
 			if(*vs.g_pp){
-				anzeige.initVis(*vs.g_pp);
+				anzeige.initVis(*vs.g_pp, vs.shortcuts);
 				anzeige.start(vs.active, false);
 			}
 		}
@@ -248,11 +251,13 @@ int main(int argc, char *argv[]){
 	}
 
 	// Starte Visualisierung
+	list<Edge>* shortcuts = 0;
 	if(setVisPerParameter)
 		co.showVis = setVisPerParameter-1;
 	if(co.showVis){
+		shortcuts = new list<Edge>();
 		cout << "> Starte Visualisierung" << endl;
-		t_vis = thread( &startVisThread, vis_stuff( argc, argv, &active, &running, &renderMode, g_pp ) );
+		t_vis = thread( &startVisThread, vis_stuff( argc, argv, &active, &running, &renderMode, g_pp , shortcuts) );
 	}
 
 	clock_t start,finish;
@@ -279,7 +284,7 @@ int main(int argc, char *argv[]){
 	tc.run();
 
 	cout << "> Starte die Simulation." << endl;
-	sim s(&g, &tr, &co);
+	sim s(&g, &tr, &co, shortcuts);
 
 	// TODO all2all + Vis Modus bereitstellen
 	//cout << "> Warte auf normale Runde." << endl;
@@ -312,6 +317,13 @@ int main(int argc, char *argv[]){
 	}
 
 	cout << "" << endl;
+
+//	cout << "INTERMISSION: Zeige Karte an" << endl;
+//		setVisGraph();
+//		cout << "> Drücke EINGABETASTE um auszublenden" << endl;
+//		cin.get();
+//		setVisHorse();
+
 
 	//anhand Modus jeweils auswählen
 	if( rounds == 0){ 
@@ -382,11 +394,13 @@ int main(int argc, char *argv[]){
 
 
 	if(co.showVis){
+		delete shortcuts; 
 		cout << "> Warte auf VisThread: join()" << endl;
 		running = false;
 		setVisHorse();
 		t_vis.join();
 	}
+	shortcuts = 0;
 
 	cout << "> Exit Pferd" << endl;
 

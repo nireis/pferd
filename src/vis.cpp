@@ -5,7 +5,7 @@ using namespace std;
 vis::vis(int pargc, char** pargv, Graph* gr, std::list<openGL_Cluster>* circs) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
 	pferd_argc = pargc;
 	pferd_argv = pargv;
-	initRenderer(circs);
+	initRenderer(circs, 0);
 }
 vis::vis(int pargc, char** pargv, Graph* gr) : render(), nodes(0), edges(0), shortcut_edges(0), circles(0), g(gr){
 	pferd_argc = pargc;
@@ -44,20 +44,26 @@ float vis::merkatorY(float in_y)
 void vis::initVis(Graph* gr, std::list<openGL_Cluster>* circs)
 {
 	g = gr;
-	initRenderer(circs);
+	initRenderer(circs, 0);
 }
 
 void vis::initVis(Graph* gr)
 {
 	g = gr;
-	initRenderer(0);
+	initRenderer(0, 0);
+}
+
+void vis::initVis(Graph* gr, std::list<Edge>* shortcuts)
+{
+	g = gr;
+	initRenderer(0, shortcuts);
 }
 
 void vis::init(){
-	initRenderer(0);
+	initRenderer(0, 0);
 }
 
-void vis::initRenderer(std::list<openGL_Cluster>* circs)
+void vis::initRenderer(std::list<openGL_Cluster>* circs, std::list<Edge>* shortcuts)
 {
 
 	unsigned int NodeCount = 0;
@@ -68,6 +74,11 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 	NodeCount = g->getNodeCount();
 	EdgeCount = g->getEdgeCount();
 	node_data = g->getNodeDataPointer();
+	if(shortcuts){
+		ShortcutCount = shortcuts->size();
+	} else {
+		ShortcutCount = 0;
+	}
 
 	delete[] nodes; nodes = 0;
 	delete[] edges; edges = 0;
@@ -126,6 +137,22 @@ void vis::initRenderer(std::list<openGL_Cluster>* circs)
 				index++;
 			}
 		}
+	}
+
+	//add shortcuts vom shortcut list
+	s_index = 0;
+	while( shortcuts && !(shortcuts->empty()) ){
+		Edge e = shortcuts->front();
+		shortcuts->pop_front();
+				// shortcut.id ist source knoten
+				shortcut_edges[s_index] = openGL_Node_3d(	merkatorX((float) node_data[ e.id ].lon),
+															merkatorY((float) node_data[ e.id ].lat),
+															COLOUR );
+				s_index++;
+				shortcut_edges[s_index] = openGL_Node_3d(	merkatorX((float) node_data[ e.other_node ].lon),
+															merkatorY((float) node_data[ e.other_node ].lat),
+															COLOUR );
+				s_index++;
 	}
 
 	render.setNodeCount(NodeCount);

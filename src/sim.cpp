@@ -1,7 +1,7 @@
 #include "sim.h"
 
 
-sim::sim(Graph* g, travelers* t, conf* c):
+sim::sim(Graph* g, travelers* t, conf* c, std::list<Edge>* scuts):
 	base_g(g),
 	sim_g(0),
 	trav(t),
@@ -12,7 +12,8 @@ sim::sim(Graph* g, travelers* t, conf* c):
 	loadhistory(),
 	currentweight(g->getEdgeCount(), 0.0),
 	lastweight(g->getEdgeCount(), 0.0),
-	graphtype(-1)
+	graphtype(-1),
+	shortcuts(scuts)
 {
 	// Graphtypen anpassen und
 	// Kanten ihrem Typ nach gewichten
@@ -30,6 +31,7 @@ sim::~sim(){
 	delete d; d = 0;
 	trav = 0;
 	cfg = 0;
+	shortcuts = 0;
 }
 void sim::resetGraph(){
 	base_g->updateEdgeLoads();
@@ -119,6 +121,20 @@ void sim::calcOneRoundCH(){
 
 	// einfärben der kanten im base_g Graph
 	paintEdges();
+
+	// shortcuts nach aussen reichen
+	if(shortcuts){
+	for(unsigned int i = 0; i < sim_g->getNodeCount(); i++){
+		EdgesIterator it = sim_g->getOutEdgesIt(i);
+		while( it.hasNext() ){
+			Edge e = * it.getNext();
+			if( sim_g->isShortcut(e.id) ){
+				e.id = i;
+				shortcuts->push_back(e);
+			}
+		}
+	}
+	}
 
 	// aufräumen der graphen und ch ?
 	delete sim_g; sim_g = 0;
